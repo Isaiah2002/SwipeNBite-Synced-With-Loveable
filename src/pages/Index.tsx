@@ -1,11 +1,196 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useEffect } from 'react';
+import { Restaurant, Filters } from '@/types/restaurant';
+import { restaurants } from '@/data/restaurants';
+import { SwipeCard } from '@/components/SwipeCard';
+import { FilterBar } from '@/components/FilterBar';
+import { LikedRestaurants } from '@/components/LikedRestaurants';
+import { Button } from '@/components/ui/button';
+import { Heart, RotateCcw } from 'lucide-react';
+import { toast } from 'sonner';
 
 const Index = () => {
+  const [currentRestaurants, setCurrentRestaurants] = useState<Restaurant[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [likedRestaurants, setLikedRestaurants] = useState<Restaurant[]>([]);
+  const [showLiked, setShowLiked] = useState(false);
+  const [swipeAnimation, setSwipeAnimation] = useState<'left' | 'right' | null>(null);
+  const [filters, setFilters] = useState<Filters>({
+    maxPrice: '$$$',
+    maxDistance: 5,
+    dietary: [],
+    minRating: 3.5
+  });
+
+  // Filter restaurants based on current filters
+  useEffect(() => {
+    const priceValues: { [key: string]: number } = { '$': 1, '$$': 2, '$$$': 3 };
+    const maxPriceValue = priceValues[filters.maxPrice];
+
+    const filtered = restaurants.filter(restaurant => {
+      const restaurantPriceValue = priceValues[restaurant.price];
+      const matchesPrice = restaurantPriceValue <= maxPriceValue;
+      const matchesDistance = restaurant.distance <= filters.maxDistance;
+      const matchesRating = restaurant.rating >= filters.minRating;
+      const matchesDietary = filters.dietary.length === 0 || 
+        filters.dietary.some(diet => restaurant.dietary.includes(diet));
+      
+      return matchesPrice && matchesDistance && matchesRating && matchesDietary;
+    });
+
+    setCurrentRestaurants(filtered);
+    setCurrentIndex(0);
+  }, [filters]);
+
+  const handleSwipe = (direction: 'left' | 'right') => {
+    const currentRestaurant = currentRestaurants[currentIndex];
+    if (!currentRestaurant) return;
+
+    setSwipeAnimation(direction);
+
+    if (direction === 'right') {
+      setLikedRestaurants(prev => [...prev, currentRestaurant]);
+      toast.success(`Added ${currentRestaurant.name} to your matches! 💚`);
+    } else {
+      toast(`Passed on ${currentRestaurant.name} 👋`);
+    }
+
+    // Move to next restaurant after animation
+    setTimeout(() => {
+      setCurrentIndex(prev => prev + 1);
+      setSwipeAnimation(null);
+    }, 600);
+  };
+
+  const resetCards = () => {
+    setCurrentIndex(0);
+    setSwipeAnimation(null);
+    toast.success('Cards reset! Start swiping again 🔄');
+  };
+
+  const currentRestaurant = currentRestaurants[currentIndex];
+  const hasMoreCards = currentIndex < currentRestaurants.length;
+
+  if (showLiked) {
+    return (
+      <div className="min-h-screen bg-background p-4">
+        <div className="max-w-md mx-auto">
+          <LikedRestaurants 
+            likedRestaurants={likedRestaurants}
+            onClose={() => setShowLiked(false)}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="p-4 pb-2">
+        <div className="max-w-md mx-auto">
+          <FilterBar filters={filters} onFiltersChange={setFilters} />
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-4">
+        <div className="max-w-md mx-auto space-y-6">
+          
+          {/* Cards Stack */}
+          <div className="relative h-[600px] flex items-center justify-center">
+            {!hasMoreCards ? (
+              // No more cards
+              <div className="text-center space-y-6">
+                <div className="text-8xl">🎉</div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold text-card-foreground">
+                    You've seen all restaurants!
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {likedRestaurants.length > 0 
+                      ? `You have ${likedRestaurants.length} matches waiting for you!`
+                      : 'Try adjusting your filters to see more options'
+                    }
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <Button 
+                    onClick={resetCards}
+                    className="gradient-primary text-primary-foreground border-0 w-full"
+                  >
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Start Over
+                  </Button>
+                  {likedRestaurants.length > 0 && (
+                    <Button 
+                      onClick={() => setShowLiked(true)}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      <Heart className="w-4 h-4 mr-2 text-accent fill-current" />
+                      View Matches ({likedRestaurants.length})
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              // Show current card with next card behind it
+              <div className="relative w-full">
+                {/* Next card (behind current) */}
+                {currentRestaurants[currentIndex + 1] && (
+                  <div className="absolute inset-0 transform scale-95 opacity-50">
+                    <SwipeCard 
+                      restaurant={currentRestaurants[currentIndex + 1]}
+                      onSwipe={() => {}}
+                      isActive={false}
+                    />
+                  </div>
+                )}
+                
+                {/* Current card */}
+                <div 
+                  className={`relative transition-all duration-600 ease-out ${
+                    swipeAnimation === 'right' ? 'animate-swipe-right' :
+                    swipeAnimation === 'left' ? 'animate-swipe-left' : ''
+                  }`}
+                >
+                  <SwipeCard 
+                    restaurant={currentRestaurant}
+                    onSwipe={handleSwipe}
+                    isActive={!swipeAnimation}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Stats */}
+          {hasMoreCards && (
+            <div className="flex justify-between items-center text-sm text-muted-foreground bg-card p-4 rounded-2xl border border-border/50">
+              <div className="text-center">
+                <div className="font-bold text-card-foreground text-base">
+                  {currentIndex + 1}
+                </div>
+                <div>of {currentRestaurants.length}</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-card-foreground text-base">
+                  {likedRestaurants.length}
+                </div>
+                <div>matches</div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowLiked(true)}
+                className="flex items-center space-x-2"
+              >
+                <Heart className="w-4 h-4 text-accent fill-current" />
+                <span>Matches</span>
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
