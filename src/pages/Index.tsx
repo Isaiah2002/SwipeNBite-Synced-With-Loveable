@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Heart, RotateCcw, LogOut, User, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import BottomNav from '@/components/BottomNav';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -117,7 +118,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="p-4 pb-2">
         <div className="max-w-md mx-auto space-y-4">
@@ -258,6 +259,7 @@ const Index = () => {
           )}
         </div>
       </div>
+      <BottomNav />
     </div>
   );
 };

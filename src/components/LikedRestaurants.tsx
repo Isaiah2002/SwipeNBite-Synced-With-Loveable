@@ -1,13 +1,14 @@
 import { Restaurant } from '@/types/restaurant';
-import { Heart, MapPin, Star } from 'lucide-react';
+import { Heart, MapPin, Star, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface LikedRestaurantsProps {
   likedRestaurants: Restaurant[];
   onClose: () => void;
+  showCloseButton?: boolean;
 }
 
-export const LikedRestaurants = ({ likedRestaurants, onClose }: LikedRestaurantsProps) => {
+export const LikedRestaurants = ({ likedRestaurants, onClose, showCloseButton = true }: LikedRestaurantsProps) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -15,9 +16,12 @@ export const LikedRestaurants = ({ likedRestaurants, onClose }: LikedRestaurants
           <Heart className="w-5 h-5 text-accent fill-current" />
           <h2 className="text-xl font-bold text-card-foreground">Your Matches</h2>
         </div>
-        <Button variant="outline" onClick={onClose} size="sm">
-          Back to Swiping
-        </Button>
+        {showCloseButton && (
+          <Button variant="outline" onClick={onClose} size="sm">
+            <X className="w-4 h-4 mr-2" />
+            Back to Swiping
+          </Button>
+        )}
       </div>
 
       {likedRestaurants.length === 0 ? (
