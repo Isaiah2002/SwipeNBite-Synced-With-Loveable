@@ -36,7 +36,7 @@ const Index = () => {
   const [showLocationPrompt, setShowLocationPrompt] = useState(false);
   const [filters, setFilters] = useState<Filters>({
     maxPrice: '$$$',
-    maxDistance: 5,
+    maxDistance: 25, // Increased from 5 to 25 miles for better coverage
     dietary: [],
     minRating: 3.5
   });
@@ -53,6 +53,7 @@ const Index = () => {
           { latitude: location.latitude, longitude: location.longitude },
           { latitude: restaurant.latitude, longitude: restaurant.longitude }
         );
+        console.log(`Distance to ${restaurant.name}: ${actualDistance} miles (max allowed: ${filters.maxDistance})`);
         return { ...restaurant, distance: actualDistance };
       }
       return restaurant;
@@ -63,6 +64,9 @@ const Index = () => {
       restaurantsWithDistance = restaurantsWithDistance.sort((a, b) => a.distance - b.distance);
     }
 
+    console.log(`User location: ${location?.latitude}, ${location?.longitude}`);
+    console.log(`Current filters - maxDistance: ${filters.maxDistance}, minRating: ${filters.minRating}, maxPrice: ${filters.maxPrice}`);
+    
     const filtered = restaurantsWithDistance.filter(restaurant => {
       const restaurantPriceValue = priceValues[restaurant.price];
       const matchesPrice = restaurantPriceValue <= maxPriceValue;
@@ -74,8 +78,14 @@ const Index = () => {
         restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         restaurant.cuisine.toLowerCase().includes(searchTerm.toLowerCase());
       
+      if (!matchesDistance) {
+        console.log(`${restaurant.name} filtered out by distance: ${restaurant.distance} > ${filters.maxDistance}`);
+      }
+      
       return matchesPrice && matchesDistance && matchesRating && matchesDietary && matchesSearch;
     });
+
+    console.log(`Filtered restaurants count: ${filtered.length}`);
 
     setCurrentRestaurants(filtered);
     setCurrentIndex(0);
@@ -254,7 +264,9 @@ const Index = () => {
                   <p className="text-muted-foreground">
                     {likedRestaurants.length > 0 
                       ? `You have ${likedRestaurants.length} matches waiting for you!`
-                      : 'Try adjusting your filters to see more options'
+                      : location 
+                        ? 'No restaurants found within your distance filter. Try increasing the distance or adjusting other filters.'
+                        : 'Try adjusting your filters to see more options'
                     }
                   </p>
                 </div>
