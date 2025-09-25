@@ -16,28 +16,55 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          address: string | null
+          city: string | null
           created_at: string
+          dietary_restrictions: string[] | null
+          favorite_cuisines: string[] | null
+          food_preferences: string[] | null
           full_name: string | null
           id: string
+          max_distance_preference: number | null
           phone_number: string | null
+          price_preference: string | null
+          state: string | null
           updated_at: string
           user_id: string
+          zip_code: string | null
         }
         Insert: {
+          address?: string | null
+          city?: string | null
           created_at?: string
+          dietary_restrictions?: string[] | null
+          favorite_cuisines?: string[] | null
+          food_preferences?: string[] | null
           full_name?: string | null
           id?: string
+          max_distance_preference?: number | null
           phone_number?: string | null
+          price_preference?: string | null
+          state?: string | null
           updated_at?: string
           user_id: string
+          zip_code?: string | null
         }
         Update: {
+          address?: string | null
+          city?: string | null
           created_at?: string
+          dietary_restrictions?: string[] | null
+          favorite_cuisines?: string[] | null
+          food_preferences?: string[] | null
           full_name?: string | null
           id?: string
+          max_distance_preference?: number | null
           phone_number?: string | null
+          price_preference?: string | null
+          state?: string | null
           updated_at?: string
           user_id?: string
+          zip_code?: string | null
         }
         Relationships: []
       }

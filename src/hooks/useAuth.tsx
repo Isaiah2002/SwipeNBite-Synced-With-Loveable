@@ -8,7 +8,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, fullName: string, phoneNumber: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, phoneNumber: string, profileData?: any) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
 }
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
-  const signUp = useCallback(async (email: string, password: string, fullName: string, phoneNumber: string) => {
+  const signUp = useCallback(async (email: string, password: string, fullName: string, phoneNumber: string, profileData?: any) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
@@ -78,6 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           data: {
             full_name: fullName,
             phone_number: phoneNumber,
+            ...profileData
           }
         }
       });

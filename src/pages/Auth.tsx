@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Mail, Lock, User, Phone } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ArrowLeft, Mail, Lock, User, Phone, MapPin } from 'lucide-react';
 
 type AuthMode = 'login' | 'signup' | 'reset';
 
@@ -21,6 +23,16 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  
+  // Enhanced signup fields
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [zipCode, setZipCode] = useState('');
+  const [pricePreference, setPricePreference] = useState<'$' | '$$' | '$$$'>('$$');
+  const [maxDistancePreference, setMaxDistancePreference] = useState(10);
+  const [favoriteCuisines, setFavoriteCuisines] = useState<string[]>([]);
+  const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
 
   // Redirect authenticated users
   useEffect(() => {
@@ -45,7 +57,17 @@ const Auth = () => {
       if (mode === 'login') {
         await signIn(email, password);
       } else if (mode === 'signup') {
-        await signUp(email, password, fullName, phoneNumber);
+        const profileData = {
+          address,
+          city,
+          state,
+          zipCode,
+          pricePreference,
+          maxDistancePreference,
+          favoriteCuisines,
+          dietaryRestrictions
+        };
+        await signUp(email, password, fullName, phoneNumber, profileData);
       } else if (mode === 'reset') {
         await resetPassword(email);
       }
@@ -59,6 +81,14 @@ const Auth = () => {
     setPassword('');
     setFullName('');
     setPhoneNumber('');
+    setAddress('');
+    setCity('');
+    setState('');
+    setZipCode('');
+    setPricePreference('$$');
+    setMaxDistancePreference(10);
+    setFavoriteCuisines([]);
+    setDietaryRestrictions([]);
   };
 
   const switchMode = (newMode: AuthMode) => {
@@ -151,6 +181,147 @@ const Auth = () => {
                     />
                   </div>
                 </div>
+              )}
+
+              {/* Address Fields - Signup only */}
+              {mode === 'signup' && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="address">Street Address</Label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="address"
+                        type="text"
+                        placeholder="123 Main St"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="city">City</Label>
+                      <Input
+                        id="city"
+                        type="text"
+                        placeholder="New York"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="zipCode">ZIP Code</Label>
+                      <Input
+                        id="zipCode"
+                        type="text"
+                        placeholder="10001"
+                        value={zipCode}
+                        onChange={(e) => setZipCode(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="state">State</Label>
+                    <Select value={state} onValueChange={setState} required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your state" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="NY">New York</SelectItem>
+                        <SelectItem value="CA">California</SelectItem>
+                        <SelectItem value="TX">Texas</SelectItem>
+                        <SelectItem value="FL">Florida</SelectItem>
+                        <SelectItem value="IL">Illinois</SelectItem>
+                        <SelectItem value="PA">Pennsylvania</SelectItem>
+                        <SelectItem value="OH">Ohio</SelectItem>
+                        <SelectItem value="GA">Georgia</SelectItem>
+                        <SelectItem value="NC">North Carolina</SelectItem>
+                        <SelectItem value="MI">Michigan</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="pricePreference">Price Preference</Label>
+                    <Select value={pricePreference} onValueChange={(value: '$' | '$$' | '$$$') => setPricePreference(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="$">$ - Budget Friendly</SelectItem>
+                        <SelectItem value="$$">$$ - Moderate</SelectItem>
+                        <SelectItem value="$$$">$$$ - Premium</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="maxDistance">Maximum Distance (miles)</Label>
+                    <Select value={maxDistancePreference.toString()} onValueChange={(value) => setMaxDistancePreference(parseInt(value))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="5">5 miles</SelectItem>
+                        <SelectItem value="10">10 miles</SelectItem>
+                        <SelectItem value="15">15 miles</SelectItem>
+                        <SelectItem value="25">25 miles</SelectItem>
+                        <SelectItem value="50">50 miles</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label>Favorite Cuisines (select all that apply)</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['Italian', 'Mexican', 'Asian', 'American', 'Indian', 'Thai', 'Mediterranean', 'Japanese'].map((cuisine) => (
+                        <div key={cuisine} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={cuisine}
+                            checked={favoriteCuisines.includes(cuisine)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setFavoriteCuisines([...favoriteCuisines, cuisine]);
+                              } else {
+                                setFavoriteCuisines(favoriteCuisines.filter(c => c !== cuisine));
+                              }
+                            }}
+                          />
+                          <Label htmlFor={cuisine} className="text-sm">{cuisine}</Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label>Dietary Restrictions (optional)</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free', 'Keto', 'Halal', 'Kosher'].map((restriction) => (
+                        <div key={restriction} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={restriction}
+                            checked={dietaryRestrictions.includes(restriction)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setDietaryRestrictions([...dietaryRestrictions, restriction]);
+                              } else {
+                                setDietaryRestrictions(dietaryRestrictions.filter(r => r !== restriction));
+                              }
+                            }}
+                          />
+                          <Label htmlFor={restriction} className="text-sm">{restriction}</Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
               )}
 
               {/* Password - Not for reset */}
