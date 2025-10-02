@@ -1,27 +1,61 @@
+import { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { LikedRestaurants } from '@/components/LikedRestaurants';
+import { FriendsPicksTab } from '@/components/FriendsPicksTab';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BottomNav from '@/components/BottomNav';
-
-// Mock data for now - in a real app this would come from state management or API
-const mockLikedRestaurants = [
-  {
-    id: '1',
-    name: 'Mama Mia\'s Pizza',
-    cuisine: 'Italian',
-    rating: 4.8,
-    price: '$$' as const,
-    distance: 0.3,
-    image: '/src/assets/pizza.jpg',
-    description: 'Authentic Italian pizza with fresh ingredients',
-    dietary: ['vegetarian'],
-    estimatedTime: 25
-  }
-];
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Favorites = () => {
   const navigate = useNavigate();
+  const [likedRestaurants, setLikedRestaurants] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchLikedRestaurants();
+  }, []);
+
+  const fetchLikedRestaurants = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('liked_restaurants')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Transform to Restaurant type
+      const transformedData = data?.map(item => ({
+        id: item.restaurant_id,
+        name: item.restaurant_name,
+        cuisine: item.cuisine,
+        rating: item.rating,
+        price: item.price as '$' | '$$' | '$$$',
+        distance: item.distance,
+        image: item.image,
+        description: item.description,
+        dietary: item.dietary,
+        estimatedTime: item.estimated_time,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        deals: item.deals
+      })) || [];
+
+      setLikedRestaurants(transformedData);
+    } catch (error: any) {
+      console.error('Error fetching liked restaurants:', error);
+      toast.error('Failed to load favorites');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -41,11 +75,31 @@ const Favorites = () => {
           </div>
 
           {/* Content */}
-          <LikedRestaurants 
-            likedRestaurants={mockLikedRestaurants}
-            onClose={() => navigate('/')}
-            showCloseButton={false}
-          />
+          <Tabs defaultValue="my-favorites" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="my-favorites">My Favorites</TabsTrigger>
+              <TabsTrigger value="friends-picks">Friends' Picks</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="my-favorites">
+              {loading ? (
+                <div className="text-center py-12">
+                  <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+                  <p className="text-muted-foreground">Loading favorites...</p>
+                </div>
+              ) : (
+                <LikedRestaurants 
+                  likedRestaurants={likedRestaurants}
+                  onClose={() => navigate('/')}
+                  showCloseButton={false}
+                />
+              )}
+            </TabsContent>
+            
+            <TabsContent value="friends-picks">
+              <FriendsPicksTab />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
       <BottomNav />

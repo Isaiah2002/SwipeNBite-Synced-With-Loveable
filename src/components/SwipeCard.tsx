@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { Restaurant } from '@/types/restaurant';
-import { Heart, X, Clock, MapPin, Star } from 'lucide-react';
+import { Heart, X, Clock, MapPin, Star, Share2 } from 'lucide-react';
 
 interface SwipeCardProps {
   restaurant: Restaurant;
   onSwipe: (direction: 'left' | 'right') => void;
   onFavorite?: (restaurant: Restaurant) => void;
+  onShare?: (restaurant: Restaurant) => void;
   isFavorited?: boolean;
   isActive?: boolean;
 }
 
-export const SwipeCard = ({ restaurant, onSwipe, onFavorite, isFavorited = false, isActive = true }: SwipeCardProps) => {
+export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorited = false, isActive = true }: SwipeCardProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
 
@@ -130,13 +131,24 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, isFavorited = false
 
       {/* Action Buttons */}
       {isActive && (
-        <div className="flex justify-center items-center space-x-8 mt-8">
+        <div className="flex justify-center items-center space-x-6 mt-8">
           <button
             onClick={() => handleButtonClick('left')}
             className="pass-button group hover:scale-110"
           >
             <X className="w-6 h-6" />
           </button>
+          {onShare && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onShare(restaurant);
+              }}
+              className="action-button bg-gradient-primary text-primary-foreground group hover:scale-110"
+            >
+              <Share2 className="w-5 h-5" />
+            </button>
+          )}
           <button
             onClick={() => handleButtonClick('right')}
             className="like-button group hover:scale-110"

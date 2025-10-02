@@ -9,11 +9,13 @@ import { SwipeCard } from '@/components/SwipeCard';
 import { FilterBar } from '@/components/FilterBar';
 import { LikedRestaurants } from '@/components/LikedRestaurants';
 import { LocationPrompt } from '@/components/LocationPrompt';
+import { ShareDialog } from '@/components/ShareDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Heart, RotateCcw, LogOut, User, Search, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import BottomNav from '@/components/BottomNav';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -34,9 +36,11 @@ const Index = () => {
   const [swipeAnimation, setSwipeAnimation] = useState<'left' | 'right' | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showLocationPrompt, setShowLocationPrompt] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [restaurantToShare, setRestaurantToShare] = useState<Restaurant | null>(null);
   const [filters, setFilters] = useState<Filters>({
     maxPrice: '$$$',
-    maxDistance: 25, // Increased from 5 to 25 miles for better coverage
+    maxDistance: 25,
     dietary: [],
     minRating: 3.5
   });
@@ -91,7 +95,7 @@ const Index = () => {
     setCurrentIndex(0);
   }, [filters, searchTerm, location]);
 
-  const handleSwipe = (direction: 'left' | 'right') => {
+  const handleSwipe = async (direction: 'left' | 'right') => {
     const currentRestaurant = currentRestaurants[currentIndex];
     if (!currentRestaurant) return;
 
@@ -99,6 +103,32 @@ const Index = () => {
 
     if (direction === 'right') {
       setLikedRestaurants(prev => [...prev, currentRestaurant]);
+      
+      // Save to database
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.from('liked_restaurants').insert({
+            user_id: user.id,
+            restaurant_id: currentRestaurant.id,
+            restaurant_name: currentRestaurant.name,
+            cuisine: currentRestaurant.cuisine,
+            price: currentRestaurant.price,
+            rating: currentRestaurant.rating,
+            distance: currentRestaurant.distance,
+            image: currentRestaurant.image,
+            description: currentRestaurant.description,
+            dietary: currentRestaurant.dietary,
+            estimated_time: currentRestaurant.estimatedTime,
+            latitude: currentRestaurant.latitude,
+            longitude: currentRestaurant.longitude,
+            deals: currentRestaurant.deals
+          });
+        }
+      } catch (error: any) {
+        console.error('Error saving liked restaurant:', error);
+      }
+      
       toast.success(`Added ${currentRestaurant.name} to your matches! 💚`);
     } else {
       toast(`Passed on ${currentRestaurant.name} 👋`);
@@ -127,6 +157,11 @@ const Index = () => {
     setCurrentIndex(0);
     setSwipeAnimation(null);
     toast.success('Cards reset! Start swiping again 🔄');
+  };
+
+  const handleShare = (restaurant: Restaurant) => {
+    setRestaurantToShare(restaurant);
+    setShareDialogOpen(true);
   };
 
   const handleLocationRequest = () => {
@@ -296,13 +331,14 @@ const Index = () => {
                 {/* Next card (behind current) */}
                 {currentRestaurants[currentIndex + 1] && (
                   <div className="absolute inset-0 transform scale-95 opacity-50">
-                    <SwipeCard 
-                      restaurant={currentRestaurants[currentIndex + 1]}
-                      onSwipe={() => {}}
-                      onFavorite={handleFavorite}
-                      isFavorited={favoriteRestaurants.some(fav => fav.id === currentRestaurants[currentIndex + 1]?.id)}
-                      isActive={false}
-                    />
+                  <SwipeCard 
+                    restaurant={currentRestaurants[currentIndex + 1]}
+                    onSwipe={() => {}}
+                    onFavorite={handleFavorite}
+                    onShare={handleShare}
+                    isFavorited={favoriteRestaurants.some(fav => fav.id === currentRestaurants[currentIndex + 1]?.id)}
+                    isActive={false}
+                  />
                   </div>
                 )}
                 
@@ -313,13 +349,14 @@ const Index = () => {
                     swipeAnimation === 'left' ? 'animate-swipe-left' : ''
                   }`}
                 >
-                  <SwipeCard 
-                    restaurant={currentRestaurant}
-                    onSwipe={handleSwipe}
-                    onFavorite={handleFavorite}
-                    isFavorited={favoriteRestaurants.some(fav => fav.id === currentRestaurant.id)}
-                    isActive={!swipeAnimation}
-                  />
+                <SwipeCard 
+                  restaurant={currentRestaurant}
+                  onSwipe={handleSwipe}
+                  onFavorite={handleFavorite}
+                  onShare={handleShare}
+                  isFavorited={favoriteRestaurants.some(fav => fav.id === currentRestaurant.id)}
+                  isActive={!swipeAnimation}
+                />
                 </div>
               </div>
             )}
@@ -354,6 +391,15 @@ const Index = () => {
         </div>
       </div>
       <BottomNav />
+      
+      {/* Share Dialog */}
+      {restaurantToShare && (
+        <ShareDialog 
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+          restaurant={restaurantToShare}
+        />
+      )}
     </div>
   );
 };

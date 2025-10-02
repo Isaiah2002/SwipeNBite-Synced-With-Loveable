@@ -14,6 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
+      friendships: {
+        Row: {
+          created_at: string
+          friend_id: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          friend_id: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          friend_id?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      liked_restaurants: {
+        Row: {
+          created_at: string
+          cuisine: string
+          deals: string | null
+          description: string
+          dietary: string[]
+          distance: number
+          estimated_time: number
+          id: string
+          image: string
+          latitude: number | null
+          longitude: number | null
+          price: string
+          rating: number
+          restaurant_id: string
+          restaurant_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          cuisine: string
+          deals?: string | null
+          description: string
+          dietary?: string[]
+          distance: number
+          estimated_time: number
+          id?: string
+          image: string
+          latitude?: number | null
+          longitude?: number | null
+          price: string
+          rating: number
+          restaurant_id: string
+          restaurant_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          cuisine?: string
+          deals?: string | null
+          description?: string
+          dietary?: string[]
+          distance?: number
+          estimated_time?: number
+          id?: string
+          image?: string
+          latitude?: number | null
+          longitude?: number | null
+          price?: string
+          rating?: number
+          restaurant_id?: string
+          restaurant_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
@@ -65,6 +149,72 @@ export type Database = {
           updated_at?: string
           user_id?: string
           zip_code?: string | null
+        }
+        Relationships: []
+      }
+      shared_restaurants: {
+        Row: {
+          created_at: string
+          cuisine: string
+          deals: string | null
+          description: string
+          dietary: string[]
+          distance: number
+          estimated_time: number
+          id: string
+          image: string
+          latitude: number | null
+          longitude: number | null
+          message: string | null
+          price: string
+          rating: number
+          recipient_id: string
+          restaurant_id: string
+          restaurant_name: string
+          sender_id: string
+          viewed: boolean
+        }
+        Insert: {
+          created_at?: string
+          cuisine: string
+          deals?: string | null
+          description: string
+          dietary?: string[]
+          distance: number
+          estimated_time: number
+          id?: string
+          image: string
+          latitude?: number | null
+          longitude?: number | null
+          message?: string | null
+          price: string
+          rating: number
+          recipient_id: string
+          restaurant_id: string
+          restaurant_name: string
+          sender_id: string
+          viewed?: boolean
+        }
+        Update: {
+          created_at?: string
+          cuisine?: string
+          deals?: string | null
+          description?: string
+          dietary?: string[]
+          distance?: number
+          estimated_time?: number
+          id?: string
+          image?: string
+          latitude?: number | null
+          longitude?: number | null
+          message?: string | null
+          price?: string
+          rating?: number
+          recipient_id?: string
+          restaurant_id?: string
+          restaurant_name?: string
+          sender_id?: string
+          viewed?: boolean
         }
         Relationships: []
       }
