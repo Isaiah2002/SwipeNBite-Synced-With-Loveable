@@ -22,127 +22,45 @@ export const useLocation = () => {
     setError(null);
 
     try {
-      // First try browser geolocation as fallback
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            try {
-              // Use Google Geolocation API for enhanced accuracy
-              const response = await fetch(`https://www.googleapis.com/geolocation/v1/geolocate?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  considerIp: true,
-                  wifiAccessPoints: [],
-                  cellTowers: []
-                })
-              });
+      if (!navigator.geolocation) {
+        setError({ code: 0, message: 'Location services are not available in your browser.' });
+        setLoading(false);
+        return;
+      }
 
-              if (response.ok) {
-                const data = await response.json();
-                setLocation({
-                  latitude: data.location.lat,
-                  longitude: data.location.lng,
-                  accuracy: data.accuracy || position.coords.accuracy,
-                });
-              } else {
-                // Fallback to browser geolocation
-                setLocation({
-                  latitude: position.coords.latitude,
-                  longitude: position.coords.longitude,
-                  accuracy: position.coords.accuracy,
-                });
-              }
-              setPermissionStatus('granted');
-              setLoading(false);
-            } catch (apiError) {
-              // Fallback to browser geolocation
-              setLocation({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                accuracy: position.coords.accuracy,
-              });
-              setPermissionStatus('granted');
-              setLoading(false);
-            }
-          },
-          async (error) => {
-            // If browser geolocation fails, try Google API without coordinates
-            try {
-              const response = await fetch(`https://www.googleapis.com/geolocation/v1/geolocate?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  considerIp: true,
-                })
-              });
-
-              if (response.ok) {
-                const data = await response.json();
-                setLocation({
-                  latitude: data.location.lat,
-                  longitude: data.location.lng,
-                  accuracy: data.accuracy || 1000,
-                });
-                setPermissionStatus('granted');
-                setLoading(false);
-                return;
-              }
-            } catch (apiError) {
-              // Both methods failed
-            }
-
-            let message = 'Unable to get your location.';
-            switch (error.code) {
-              case error.PERMISSION_DENIED:
-                message = 'Location access denied. Please enable location services.';
-                setPermissionStatus('denied');
-                break;
-              case error.POSITION_UNAVAILABLE:
-                message = 'Location information is unavailable.';
-                break;
-              case error.TIMEOUT:
-                message = 'Location request timed out.';
-                break;
-            }
-            setError({ code: error.code, message });
-            setLoading(false);
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 300000, // 5 minutes
-          }
-        );
-      } else {
-        // No geolocation support, try Google API with IP-based location
-        const response = await fetch(`https://www.googleapis.com/geolocation/v1/geolocate?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            considerIp: true,
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
           setLocation({
-            latitude: data.location.lat,
-            longitude: data.location.lng,
-            accuracy: data.accuracy || 1000,
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
           });
           setPermissionStatus('granted');
-        } else {
-          setError({ code: 0, message: 'Location services are not available.' });
+          setLoading(false);
+        },
+        (error) => {
+          let message = 'Unable to get your location.';
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              message = 'Location access denied. Please enable location services in your browser settings.';
+              setPermissionStatus('denied');
+              break;
+            case error.POSITION_UNAVAILABLE:
+              message = 'Location information is unavailable.';
+              break;
+            case error.TIMEOUT:
+              message = 'Location request timed out. Please try again.';
+              break;
+          }
+          setError({ code: error.code, message });
+          setLoading(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000, // 5 minutes
         }
-        setLoading(false);
-      }
+      );
     } catch (error) {
       setError({ code: 0, message: 'Failed to get location. Please try again.' });
       setLoading(false);

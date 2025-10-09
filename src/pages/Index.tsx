@@ -38,6 +38,7 @@ const Index = () => {
   const [showLocationPrompt, setShowLocationPrompt] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [restaurantToShare, setRestaurantToShare] = useState<Restaurant | null>(null);
+  const [fetchingRestaurants, setFetchingRestaurants] = useState(false);
   const [filters, setFilters] = useState<Filters>({
     maxPrice: '$$$',
     maxDistance: 25,
@@ -45,36 +46,64 @@ const Index = () => {
     minRating: 3.5
   });
 
+  // Fetch restaurants from Yelp when location is available
+  useEffect(() => {
+    const fetchNearbyRestaurants = async () => {
+      if (!location) {
+        // Use static data when no location
+        setCurrentRestaurants(restaurants);
+        return;
+      }
+
+      setFetchingRestaurants(true);
+      try {
+        const radiusInMeters = Math.round(filters.maxDistance * 1609.34); // Convert miles to meters
+        
+        const { data, error } = await supabase.functions.invoke('nearby-restaurants', {
+          body: {
+            latitude: location.latitude,
+            longitude: location.longitude,
+            radius: radiusInMeters,
+            limit: 50
+          }
+        });
+
+        if (error) {
+          console.error('Error fetching restaurants:', error);
+          toast.error('Failed to fetch nearby restaurants. Using default list.');
+          setCurrentRestaurants(restaurants);
+        } else if (data?.restaurants) {
+          console.log(`Fetched ${data.restaurants.length} restaurants from Yelp`);
+          setCurrentRestaurants(data.restaurants);
+        } else {
+          console.log('No restaurants found nearby, using default list');
+          setCurrentRestaurants(restaurants);
+        }
+      } catch (err) {
+        console.error('Error fetching restaurants:', err);
+        toast.error('Failed to fetch nearby restaurants. Using default list.');
+        setCurrentRestaurants(restaurants);
+      } finally {
+        setFetchingRestaurants(false);
+      }
+    };
+
+    fetchNearbyRestaurants();
+  }, [location, filters.maxDistance]);
+
   // Filter restaurants based on current filters and search
   useEffect(() => {
+    if (currentRestaurants.length === 0) return;
+
     const priceValues: { [key: string]: number } = { '$': 1, '$$': 2, '$$$': 3 };
     const maxPriceValue = priceValues[filters.maxPrice];
-
-    let restaurantsWithDistance = restaurants.map(restaurant => {
-      // Calculate actual distance if location is available
-      if (location && restaurant.latitude && restaurant.longitude) {
-        const actualDistance = calculateDistance(
-          { latitude: location.latitude, longitude: location.longitude },
-          { latitude: restaurant.latitude, longitude: restaurant.longitude }
-        );
-        console.log(`Distance to ${restaurant.name}: ${actualDistance} miles (max allowed: ${filters.maxDistance})`);
-        return { ...restaurant, distance: actualDistance };
-      }
-      return restaurant;
-    });
-
-    // Sort by distance if location is available
-    if (location) {
-      restaurantsWithDistance = restaurantsWithDistance.sort((a, b) => a.distance - b.distance);
-    }
 
     console.log(`User location: ${location?.latitude}, ${location?.longitude}`);
     console.log(`Current filters - maxDistance: ${filters.maxDistance}, minRating: ${filters.minRating}, maxPrice: ${filters.maxPrice}`);
     
-    const filtered = restaurantsWithDistance.filter(restaurant => {
+    const filtered = currentRestaurants.filter(restaurant => {
       const restaurantPriceValue = priceValues[restaurant.price];
       const matchesPrice = restaurantPriceValue <= maxPriceValue;
-      const matchesDistance = restaurant.distance <= filters.maxDistance;
       const matchesRating = restaurant.rating >= filters.minRating;
       const matchesDietary = filters.dietary.length === 0 || 
         filters.dietary.some(diet => restaurant.dietary.includes(diet));
@@ -82,18 +111,14 @@ const Index = () => {
         restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         restaurant.cuisine.toLowerCase().includes(searchTerm.toLowerCase());
       
-      if (!matchesDistance) {
-        console.log(`${restaurant.name} filtered out by distance: ${restaurant.distance} > ${filters.maxDistance}`);
-      }
-      
-      return matchesPrice && matchesDistance && matchesRating && matchesDietary && matchesSearch;
+      return matchesPrice && matchesRating && matchesDietary && matchesSearch;
     });
 
     console.log(`Filtered restaurants count: ${filtered.length}`);
 
     setCurrentRestaurants(filtered);
     setCurrentIndex(0);
-  }, [filters, searchTerm, location]);
+  }, [filters.maxPrice, filters.minRating, filters.dietary, searchTerm]);
 
   const handleSwipe = async (direction: 'left' | 'right') => {
     const currentRestaurant = currentRestaurants[currentIndex];
@@ -172,13 +197,15 @@ const Index = () => {
   const currentRestaurant = currentRestaurants[currentIndex];
   const hasMoreCards = currentIndex < currentRestaurants.length;
 
-  // Show loading state while checking auth
-  if (loading) {
+  // Show loading state while checking auth or fetching restaurants
+  if (loading || fetchingRestaurants) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
-          <p className="text-muted-foreground">Loading SwipEats...</p>
+          <p className="text-muted-foreground">
+            {fetchingRestaurants ? 'Finding restaurants near you...' : 'Loading SwipEats...'}
+          </p>
         </div>
       </div>
     );

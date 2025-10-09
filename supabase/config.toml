@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.opentable-reservation]
 verify_jwt = false
+
+[functions.nearby-restaurants]
+verify_jwt = false
