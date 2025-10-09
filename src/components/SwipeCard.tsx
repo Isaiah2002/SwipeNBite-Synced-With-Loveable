@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { Restaurant } from '@/types/restaurant';
-import { Heart, X, Clock, MapPin, Star, Share2 } from 'lucide-react';
+import { Heart, X, Clock, MapPin, Star, Share2, ExternalLink, Info } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { RestaurantDetails } from '@/components/RestaurantDetails';
+import { useRestaurantData } from '@/hooks/useRestaurantData';
+import { Button } from '@/components/ui/button';
 
 interface SwipeCardProps {
   restaurant: Restaurant;
@@ -14,6 +18,8 @@ interface SwipeCardProps {
 export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorited = false, isActive = true }: SwipeCardProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const { enrichedRestaurant, loading: dataLoading } = useRestaurantData(restaurant);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!isActive) return;
@@ -126,6 +132,49 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
               ))}
             </div>
           )}
+
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="flex-1"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Info className="w-4 h-4 mr-2" />
+                  More Info
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl">{restaurant.name}</DialogTitle>
+                </DialogHeader>
+                {dataLoading ? (
+                  <div className="py-12 text-center">
+                    <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-muted-foreground">Loading details...</p>
+                  </div>
+                ) : (
+                  <RestaurantDetails restaurant={enrichedRestaurant} />
+                )}
+              </DialogContent>
+            </Dialog>
+
+            {enrichedRestaurant.mapsUrl && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(enrichedRestaurant.mapsUrl, '_blank');
+                }}
+              >
+                <MapPin className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
