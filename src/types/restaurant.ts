@@ -1,3 +1,12 @@
+export interface MenuItem {
+  id: string;
+  name: string;
+  description?: string;
+  price?: number;
+  category: string;
+  image?: string;
+}
+
 export interface Restaurant {
   id: string;
   name: string;
@@ -12,6 +21,7 @@ export interface Restaurant {
   estimatedTime: number; // minutes
   latitude?: number;
   longitude?: number;
+  menu?: MenuItem[];
   // Google Maps data
   placeId?: string;
   mapsUrl?: string;

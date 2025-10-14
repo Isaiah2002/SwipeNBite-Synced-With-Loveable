@@ -4,14 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { restaurants } from '@/data/restaurants';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-
-interface MenuItem {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-}
+import { MenuItem } from '@/types/restaurant';
 
 const RestaurantOrder = () => {
   const navigate = useNavigate();
@@ -34,8 +27,8 @@ const RestaurantOrder = () => {
     );
   }
 
-  // Mock menu items - in a real app, this would come from an API
-  const menuItems: MenuItem[] = [
+  // Use restaurant menu if available, otherwise show fallback
+  const menuItems: MenuItem[] = restaurant.menu || [
     {
       id: '1',
       name: 'Signature Special',
@@ -158,45 +151,58 @@ const RestaurantOrder = () => {
           
           <div className="space-y-4">
             {menuItems.map((item) => (
-              <div key={item.id} className="swipe-card p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-card-foreground">{item.name}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
-                    <p className="text-lg font-bold text-card-foreground mt-2">
-                      ${item.price.toFixed(2)}
-                    </p>
+              <div key={item.id} className="swipe-card p-0 overflow-hidden">
+                {item.image && (
+                  <img 
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-48 object-cover"
+                  />
+                )}
+                <div className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-card-foreground">{item.name}</h3>
+                      {item.description && (
+                        <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
+                      )}
+                      {item.price && (
+                        <p className="text-lg font-bold text-card-foreground mt-2">
+                          ${item.price.toFixed(2)}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-                
-                <div className="flex items-center justify-between mt-3">
-                  <span className="text-xs text-muted-foreground uppercase tracking-wide">
-                    {item.category}
-                  </span>
                   
-                  <div className="flex items-center space-x-2">
-                    {cart[item.id] > 0 && (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => removeFromCart(item.id)}
-                          className="w-8 h-8 p-0"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </Button>
-                        <span className="w-8 text-center text-sm font-medium">
-                          {cart[item.id]}
-                        </span>
-                      </>
-                    )}
-                    <Button
-                      size="sm"
-                      onClick={() => addToCart(item.id)}
-                      className="gradient-primary text-primary-foreground border-0 w-8 h-8 p-0"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </Button>
+                  <div className="flex items-center justify-between mt-3">
+                    <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                      {item.category}
+                    </span>
+                    
+                    <div className="flex items-center space-x-2">
+                      {cart[item.id] > 0 && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeFromCart(item.id)}
+                            className="w-8 h-8 p-0"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </Button>
+                          <span className="w-8 text-center text-sm font-medium">
+                            {cart[item.id]}
+                          </span>
+                        </>
+                      )}
+                      <Button
+                        size="sm"
+                        onClick={() => addToCart(item.id)}
+                        className="gradient-primary text-primary-foreground border-0 w-8 h-8 p-0"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>

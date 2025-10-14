@@ -5,6 +5,12 @@ import pizzaImage from '@/assets/pizza.jpg';
 import saladImage from '@/assets/salad.jpg';
 import dinerImage from '@/assets/diner.jpg';
 import indianImage from '@/assets/indian.jpg';
+import halfSmokeOriginal from '@/assets/menu/half-smoke-original.jpg';
+import turkeyDog from '@/assets/menu/turkey-dog.jpg';
+import halfSmokeSpicy from '@/assets/menu/half-smoke-spicy.jpg';
+import juniorDog from '@/assets/menu/junior-dog.jpg';
+import beefDog from '@/assets/menu/beef-dog.jpg';
+import veggieDog from '@/assets/menu/veggie-dog.jpg';
 
 export const restaurants: Restaurant[] = [
   {
@@ -20,7 +26,51 @@ export const restaurants: Restaurant[] = [
     deals: 'Student discount with Howard ID',
     estimatedTime: 12,
     latitude: 38.9170,
-    longitude: -77.0281
+    longitude: -77.0281,
+    menu: [
+      {
+        id: 'hs-original',
+        name: 'Original Half Smoke',
+        category: 'Signature',
+        image: halfSmokeOriginal,
+        description: 'Our famous original half smoke with chili'
+      },
+      {
+        id: 'turkey-dog',
+        name: 'Jumbo Turkey Dog',
+        category: 'Hot Dogs',
+        image: turkeyDog,
+        description: 'Jumbo turkey hot dog'
+      },
+      {
+        id: 'hs-spicy',
+        name: 'Spicy Chili Half Smoke',
+        category: 'Signature',
+        image: halfSmokeSpicy,
+        description: 'Half smoke with our spicy chili'
+      },
+      {
+        id: 'junior-dog',
+        name: 'Junior Dog',
+        category: 'Hot Dogs',
+        image: juniorDog,
+        description: 'Perfect size hot dog for lighter appetites'
+      },
+      {
+        id: 'beef-dog',
+        name: 'Jumbo Beef Dog',
+        category: 'Hot Dogs',
+        image: beefDog,
+        description: 'All-beef jumbo hot dog'
+      },
+      {
+        id: 'veggie-dog',
+        name: 'Veggie Dog',
+        category: 'Vegetarian',
+        image: veggieDog,
+        description: 'Vegetarian hot dog option'
+      }
+    ]
   },
   {
     id: '2',
