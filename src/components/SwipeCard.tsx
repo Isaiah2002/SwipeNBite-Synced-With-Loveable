@@ -19,10 +19,63 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isImageSwiping, setIsImageSwiping] = useState(false);
   const { enrichedRestaurant, loading: dataLoading } = useRestaurantData(restaurant);
 
+  // Get all available images (menu items with images)
+  const availableImages = restaurant.menu?.filter(item => item.image).map(item => ({
+    url: item.image!,
+    name: item.name
+  })) || [];
+  
+  // If no menu images, use the restaurant image
+  const images = availableImages.length > 0 ? availableImages : [{ url: restaurant.image, name: restaurant.name }];
+
+  const handleImageSwipe = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isActive || images.length <= 1) return;
+    
+    const startX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const imageContainer = e.currentTarget;
+    let moved = false;
+    
+    const handleMove = (moveEvent: MouseEvent | TouchEvent) => {
+      const currentX = 'touches' in moveEvent ? (moveEvent as TouchEvent).touches[0].clientX : (moveEvent as MouseEvent).clientX;
+      const diff = currentX - startX;
+      
+      if (Math.abs(diff) > 10) {
+        moved = true;
+        setIsImageSwiping(true);
+      }
+    };
+    
+    const handleEnd = (endEvent: MouseEvent | TouchEvent) => {
+      const currentX = 'changedTouches' in endEvent ? (endEvent as TouchEvent).changedTouches[0].clientX : (endEvent as MouseEvent).clientX;
+      const diff = currentX - startX;
+      
+      if (moved && Math.abs(diff) > 50) {
+        if (diff > 0 && currentImageIndex > 0) {
+          setCurrentImageIndex(prev => prev - 1);
+        } else if (diff < 0 && currentImageIndex < images.length - 1) {
+          setCurrentImageIndex(prev => prev + 1);
+        }
+      }
+      
+      setIsImageSwiping(false);
+      document.removeEventListener('mousemove', handleMove as any);
+      document.removeEventListener('mouseup', handleEnd as any);
+      document.removeEventListener('touchmove', handleMove as any);
+      document.removeEventListener('touchend', handleEnd as any);
+    };
+    
+    document.addEventListener('mousemove', handleMove as any);
+    document.addEventListener('mouseup', handleEnd as any);
+    document.addEventListener('touchmove', handleMove as any);
+    document.addEventListener('touchend', handleEnd as any);
+  };
+
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (!isActive) return;
+    if (!isActive || isImageSwiping) return;
     setIsDragging(true);
     const startX = e.clientX;
     
@@ -64,16 +117,31 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
         }}
         onMouseDown={handleMouseDown}
       >
-        {/* Restaurant Image */}
-        <div className="relative h-64 overflow-hidden">
-          <img 
-            src={restaurant.image} 
-            alt={restaurant.name}
-            className="w-full h-full object-cover"
-          />
+        {/* Restaurant Image Carousel */}
+        <div 
+          className="relative h-64 overflow-hidden"
+          onMouseDown={handleImageSwipe}
+          onTouchStart={handleImageSwipe}
+        >
+          <div 
+            className="flex transition-transform duration-300 ease-out h-full"
+            style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+          >
+            {images.map((image, index) => (
+              <div key={index} className="min-w-full h-full relative">
+                <img 
+                  src={image.url} 
+                  alt={image.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+          </div>
+          
           <div className="absolute top-4 left-4">
             <span className="price-badge">{restaurant.price}</span>
           </div>
+          
           <div className="absolute top-4 right-4 flex items-center space-x-2">
             <button
               onClick={(e) => {
@@ -93,6 +161,27 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
               <span className="text-white text-xs font-medium">{restaurant.rating}</span>
             </div>
           </div>
+          
+          {/* Image Navigation Dots */}
+          {images.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+              {images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex(index);
+                  }}
+                  className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                    index === currentImageIndex 
+                      ? 'bg-white w-6' 
+                      : 'bg-white/50 hover:bg-white/75'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+          
           {restaurant.deals && (
             <div className="absolute bottom-4 left-4 bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs font-bold">
               {restaurant.deals}
