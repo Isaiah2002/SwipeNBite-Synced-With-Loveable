@@ -18,6 +18,20 @@ import turkeyBurger from '@/assets/menu/turkey-burger.jpg';
 import bigBenBurger from '@/assets/menu/big-ben-burger.jpg';
 import veggieBeyondBurger from '@/assets/menu/veggie-beyond-burger.jpg';
 import veggieImpossibleBurger from '@/assets/menu/veggie-impossible-burger.jpg';
+import smallChiliConCarne from '@/assets/menu/small-chili-con-carne.jpg';
+import largeChiliConCarne from '@/assets/menu/large-chili-con-carne.jpg';
+import smallVeggieChili from '@/assets/menu/small-veggie-chili.jpg';
+import largeVeggieChili from '@/assets/menu/large-veggie-chili.jpg';
+import smallTurkeyChili from '@/assets/menu/small-turkey-chili.jpg';
+import largeTurkeyChili from '@/assets/menu/large-turkey-chili.jpg';
+import riceBowl from '@/assets/menu/rice-bowl.jpg';
+import saladBowl from '@/assets/menu/salad-bowl.jpg';
+import halfGallonChiliConCarne from '@/assets/menu/half-gallon-chili-con-carne.jpg';
+import gallonChiliConCarne from '@/assets/menu/gallon-chili-con-carne.jpg';
+import halfGallonVeggieChili from '@/assets/menu/half-gallon-veggie-chili.jpg';
+import gallonVeggieChili from '@/assets/menu/gallon-veggie-chili.jpg';
+import halfGallonTurkeyChili from '@/assets/menu/half-gallon-turkey-chili.jpg';
+import gallonTurkeyChili from '@/assets/menu/gallon-turkey-chili.jpg';
 
 export const restaurants: Restaurant[] = [
   {
@@ -125,6 +139,104 @@ export const restaurants: Restaurant[] = [
         category: 'Vegetarian',
         image: veggieImpossibleBurger,
         description: 'Plant-based Impossible Meat burger'
+      },
+      {
+        id: 'small-chili-con-carne',
+        name: 'Small Chili Con Carne',
+        category: 'Chili',
+        image: smallChiliConCarne,
+        description: 'Small bowl of our famous beef chili'
+      },
+      {
+        id: 'large-chili-con-carne',
+        name: 'Large Chili Con Carne',
+        category: 'Chili',
+        image: largeChiliConCarne,
+        description: 'Large bowl of our famous beef chili'
+      },
+      {
+        id: 'small-veggie-chili',
+        name: 'Small Veggie Chili',
+        category: 'Chili',
+        image: smallVeggieChili,
+        description: 'Small bowl of vegetarian chili'
+      },
+      {
+        id: 'large-veggie-chili',
+        name: 'Large Veggie Chili',
+        category: 'Chili',
+        image: largeVeggieChili,
+        description: 'Large bowl of vegetarian chili'
+      },
+      {
+        id: 'small-turkey-chili',
+        name: 'Small Turkey Chili',
+        category: 'Chili',
+        image: smallTurkeyChili,
+        description: 'Small bowl of lean turkey chili'
+      },
+      {
+        id: 'large-turkey-chili',
+        name: 'Large Turkey Chili',
+        category: 'Chili',
+        image: largeTurkeyChili,
+        description: 'Large bowl of lean turkey chili'
+      },
+      {
+        id: 'rice-bowl',
+        name: 'Rice Bowl',
+        category: 'Bowls',
+        image: riceBowl,
+        description: 'Rice topped with chili and toppings'
+      },
+      {
+        id: 'salad-bowl',
+        name: 'Salad Bowl',
+        category: 'Bowls',
+        image: saladBowl,
+        description: 'Fresh salad with chili'
+      },
+      {
+        id: 'half-gallon-chili-con-carne',
+        name: '1/2 Gallon Chili Con Carne',
+        category: 'Bulk Chili',
+        image: halfGallonChiliConCarne,
+        description: 'Half gallon of our famous beef chili to go'
+      },
+      {
+        id: 'gallon-chili-con-carne',
+        name: 'Gallon Chili Con Carne',
+        category: 'Bulk Chili',
+        image: gallonChiliConCarne,
+        description: 'Full gallon of our famous beef chili to go'
+      },
+      {
+        id: 'half-gallon-veggie-chili',
+        name: '1/2 Gallon Veggie Chili',
+        category: 'Bulk Chili',
+        image: halfGallonVeggieChili,
+        description: 'Half gallon of vegetarian chili to go'
+      },
+      {
+        id: 'gallon-veggie-chili',
+        name: 'Gallon Veggie Chili',
+        category: 'Bulk Chili',
+        image: gallonVeggieChili,
+        description: 'Full gallon of vegetarian chili to go'
+      },
+      {
+        id: 'half-gallon-turkey-chili',
+        name: '1/2 Gallon Turkey Chili',
+        category: 'Bulk Chili',
+        image: halfGallonTurkeyChili,
+        description: 'Half gallon of lean turkey chili to go'
+      },
+      {
+        id: 'gallon-turkey-chili',
+        name: 'Gallon Turkey Chili',
+        category: 'Bulk Chili',
+        image: gallonTurkeyChili,
+        description: 'Full gallon of lean turkey chili to go'
       }
     ]
   },
