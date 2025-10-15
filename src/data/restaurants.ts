@@ -40,6 +40,13 @@ import chickenSandwich from '@/assets/menu/chicken-sandwich.jpg';
 import impossibleBurgerSub from '@/assets/menu/impossible-burger-sub.jpg';
 import beyondBurgerSub from '@/assets/menu/beyond-burger-sub.jpg';
 import blt from '@/assets/menu/blt.jpg';
+import bananaPudding from '@/assets/menu/banana-pudding.jpg';
+import milkshake from '@/assets/menu/milkshake.jpg';
+import cakeSlice from '@/assets/menu/cake-slice.jpg';
+import iceCreamCone from '@/assets/menu/ice-cream-cone.jpg';
+import iceCreamSundae from '@/assets/menu/ice-cream-sundae.jpg';
+import kidsCone from '@/assets/menu/kids-cone.jpg';
+import iceCreamCup from '@/assets/menu/ice-cream-cup.jpg';
 
 export const restaurants: Restaurant[] = [
   {
@@ -301,6 +308,55 @@ export const restaurants: Restaurant[] = [
         category: 'Sandwiches & Subs',
         image: blt,
         description: 'Classic bacon, lettuce, and tomato sandwich'
+      },
+      {
+        id: 'banana-pudding',
+        name: "Virginia's Banana Pudding",
+        category: 'Desserts',
+        image: bananaPudding,
+        description: 'Made with fresh bananas, heavy cream, Biscoff cookies and love'
+      },
+      {
+        id: 'milkshake',
+        name: 'Milkshake',
+        category: 'Desserts',
+        image: milkshake,
+        description: 'Creamy milkshake in various flavors'
+      },
+      {
+        id: 'cake-slice',
+        name: 'Slice of Cake',
+        category: 'Desserts',
+        image: cakeSlice,
+        description: 'Delicious cake slice'
+      },
+      {
+        id: 'ice-cream-cone',
+        name: 'Ice Cream Cone',
+        category: 'Desserts',
+        image: iceCreamCone,
+        description: 'Classic ice cream cone'
+      },
+      {
+        id: 'ice-cream-sundae',
+        name: 'Ice Cream Sundae',
+        category: 'Desserts',
+        image: iceCreamSundae,
+        description: 'Ice cream sundae with toppings'
+      },
+      {
+        id: 'kids-cone',
+        name: 'Kids Cone',
+        category: 'Desserts',
+        image: kidsCone,
+        description: 'Kid-sized ice cream cone'
+      },
+      {
+        id: 'ice-cream-cup',
+        name: 'Ice Cream Cup',
+        category: 'Desserts',
+        image: iceCreamCup,
+        description: 'Ice cream served in a cup'
       }
     ]
   },
