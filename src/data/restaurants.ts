@@ -89,6 +89,9 @@ import chickfilaDeluxeSandwich from '@/assets/menu/chickfila-deluxe-sandwich.jpg
 import chickfilaCoolWrap from '@/assets/menu/chickfila-cool-wrap.jpg';
 import chickfilaChickNStrips from '@/assets/menu/chickfila-chick-n-strips.jpg';
 import grilledChickenSandwich from '@/assets/menu/grilled-chicken-sandwich.jpg';
+import cobbSalad from '@/assets/menu/cobb-salad.jpg';
+import spicySouthwestSalad from '@/assets/menu/spicy-southwest-salad.jpg';
+import marketSalad from '@/assets/menu/market-salad.jpg';
 
 export const restaurants: Restaurant[] = [
   {
@@ -727,6 +730,27 @@ export const restaurants: Restaurant[] = [
         category: 'Entrees',
         image: grilledChickenSandwich,
         description: 'Grilled chicken breast on a bun'
+      },
+      {
+        id: 'cobb-salad',
+        name: 'Cobb Salad',
+        category: 'Salads',
+        image: cobbSalad,
+        description: 'Fresh salad with chicken, bacon, and hard-boiled egg'
+      },
+      {
+        id: 'spicy-southwest-salad',
+        name: 'Spicy Southwest Salad',
+        category: 'Salads',
+        image: spicySouthwestSalad,
+        description: 'Spicy salad with corn, black beans, and peppers'
+      },
+      {
+        id: 'market-salad',
+        name: 'Market Salad',
+        category: 'Salads',
+        image: marketSalad,
+        description: 'Fresh greens with apples, strawberries, and blueberries'
       }
     ]
   },
