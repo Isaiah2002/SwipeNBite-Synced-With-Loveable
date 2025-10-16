@@ -92,6 +92,21 @@ import grilledChickenSandwich from '@/assets/menu/grilled-chicken-sandwich.jpg';
 import cobbSalad from '@/assets/menu/cobb-salad.jpg';
 import spicySouthwestSalad from '@/assets/menu/spicy-southwest-salad.jpg';
 import marketSalad from '@/assets/menu/market-salad.jpg';
+import chickfilaChickenBiscuit from '@/assets/menu/chickfila-chicken-biscuit.jpg';
+import chickfilaSpicyChickenBiscuit from '@/assets/menu/chickfila-spicy-chicken-biscuit.jpg';
+import chickfilaChickNMinis from '@/assets/menu/chickfila-chick-n-minis.jpg';
+import chickfilaEggWhiteGrill from '@/assets/menu/chickfila-egg-white-grill.jpg';
+import chickfilaHashBrownScrambleBurrito from '@/assets/menu/chickfila-hash-brown-scramble-burrito.jpg';
+import chickfilaHashBrownScrambleBowl from '@/assets/menu/chickfila-hash-brown-scramble-bowl.jpg';
+import chickfilaChickenEggCheeseBiscuit from '@/assets/menu/chickfila-chicken-egg-cheese-biscuit.jpg';
+import chickfilaBaconEggCheeseBiscuit from '@/assets/menu/chickfila-bacon-egg-cheese-biscuit.jpg';
+import chickfilaSausageEggCheeseBiscuit from '@/assets/menu/chickfila-sausage-egg-cheese-biscuit.jpg';
+import chickfilaChickenEggCheeseMuffin from '@/assets/menu/chickfila-chicken-egg-cheese-muffin.jpg';
+import chickfilaBaconEggCheeseMuffin from '@/assets/menu/chickfila-bacon-egg-cheese-muffin.jpg';
+import chickfilaSausageEggCheeseMuffin from '@/assets/menu/chickfila-sausage-egg-cheese-muffin.jpg';
+import chickfilaHashBrowns from '@/assets/menu/chickfila-hash-browns.jpg';
+import chickfilaBerryParfait from '@/assets/menu/chickfila-berry-parfait.jpg';
+import chickfilaFruitCup from '@/assets/menu/chickfila-fruit-cup.jpg';
 
 export const restaurants: Restaurant[] = [
   {
@@ -751,6 +766,111 @@ export const restaurants: Restaurant[] = [
         category: 'Salads',
         image: marketSalad,
         description: 'Fresh greens with apples, strawberries, and blueberries'
+      },
+      {
+        id: 'chickfila-chicken-biscuit',
+        name: 'Chick-fil-A Chicken Biscuit',
+        category: 'Breakfast',
+        image: chickfilaChickenBiscuit,
+        description: 'Chicken filet on a buttermilk biscuit'
+      },
+      {
+        id: 'chickfila-spicy-chicken-biscuit',
+        name: 'Spicy Chicken Biscuit',
+        category: 'Breakfast',
+        image: chickfilaSpicyChickenBiscuit,
+        description: 'Spicy chicken filet on a buttermilk biscuit'
+      },
+      {
+        id: 'chickfila-chick-n-minis',
+        name: 'Chick-n-Minis (4 ct)',
+        category: 'Breakfast',
+        image: chickfilaChickNMinis,
+        description: 'Bite-sized chicken nuggets in mini yeast rolls'
+      },
+      {
+        id: 'chickfila-egg-white-grill',
+        name: 'Egg White Grill',
+        category: 'Breakfast',
+        image: chickfilaEggWhiteGrill,
+        description: 'Grilled chicken with egg whites on an English muffin'
+      },
+      {
+        id: 'chickfila-hash-brown-scramble-burrito',
+        name: 'Hash Brown Scramble Burrito',
+        category: 'Breakfast',
+        image: chickfilaHashBrownScrambleBurrito,
+        description: 'Scrambled eggs, hash browns, and cheese in a tortilla'
+      },
+      {
+        id: 'chickfila-hash-brown-scramble-bowl',
+        name: 'Hash Brown Scramble Bowl',
+        category: 'Breakfast',
+        image: chickfilaHashBrownScrambleBowl,
+        description: 'Scrambled eggs, hash browns, and cheese in a bowl'
+      },
+      {
+        id: 'chickfila-chicken-egg-cheese-biscuit',
+        name: 'Chicken, Egg & Cheese Biscuit',
+        category: 'Breakfast',
+        image: chickfilaChickenEggCheeseBiscuit,
+        description: 'Chicken filet, egg, and cheese on a buttermilk biscuit'
+      },
+      {
+        id: 'chickfila-bacon-egg-cheese-biscuit',
+        name: 'Bacon, Egg & Cheese Biscuit',
+        category: 'Breakfast',
+        image: chickfilaBaconEggCheeseBiscuit,
+        description: 'Bacon, egg, and cheese on a buttermilk biscuit'
+      },
+      {
+        id: 'chickfila-sausage-egg-cheese-biscuit',
+        name: 'Sausage, Egg & Cheese Biscuit',
+        category: 'Breakfast',
+        image: chickfilaSausageEggCheeseBiscuit,
+        description: 'Sausage, egg, and cheese on a buttermilk biscuit'
+      },
+      {
+        id: 'chickfila-chicken-egg-cheese-muffin',
+        name: 'Chicken, Egg & Cheese Muffin',
+        category: 'Breakfast',
+        image: chickfilaChickenEggCheeseMuffin,
+        description: 'Chicken filet, egg, and cheese on an English muffin'
+      },
+      {
+        id: 'chickfila-bacon-egg-cheese-muffin',
+        name: 'Bacon, Egg & Cheese Muffin',
+        category: 'Breakfast',
+        image: chickfilaBaconEggCheeseMuffin,
+        description: 'Bacon, egg, and cheese on an English muffin'
+      },
+      {
+        id: 'chickfila-sausage-egg-cheese-muffin',
+        name: 'Sausage, Egg & Cheese Muffin',
+        category: 'Breakfast',
+        image: chickfilaSausageEggCheeseMuffin,
+        description: 'Sausage, egg, and cheese on an English muffin'
+      },
+      {
+        id: 'chickfila-hash-browns',
+        name: 'Hash Browns',
+        category: 'Breakfast',
+        image: chickfilaHashBrowns,
+        description: 'Crispy hash brown potatoes'
+      },
+      {
+        id: 'chickfila-berry-parfait',
+        name: 'Berry Parfait',
+        category: 'Breakfast',
+        image: chickfilaBerryParfait,
+        description: 'Yogurt parfait with berries and granola'
+      },
+      {
+        id: 'chickfila-fruit-cup',
+        name: 'Fruit Cup',
+        category: 'Breakfast',
+        image: chickfilaFruitCup,
+        description: 'Fresh fruit medley'
       }
     ]
   },
