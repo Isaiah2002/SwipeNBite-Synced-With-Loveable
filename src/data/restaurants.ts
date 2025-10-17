@@ -174,6 +174,7 @@ import bambaElGringo from '@/assets/menu/bamba-el-gringo.jpg';
 import bambaJujuBurger from '@/assets/menu/bamba-juju-burger.jpg';
 import bambaSpicyShroom from '@/assets/menu/bamba-spicy-shroom.jpg';
 import bambaFlautas from '@/assets/menu/bamba-flautas.jpg';
+import bambaElBachoNacho from '@/assets/menu/bamba-el-bacho-nacho.jpg';
 
 export const restaurants: Restaurant[] = [
   {
@@ -1564,7 +1565,7 @@ export const restaurants: Restaurant[] = [
         id: 'el-bacho-nacho',
         name: 'El Bacho Nacho',
         category: 'Crispy Things',
-        image: bambaQuesoChips,
+        image: bambaElBachoNacho,
         description: 'Crispy nachos with any tradicional meat, salsa morita, crema, nacho cheese, pickled onion, pico de gallo',
         price: 11.50
       },
