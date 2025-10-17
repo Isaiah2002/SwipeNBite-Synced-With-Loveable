@@ -16,6 +16,7 @@ import coupeHuevosRancheros from '@/assets/menu/coupe-huevos-rancheros.jpg';
 import coupeFrenchToast from '@/assets/menu/coupe-french-toast.jpg';
 import coupeChickenWaffle from '@/assets/menu/coupe-chicken-waffle.jpg';
 import coupeYogurtParfait from '@/assets/menu/coupe-yogurt-parfait.jpg';
+import coupeCaesarSalad from '@/assets/menu/coupe-caesar-salad.jpg';
 import halfSmokeOriginal from '@/assets/menu/half-smoke-original.jpg';
 import turkeyDog from '@/assets/menu/turkey-dog.jpg';
 import halfSmokeSpicy from '@/assets/menu/half-smoke-spicy.jpg';
@@ -1277,7 +1278,8 @@ export const restaurants: Restaurant[] = [
         name: 'Classic Caesar',
         price: 13.00,
         category: 'Salads & Soups',
-        description: 'Romaine lettuce, parmesan cheese, garlic croutons with a Caesar dressing'
+        description: 'Romaine lettuce, parmesan cheese, garlic croutons with a Caesar dressing',
+        image: coupeCaesarSalad
       },
       {
         id: 'coupe-bowl',
