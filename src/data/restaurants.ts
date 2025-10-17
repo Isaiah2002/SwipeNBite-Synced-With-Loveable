@@ -5,6 +5,12 @@ import pizzaImage from '@/assets/pizza.jpg';
 import saladImage from '@/assets/salad.jpg';
 import dinerImage from '@/assets/diner.jpg';
 import indianImage from '@/assets/indian.jpg';
+import coupeImage1 from '@/assets/menu/coupe-1.jpg';
+import coupeImage2 from '@/assets/menu/coupe-2.jpg';
+import coupeImage3 from '@/assets/menu/coupe-3.jpg';
+import coupeImage4 from '@/assets/menu/coupe-4.jpg';
+import coupeImage5 from '@/assets/menu/coupe-5.jpg';
+import coupeImage6 from '@/assets/menu/coupe-6.jpg';
 import halfSmokeOriginal from '@/assets/menu/half-smoke-original.jpg';
 import turkeyDog from '@/assets/menu/turkey-dog.jpg';
 import halfSmokeSpicy from '@/assets/menu/half-smoke-spicy.jpg';
@@ -1172,7 +1178,57 @@ export const restaurants: Restaurant[] = [
     deals: 'Free WiFi + study space',
     estimatedTime: 10,
     latitude: 38.9240,
-    longitude: -77.0380
+    longitude: -77.0380,
+    menu: [
+      {
+        id: 'coupe-latte',
+        name: 'Latté',
+        price: 5.25,
+        category: 'Coffee & Beverages',
+        description: 'One Part Espresso, Four Parts Milk Foam',
+        image: coupeImage1
+      },
+      {
+        id: 'coupe-iced-latte',
+        name: 'Iced Latte',
+        price: 5.50,
+        category: 'Coffee & Beverages',
+        description: 'One Part Espresso, Four Parts Milk',
+        image: coupeImage2
+      },
+      {
+        id: 'coupe-maple-chai',
+        name: 'Maple Chai Latte',
+        price: 6.00,
+        category: 'Coffee & Beverages',
+        description: 'Housemade chai syrup, maple syrup, cinnamon, steamed milk',
+        image: coupeImage3
+      },
+      {
+        id: 'coupe-burger',
+        name: 'The Coupe Burger',
+        price: 16.00,
+        category: 'Lunch & Dinner',
+        description: '8 oz Angus beef patty, cheddar cheese, garlic aioli, lettuce, tomato and red onion, served with fries',
+        image: coupeImage4
+      },
+      {
+        id: 'coupe-breakfast',
+        name: 'All Day Breakfast Sandwich',
+        price: 12.00,
+        category: 'All Day Brunch',
+        description: 'Eggs, cheese, and your choice of protein on artisan bread',
+        image: coupeImage5
+      },
+      {
+        id: 'coupe-cocktail',
+        name: 'Specialty Cocktail',
+        price: 12.00,
+        category: 'Drinks',
+        description: 'Handcrafted seasonal cocktail with premium spirits',
+        image: coupeImage6
+      }
+    ]
   },
   {
     id: '9',
