@@ -5,12 +5,12 @@ import pizzaImage from '@/assets/pizza.jpg';
 import saladImage from '@/assets/salad.jpg';
 import dinerImage from '@/assets/diner.jpg';
 import indianImage from '@/assets/indian.jpg';
-import coupeImage1 from '@/assets/menu/coupe-1.jpg';
-import coupeImage2 from '@/assets/menu/coupe-2.jpg';
-import coupeImage3 from '@/assets/menu/coupe-3.jpg';
-import coupeImage4 from '@/assets/menu/coupe-4.jpg';
-import coupeImage5 from '@/assets/menu/coupe-5.jpg';
-import coupeImage6 from '@/assets/menu/coupe-6.jpg';
+import coupeLatte from '@/assets/menu/coupe-latte.jpg';
+import coupeIcedLatte from '@/assets/menu/coupe-iced-latte.jpg';
+import coupeBurger from '@/assets/menu/coupe-burger.jpg';
+import coupeBreakfastBurrito from '@/assets/menu/coupe-breakfast-burrito.jpg';
+import coupeAvocadoToast from '@/assets/menu/coupe-avocado-toast.jpg';
+import coupePancakes from '@/assets/menu/coupe-pancakes.jpg';
 import halfSmokeOriginal from '@/assets/menu/half-smoke-original.jpg';
 import turkeyDog from '@/assets/menu/turkey-dog.jpg';
 import halfSmokeSpicy from '@/assets/menu/half-smoke-spicy.jpg';
@@ -1186,7 +1186,7 @@ export const restaurants: Restaurant[] = [
         price: 5.25,
         category: 'Coffee & Beverages',
         description: 'One Part Espresso, Four Parts Milk Foam',
-        image: coupeImage1
+        image: coupeLatte
       },
       {
         id: 'coupe-iced-latte',
@@ -1194,7 +1194,7 @@ export const restaurants: Restaurant[] = [
         price: 5.50,
         category: 'Coffee & Beverages',
         description: 'One Part Espresso, Four Parts Milk',
-        image: coupeImage2
+        image: coupeIcedLatte
       },
       {
         id: 'coupe-burger',
@@ -1202,7 +1202,7 @@ export const restaurants: Restaurant[] = [
         price: 16.00,
         category: 'Burgers & Sandwiches',
         description: '8oz Angus beef patty, cheddar cheese, garlic aioli, lettuce, tomato, pickle, red onion, served with fries',
-        image: coupeImage4
+        image: coupeBurger
       },
       {
         id: 'coupe-breakfast-burrito',
@@ -1210,7 +1210,7 @@ export const restaurants: Restaurant[] = [
         price: 15.00,
         category: 'Breakfast All Day',
         description: 'Scrambled eggs, pork chorizo, shredded potatoes, cheddar, ranchero sauce and cilantro crema in a flour tortilla',
-        image: coupeImage5
+        image: coupeBreakfastBurrito
       },
       {
         id: 'coupe-avocado-toast',
@@ -1218,7 +1218,7 @@ export const restaurants: Restaurant[] = [
         price: 15.00,
         category: 'Breakfast All Day',
         description: 'Mashed avocado, hard-boiled egg, feta, pickled red onion and everything bagel seasoning on thick cut sourdough',
-        image: coupeImage3
+        image: coupeAvocadoToast
       },
       {
         id: 'coupe-pancakes',
@@ -1226,7 +1226,7 @@ export const restaurants: Restaurant[] = [
         price: 11.00,
         category: 'Breakfast All Day',
         description: 'Served with syrup, butter and powdered sugar',
-        image: coupeImage6
+        image: coupePancakes
       },
       {
         id: 'coupe-huevos-rancheros',
