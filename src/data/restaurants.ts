@@ -161,7 +161,7 @@ import bambaDoubleSmashburger from '@/assets/menu/bamba-double-smashburger.jpg';
 import bambaCarneAsada from '@/assets/menu/bamba-carne-asada.jpg';
 import bambaAlPastor from '@/assets/menu/bamba-al-pastor.jpg';
 import bambaSignatureTaco from '@/assets/menu/bamba-signature-taco.jpg';
-import bambaQuesoChorizo from '@/assets/menu/bamba-queso-chorizo.jpg';
+import bambaQuesoChips from '@/assets/menu/bamba-queso-chips.jpg';
 import bambaLoadedFries from '@/assets/menu/bamba-loaded-fries.jpg';
 import bambaTorta from '@/assets/menu/bamba-torta.jpg';
 import bambaChurros from '@/assets/menu/bamba-churros.jpg';
@@ -1531,7 +1531,7 @@ export const restaurants: Restaurant[] = [
         id: 'queso-chips',
         name: 'Queso & Chips',
         category: 'Crispy Things',
-        image: bambaQuesoChorizo,
+        image: bambaQuesoChips,
         description: 'Bamba nacho cheese dip with tortilla chips',
         price: 8.50
       },
@@ -1563,7 +1563,7 @@ export const restaurants: Restaurant[] = [
         id: 'el-bacho-nacho',
         name: 'El Bacho Nacho',
         category: 'Crispy Things',
-        image: bambaQuesoChorizo,
+        image: bambaQuesoChips,
         description: 'Crispy nachos with any tradicional meat, salsa morita, crema, nacho cheese, pickled onion, pico de gallo',
         price: 11.50
       },
@@ -1605,7 +1605,7 @@ export const restaurants: Restaurant[] = [
         id: 'quesadilla-tradicional',
         name: 'Tradicional Quesadilla',
         category: 'Quesadillas',
-        image: bambaQuesoChorizo,
+        image: bambaQuesoChips,
         description: 'Choice of tradicional meat, chihuahua cheese, poblano crema, large flour tortilla',
         price: 10.00
       },
@@ -1613,7 +1613,7 @@ export const restaurants: Restaurant[] = [
         id: 'big-fat-mexican',
         name: 'Big Fat Mexican Quesadilla',
         category: 'Quesadillas',
-        image: bambaQuesoChorizo,
+        image: bambaQuesoChips,
         description: 'Roasted walnut mushroom chorizo, grilled corn, chipotle, mozzarella, crispy onion, basil verde',
         price: 11.00
       },
@@ -1621,7 +1621,7 @@ export const restaurants: Restaurant[] = [
         id: 'big-jerk-quesadilla',
         name: 'The Big Jerk Quesadilla',
         category: 'Quesadillas',
-        image: bambaQuesoChorizo,
+        image: bambaQuesoChips,
         description: 'Grilled jerk chicken, spicy pickled pineapple, rajas, burnt chile crema',
         price: 11.50
       },
