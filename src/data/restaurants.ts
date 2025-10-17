@@ -118,6 +118,17 @@ import chickfilaSauceWaffleChips from '@/assets/menu/chickfila-sauce-waffle-chip
 import chickfilaAppleSauce from '@/assets/menu/chickfila-apple-sauce.jpg';
 import chickfilaKaleCrunch from '@/assets/menu/chickfila-kale-crunch.jpg';
 import chickfilaBerryParfaitSide from '@/assets/menu/chickfila-berry-parfait-side.jpg';
+import chickfilaCherryBerryFrostedLemonade from '@/assets/menu/chickfila-cherry-berry-frosted-lemonade.jpg';
+import chickfilaFrostedLemonade from '@/assets/menu/chickfila-frosted-lemonade.jpg';
+import chickfilaFrostedCoffee from '@/assets/menu/chickfila-frosted-coffee.jpg';
+import chickfilaVanillaMilkshake from '@/assets/menu/chickfila-vanilla-milkshake.jpg';
+import chickfilaCookiesCreamMilkshake from '@/assets/menu/chickfila-cookies-cream-milkshake.jpg';
+import chickfilaChocolateMilkshake from '@/assets/menu/chickfila-chocolate-milkshake.jpg';
+import chickfilaStrawberryMilkshake from '@/assets/menu/chickfila-strawberry-milkshake.jpg';
+import chickfilaIcedreamCup from '@/assets/menu/chickfila-icedream-cup.jpg';
+import chickfilaIcedreamCone from '@/assets/menu/chickfila-icedream-cone.jpg';
+import chickfilaChocolateChunkCookie from '@/assets/menu/chickfila-chocolate-chunk-cookie.jpg';
+import chickfilaChocolateFudgeBrownie from '@/assets/menu/chickfila-chocolate-fudge-brownie.jpg';
 
 export const restaurants: Restaurant[] = [
   {
@@ -959,6 +970,83 @@ export const restaurants: Restaurant[] = [
         category: 'Sides',
         image: chickfilaBerryParfaitSide,
         description: 'Yogurt parfait with berries and granola'
+      },
+      {
+        id: 'chickfila-cherry-berry-frosted-lemonade',
+        name: 'Cherry Berry Frosted Lemonade',
+        category: 'Treats',
+        image: chickfilaCherryBerryFrostedLemonade,
+        description: 'Frozen cherry and berry lemonade treat'
+      },
+      {
+        id: 'chickfila-frosted-lemonade',
+        name: 'Frosted Lemonade',
+        category: 'Treats',
+        image: chickfilaFrostedLemonade,
+        description: 'Frozen lemonade with Icedream'
+      },
+      {
+        id: 'chickfila-frosted-coffee',
+        name: 'Frosted Coffee',
+        category: 'Treats',
+        image: chickfilaFrostedCoffee,
+        description: 'THRIVE Farmers coffee blended with Icedream'
+      },
+      {
+        id: 'chickfila-vanilla-milkshake',
+        name: 'Vanilla Milkshake',
+        category: 'Treats',
+        image: chickfilaVanillaMilkshake,
+        description: 'Classic vanilla milkshake'
+      },
+      {
+        id: 'chickfila-cookies-cream-milkshake',
+        name: 'Cookies & Cream Milkshake',
+        category: 'Treats',
+        image: chickfilaCookiesCreamMilkshake,
+        description: 'Milkshake with cookies and cream'
+      },
+      {
+        id: 'chickfila-chocolate-milkshake',
+        name: 'Chocolate Milkshake',
+        category: 'Treats',
+        image: chickfilaChocolateMilkshake,
+        description: 'Rich chocolate milkshake'
+      },
+      {
+        id: 'chickfila-strawberry-milkshake',
+        name: 'Strawberry Milkshake',
+        category: 'Treats',
+        image: chickfilaStrawberryMilkshake,
+        description: 'Fresh strawberry milkshake'
+      },
+      {
+        id: 'chickfila-icedream-cup',
+        name: 'Icedream Cup',
+        category: 'Treats',
+        image: chickfilaIcedreamCup,
+        description: 'Soft-serve Icedream in a cup'
+      },
+      {
+        id: 'chickfila-icedream-cone',
+        name: 'Icedream Cone',
+        category: 'Treats',
+        image: chickfilaIcedreamCone,
+        description: 'Soft-serve Icedream in a cone'
+      },
+      {
+        id: 'chickfila-chocolate-chunk-cookie',
+        name: 'Chocolate Chunk Cookie',
+        category: 'Treats',
+        image: chickfilaChocolateChunkCookie,
+        description: 'Freshly baked chocolate chunk cookie'
+      },
+      {
+        id: 'chickfila-chocolate-fudge-brownie',
+        name: 'Chocolate Fudge Brownie',
+        category: 'Treats',
+        image: chickfilaChocolateFudgeBrownie,
+        description: 'Rich and fudgy chocolate brownie'
       }
     ]
   },
