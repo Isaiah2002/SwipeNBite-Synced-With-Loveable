@@ -5,6 +5,7 @@ import pizzaImage from '@/assets/pizza.jpg';
 import saladImage from '@/assets/salad.jpg';
 import dinerImage from '@/assets/diner.jpg';
 import indianImage from '@/assets/indian.jpg';
+// The Coupe menu images - real photos from their Toast Tab ordering site
 import coupeLatte from '@/assets/menu/coupe-latte.jpg';
 import coupeIcedLatte from '@/assets/menu/coupe-iced-latte.jpg';
 import coupeBurger from '@/assets/menu/coupe-burger.jpg';
