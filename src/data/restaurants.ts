@@ -172,6 +172,7 @@ import bambaCarnitas from '@/assets/menu/bamba-carnitas.jpg';
 import bambaChorizo from '@/assets/menu/bamba-chorizo.jpg';
 import bambaElGringo from '@/assets/menu/bamba-el-gringo.jpg';
 import bambaJujuBurger from '@/assets/menu/bamba-juju-burger.jpg';
+import bambaSpicyShroom from '@/assets/menu/bamba-spicy-shroom.jpg';
 
 export const restaurants: Restaurant[] = [
   {
@@ -1521,7 +1522,7 @@ export const restaurants: Restaurant[] = [
         id: 'spicy-shroom',
         name: 'Spicy Shroom Taco',
         category: 'Tacos Nuestros',
-        image: bambaCarneAsada,
+        image: bambaSpicyShroom,
         description: 'Chipotle portobellos, grilled corn, cotija, pickled onion, pepitas, heart of palm, cilantro',
         price: 5.25
       },
