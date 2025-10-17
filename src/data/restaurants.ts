@@ -173,6 +173,7 @@ import bambaBowl from '@/assets/menu/bamba-bowl.jpg';
 import bambaStreetCorn from '@/assets/menu/bamba-street-corn.jpg';
 import bambaRiceBeans from '@/assets/menu/bamba-rice-beans.jpg';
 import bambaChurros from '@/assets/menu/bamba-churros.jpg';
+import bambaChurroCookie from '@/assets/menu/bamba-churro-cookie.jpg';
 import bambaBirria from '@/assets/menu/bamba-birria.jpg';
 import bambaGuacamole from '@/assets/menu/bamba-guacamole.jpg';
 import bambaPolloCarbon from '@/assets/menu/bamba-pollo-carbon.jpg';
@@ -1682,7 +1683,7 @@ export const restaurants: Restaurant[] = [
         id: 'churro-cookie',
         name: 'Chocolate Chip Churro Crunch Cookie',
         category: 'Dulces',
-        image: bambaChurros,
+        image: bambaChurroCookie,
         description: 'Chocolate chip cookie with churro crunch',
         price: 4.50
       }
