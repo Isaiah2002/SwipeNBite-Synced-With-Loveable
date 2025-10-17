@@ -21,6 +21,7 @@ import coupeBowl from '@/assets/menu/coupe-bowl.jpg';
 import coupeClassicCobb from '@/assets/menu/coupe-classic-cobb.jpg';
 import coupeWings from '@/assets/menu/coupe-wings.jpg';
 import coupeFries from '@/assets/menu/coupe-fries.jpg';
+import coupeSteakFrites from '@/assets/menu/coupe-steak-frites.jpg';
 import halfSmokeOriginal from '@/assets/menu/half-smoke-original.jpg';
 import turkeyDog from '@/assets/menu/turkey-dog.jpg';
 import halfSmokeSpicy from '@/assets/menu/half-smoke-spicy.jpg';
@@ -1350,7 +1351,8 @@ export const restaurants: Restaurant[] = [
         name: 'Steak Frites',
         price: 26.00,
         category: 'Entrees',
-        description: '10oz rib eye and side of brown gravy, served with parmesan-truffle fries and mixed greens salad'
+        description: '10oz rib eye and side of brown gravy, served with parmesan-truffle fries and mixed greens salad',
+        image: coupeSteakFrites
       },
       {
         id: 'coupe-grilled-salmon',
