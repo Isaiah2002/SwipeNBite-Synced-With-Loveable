@@ -1197,36 +1197,169 @@ export const restaurants: Restaurant[] = [
         image: coupeImage2
       },
       {
-        id: 'coupe-maple-chai',
-        name: 'Maple Chai Latte',
-        price: 6.00,
-        category: 'Coffee & Beverages',
-        description: 'Housemade chai syrup, maple syrup, cinnamon, steamed milk',
-        image: coupeImage3
-      },
-      {
         id: 'coupe-burger',
         name: 'The Coupe Burger',
         price: 16.00,
-        category: 'Lunch & Dinner',
-        description: '8 oz Angus beef patty, cheddar cheese, garlic aioli, lettuce, tomato and red onion, served with fries',
+        category: 'Burgers & Sandwiches',
+        description: '8oz Angus beef patty, cheddar cheese, garlic aioli, lettuce, tomato, pickle, red onion, served with fries',
         image: coupeImage4
       },
       {
-        id: 'coupe-breakfast',
-        name: 'All Day Breakfast Sandwich',
-        price: 12.00,
-        category: 'All Day Brunch',
-        description: 'Eggs, cheese, and your choice of protein on artisan bread',
+        id: 'coupe-breakfast-burrito',
+        name: 'Breakfast Burrito',
+        price: 15.00,
+        category: 'Breakfast All Day',
+        description: 'Scrambled eggs, pork chorizo, shredded potatoes, cheddar, ranchero sauce and cilantro crema in a flour tortilla',
         image: coupeImage5
       },
       {
-        id: 'coupe-cocktail',
-        name: 'Specialty Cocktail',
-        price: 12.00,
-        category: 'Drinks',
-        description: 'Handcrafted seasonal cocktail with premium spirits',
+        id: 'coupe-avocado-toast',
+        name: 'Avocado Toast',
+        price: 15.00,
+        category: 'Breakfast All Day',
+        description: 'Mashed avocado, hard-boiled egg, feta, pickled red onion and everything bagel seasoning on thick cut sourdough',
+        image: coupeImage3
+      },
+      {
+        id: 'coupe-pancakes',
+        name: 'Buttermilk Pancakes',
+        price: 11.00,
+        category: 'Breakfast All Day',
+        description: 'Served with syrup, butter and powdered sugar',
         image: coupeImage6
+      },
+      {
+        id: 'coupe-huevos-rancheros',
+        name: 'Huevos Rancheros',
+        price: 16.00,
+        category: 'Breakfast All Day',
+        description: 'Corn tortillas, black bean-chorizo mix, rancheros sauce, two sunny side up eggs, topped with queso fresco, avocado and cilantro'
+      },
+      {
+        id: 'coupe-french-toast',
+        name: 'Stuffed French Toast',
+        price: 13.00,
+        category: 'Breakfast All Day',
+        description: 'Filled with strawberries, citrus cream cheese and blueberry sauce'
+      },
+      {
+        id: 'coupe-chicken-waffle',
+        name: 'Fried Chicken & Waffle',
+        price: 17.00,
+        category: 'Breakfast All Day',
+        description: 'Chicken thigh, bacon-bourbon syrup and herb chive butter'
+      },
+      {
+        id: 'coupe-yogurt-parfait',
+        name: 'Yogurt Parfait',
+        price: 10.00,
+        category: 'Breakfast All Day',
+        description: 'Yogurt, fresh berries, banana and housemade granola'
+      },
+      {
+        id: 'coupe-eggs-benedict',
+        name: 'Eggs Benedict',
+        price: 16.00,
+        category: 'Breakfast All Day',
+        description: 'Available Saturday & Sunday 8am-3pm - Two poached eggs, ham, hollandaise on an English muffin served with a hashbrown square or grits'
+      },
+      {
+        id: 'coupe-caesar',
+        name: 'Classic Caesar',
+        price: 13.00,
+        category: 'Salads & Soups',
+        description: 'Romaine lettuce, parmesan cheese, garlic croutons with a Caesar dressing'
+      },
+      {
+        id: 'coupe-bowl',
+        name: 'The Coupe Bowl',
+        price: 14.00,
+        category: 'Salads & Soups',
+        description: 'Curried chickpeas, roasted sweet potatoes, pickled red onion, arugula and avocado with a creamy cashew dressing'
+      },
+      {
+        id: 'coupe-classic-cobb',
+        name: 'Classic Cobb',
+        price: 17.00,
+        category: 'Salads & Soups',
+        description: 'Grilled chicken, cucumber, cherry tomatoes, bacon, avocado, romaine lettuce, hard boiled egg, with a blue cheese dressing'
+      },
+      {
+        id: 'coupe-wings',
+        name: 'House Wings',
+        price: 18.00,
+        category: 'Starters',
+        description: '6 or 12 sriracha-glazed wings served with ranch or blue cheese'
+      },
+      {
+        id: 'coupe-fish-tacos',
+        name: 'Fish Tacos',
+        price: 10.00,
+        category: 'Starters',
+        description: 'Blackened whiting, pineapple salsa and lime crema in corn tortillas'
+      },
+      {
+        id: 'coupe-fries',
+        name: 'Coupe Fries',
+        price: 14.00,
+        category: 'Starters',
+        description: 'Short rib, cheese curds and pickled jalapeños smothered in brown gravy'
+      },
+      {
+        id: 'coupe-falafel',
+        name: 'Falafel Pita',
+        price: 16.00,
+        category: 'Burgers & Sandwiches',
+        description: 'Mixed greens, cucumber, pickled red onion, cherry tomatoes and cashew tzatziki wrapped in pita bread, served with fries'
+      },
+      {
+        id: 'coupe-turkey-brie',
+        name: 'Turkey & Brie Sandwich',
+        price: 15.00,
+        category: 'Burgers & Sandwiches',
+        description: 'Roasted turkey breast, green apple, brie cheese, cranberry mayo on wheat bread, served with fries'
+      },
+      {
+        id: 'coupe-salmon-burger',
+        name: 'Salmon Burger',
+        price: 18.00,
+        category: 'Burgers & Sandwiches',
+        description: 'Housemade salmon patty served with a cucumber-radish dill slaw, garlic aioli and fries'
+      },
+      {
+        id: 'coupe-steak-frites',
+        name: 'Steak Frites',
+        price: 26.00,
+        category: 'Entrees',
+        description: '10oz rib eye and side of brown gravy, served with parmesan-truffle fries and mixed greens salad'
+      },
+      {
+        id: 'coupe-grilled-salmon',
+        name: 'Grilled Salmon',
+        price: 26.00,
+        category: 'Entrees',
+        description: 'Served with roasted red potatoes, green beans and a butter sauce'
+      },
+      {
+        id: 'coupe-fish-chips',
+        name: 'Fish & Chips',
+        price: 18.00,
+        category: 'Entrees',
+        description: 'Beer battered whiting served with french fries, tartar sauce and malt vinegar'
+      },
+      {
+        id: 'coupe-mac-cheese',
+        name: 'Chicken Mac n\' Cheese',
+        price: 18.00,
+        category: 'Entrees',
+        description: 'Big bowl of our house mac n\' cheese topped with a grilled chicken breast and panko breadcrumbs'
+      },
+      {
+        id: 'coupe-rice-bowl',
+        name: 'Build-Your-Own Rice Bowl',
+        price: 7.00,
+        category: 'Build-Your-Own',
+        description: 'Start with white rice, white rice & mixed greens, or mixed greens. Add protein, veggies, cheese and sauce'
       }
     ]
   },
