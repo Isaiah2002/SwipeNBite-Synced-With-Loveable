@@ -13,6 +13,7 @@ import coupeBreakfastBurrito from '@/assets/menu/coupe-breakfast-burrito-real.jp
 import coupeAvocadoToast from '@/assets/menu/coupe-avocado-toast-real.jpg';
 import coupePancakes from '@/assets/menu/coupe-pancakes-real.jpg';
 import coupeHuevosRancheros from '@/assets/menu/coupe-huevos-rancheros.jpg';
+import coupeFrenchToast from '@/assets/menu/coupe-french-toast.jpg';
 import halfSmokeOriginal from '@/assets/menu/half-smoke-original.jpg';
 import turkeyDog from '@/assets/menu/turkey-dog.jpg';
 import halfSmokeSpicy from '@/assets/menu/half-smoke-spicy.jpg';
@@ -1243,7 +1244,8 @@ export const restaurants: Restaurant[] = [
         name: 'Stuffed French Toast',
         price: 13.00,
         category: 'Breakfast All Day',
-        description: 'Filled with strawberries, citrus cream cheese and blueberry sauce'
+        description: 'Filled with strawberries, citrus cream cheese and blueberry sauce',
+        image: coupeFrenchToast
       },
       {
         id: 'coupe-chicken-waffle',
