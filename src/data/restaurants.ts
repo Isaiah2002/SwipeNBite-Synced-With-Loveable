@@ -20,6 +20,7 @@ import coupeCaesarSalad from '@/assets/menu/coupe-caesar-salad.jpg';
 import coupeBowl from '@/assets/menu/coupe-bowl.jpg';
 import coupeClassicCobb from '@/assets/menu/coupe-classic-cobb.jpg';
 import coupeWings from '@/assets/menu/coupe-wings.jpg';
+import coupeFries from '@/assets/menu/coupe-fries.jpg';
 import halfSmokeOriginal from '@/assets/menu/half-smoke-original.jpg';
 import turkeyDog from '@/assets/menu/turkey-dog.jpg';
 import halfSmokeSpicy from '@/assets/menu/half-smoke-spicy.jpg';
@@ -1320,7 +1321,8 @@ export const restaurants: Restaurant[] = [
         name: 'Coupe Fries',
         price: 14.00,
         category: 'Starters',
-        description: 'Short rib, cheese curds and pickled jalapeños smothered in brown gravy'
+        description: 'Short rib, cheese curds and pickled jalapeños smothered in brown gravy',
+        image: coupeFries
       },
       {
         id: 'coupe-falafel',
