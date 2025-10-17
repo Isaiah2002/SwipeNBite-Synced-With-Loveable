@@ -168,6 +168,7 @@ import bambaTortaBamba from '@/assets/menu/bamba-torta-bamba.jpg';
 import bambaChoriqueso from '@/assets/menu/bamba-choriqueso.jpg';
 import bambaQuesadillaTradicional from '@/assets/menu/bamba-quesadilla-tradicional.jpg';
 import bambaBigFatMexican from '@/assets/menu/bamba-big-fat-mexican.jpg';
+import bambaBigJerk from '@/assets/menu/bamba-big-jerk.jpg';
 import bambaChurros from '@/assets/menu/bamba-churros.jpg';
 import bambaBirria from '@/assets/menu/bamba-birria.jpg';
 import bambaGuacamole from '@/assets/menu/bamba-guacamole.jpg';
@@ -1628,7 +1629,7 @@ export const restaurants: Restaurant[] = [
         id: 'big-jerk-quesadilla',
         name: 'The Big Jerk Quesadilla',
         category: 'Quesadillas',
-        image: bambaQuesoChips,
+        image: bambaBigJerk,
         description: 'Grilled jerk chicken, spicy pickled pineapple, rajas, burnt chile crema',
         price: 11.50
       },
