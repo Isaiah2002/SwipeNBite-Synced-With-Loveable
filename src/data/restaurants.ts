@@ -14,6 +14,7 @@ import coupeAvocadoToast from '@/assets/menu/coupe-avocado-toast-real.jpg';
 import coupePancakes from '@/assets/menu/coupe-pancakes-real.jpg';
 import coupeHuevosRancheros from '@/assets/menu/coupe-huevos-rancheros.jpg';
 import coupeFrenchToast from '@/assets/menu/coupe-french-toast.jpg';
+import coupeChickenWaffle from '@/assets/menu/coupe-chicken-waffle.jpg';
 import halfSmokeOriginal from '@/assets/menu/half-smoke-original.jpg';
 import turkeyDog from '@/assets/menu/turkey-dog.jpg';
 import halfSmokeSpicy from '@/assets/menu/half-smoke-spicy.jpg';
@@ -1252,7 +1253,8 @@ export const restaurants: Restaurant[] = [
         name: 'Fried Chicken & Waffle',
         price: 17.00,
         category: 'Breakfast All Day',
-        description: 'Chicken thigh, bacon-bourbon syrup and herb chive butter'
+        description: 'Chicken thigh, bacon-bourbon syrup and herb chive butter',
+        image: coupeChickenWaffle
       },
       {
         id: 'coupe-yogurt-parfait',
