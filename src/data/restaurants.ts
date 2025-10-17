@@ -11,7 +11,7 @@ import coupeIcedLatte from '@/assets/menu/coupe-iced-latte.jpg';
 import coupeBurger from '@/assets/menu/coupe-burger-real.jpg';
 import coupeBreakfastBurrito from '@/assets/menu/coupe-breakfast-burrito-real.jpg';
 import coupeAvocadoToast from '@/assets/menu/coupe-avocado-toast-real.jpg';
-import coupePancakes from '@/assets/menu/coupe-pancakes.jpg';
+import coupePancakes from '@/assets/menu/coupe-pancakes-real.jpg';
 import halfSmokeOriginal from '@/assets/menu/half-smoke-original.jpg';
 import turkeyDog from '@/assets/menu/turkey-dog.jpg';
 import halfSmokeSpicy from '@/assets/menu/half-smoke-spicy.jpg';
