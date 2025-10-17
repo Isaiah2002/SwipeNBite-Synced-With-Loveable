@@ -107,6 +107,17 @@ import chickfilaSausageEggCheeseMuffin from '@/assets/menu/chickfila-sausage-egg
 import chickfilaHashBrowns from '@/assets/menu/chickfila-hash-browns.jpg';
 import chickfilaBerryParfait from '@/assets/menu/chickfila-berry-parfait.jpg';
 import chickfilaFruitCup from '@/assets/menu/chickfila-fruit-cup.jpg';
+import chickfilaWaffleFries from '@/assets/menu/chickfila-waffle-fries.jpg';
+import chickfilaFruitCupSide from '@/assets/menu/chickfila-fruit-cup-side.jpg';
+import chickfilaSideSalad from '@/assets/menu/chickfila-side-salad.jpg';
+import chickfilaMacCheese from '@/assets/menu/chickfila-mac-cheese.jpg';
+import chickfilaChickenNoodleSoup from '@/assets/menu/chickfila-chicken-noodle-soup.jpg';
+import chickfilaChickenTortillaSoup from '@/assets/menu/chickfila-chicken-tortilla-soup.jpg';
+import chickfilaWaffleChips from '@/assets/menu/chickfila-waffle-chips.jpg';
+import chickfilaSauceWaffleChips from '@/assets/menu/chickfila-sauce-waffle-chips.jpg';
+import chickfilaAppleSauce from '@/assets/menu/chickfila-apple-sauce.jpg';
+import chickfilaKaleCrunch from '@/assets/menu/chickfila-kale-crunch.jpg';
+import chickfilaBerryParfaitSide from '@/assets/menu/chickfila-berry-parfait-side.jpg';
 
 export const restaurants: Restaurant[] = [
   {
@@ -871,6 +882,83 @@ export const restaurants: Restaurant[] = [
         category: 'Breakfast',
         image: chickfilaFruitCup,
         description: 'Fresh fruit medley'
+      },
+      {
+        id: 'chickfila-waffle-fries',
+        name: 'Waffle Potato Fries',
+        category: 'Sides',
+        image: chickfilaWaffleFries,
+        description: 'Classic waffle-cut potato fries'
+      },
+      {
+        id: 'chickfila-fruit-cup-side',
+        name: 'Fruit Cup',
+        category: 'Sides',
+        image: chickfilaFruitCupSide,
+        description: 'Fresh fruit medley'
+      },
+      {
+        id: 'chickfila-side-salad',
+        name: 'Side Salad',
+        category: 'Sides',
+        image: chickfilaSideSalad,
+        description: 'Fresh mixed greens side salad'
+      },
+      {
+        id: 'chickfila-mac-cheese',
+        name: 'Mac & Cheese',
+        category: 'Sides',
+        image: chickfilaMacCheese,
+        description: 'Creamy macaroni and cheese'
+      },
+      {
+        id: 'chickfila-chicken-noodle-soup',
+        name: 'Chicken Noodle Soup',
+        category: 'Sides',
+        image: chickfilaChickenNoodleSoup,
+        description: 'Hearty chicken noodle soup'
+      },
+      {
+        id: 'chickfila-chicken-tortilla-soup',
+        name: 'Chicken Tortilla Soup',
+        category: 'Sides',
+        image: chickfilaChickenTortillaSoup,
+        description: 'Spicy chicken tortilla soup'
+      },
+      {
+        id: 'chickfila-waffle-chips',
+        name: 'Original Waffle Potato Chips',
+        category: 'Sides',
+        image: chickfilaWaffleChips,
+        description: 'Waffle potato chips with sea salt'
+      },
+      {
+        id: 'chickfila-sauce-waffle-chips',
+        name: 'Chick-fil-A Sauce Waffle Chips',
+        category: 'Sides',
+        image: chickfilaSauceWaffleChips,
+        description: 'Waffle chips with Chick-fil-A sauce flavor'
+      },
+      {
+        id: 'chickfila-apple-sauce',
+        name: 'Buddy Fruits Apple Sauce',
+        category: 'Sides',
+        image: chickfilaAppleSauce,
+        description: 'Apple & cinnamon fruit sauce'
+      },
+      {
+        id: 'chickfila-kale-crunch',
+        name: 'Kale Crunch Side',
+        category: 'Sides',
+        image: chickfilaKaleCrunch,
+        description: 'Fresh kale crunch side'
+      },
+      {
+        id: 'chickfila-berry-parfait-side',
+        name: 'Berry Parfait',
+        category: 'Sides',
+        image: chickfilaBerryParfaitSide,
+        description: 'Yogurt parfait with berries and granola'
       }
     ]
   },
