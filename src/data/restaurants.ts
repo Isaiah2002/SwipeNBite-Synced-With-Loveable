@@ -169,6 +169,7 @@ import bambaChoriqueso from '@/assets/menu/bamba-choriqueso.jpg';
 import bambaQuesadillaTradicional from '@/assets/menu/bamba-quesadilla-tradicional.jpg';
 import bambaBigFatMexican from '@/assets/menu/bamba-big-fat-mexican.jpg';
 import bambaBigJerk from '@/assets/menu/bamba-big-jerk.jpg';
+import bambaBowl from '@/assets/menu/bamba-bowl.jpg';
 import bambaChurros from '@/assets/menu/bamba-churros.jpg';
 import bambaBirria from '@/assets/menu/bamba-birria.jpg';
 import bambaGuacamole from '@/assets/menu/bamba-guacamole.jpg';
@@ -1638,7 +1639,7 @@ export const restaurants: Restaurant[] = [
         id: 'pack-the-bowl',
         name: 'Pack the Bowl',
         category: 'Not Tacos',
-        image: bambaLoadedFries,
+        image: bambaBowl,
         description: 'Bamba salad mix, kale, carrot, cabbage, choice of tradicional filling, corn and black bean quinoa, avocado, pickled red onion',
         price: 12.00
       },
