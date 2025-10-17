@@ -171,6 +171,7 @@ import bambaBigFatMexican from '@/assets/menu/bamba-big-fat-mexican.jpg';
 import bambaBigJerk from '@/assets/menu/bamba-big-jerk.jpg';
 import bambaBowl from '@/assets/menu/bamba-bowl.jpg';
 import bambaStreetCorn from '@/assets/menu/bamba-street-corn.jpg';
+import bambaRiceBeans from '@/assets/menu/bamba-rice-beans.jpg';
 import bambaChurros from '@/assets/menu/bamba-churros.jpg';
 import bambaBirria from '@/assets/menu/bamba-birria.jpg';
 import bambaGuacamole from '@/assets/menu/bamba-guacamole.jpg';
@@ -1656,7 +1657,7 @@ export const restaurants: Restaurant[] = [
         id: 'rice-beans',
         name: 'Rice & Beans',
         category: 'Not Tacos',
-        image: bambaCarneAsada,
+        image: bambaRiceBeans,
         description: 'Black or pinto beans, cotija, pico de gallo',
         price: 4.50
       },
