@@ -1172,51 +1172,7 @@ export const restaurants: Restaurant[] = [
     deals: 'Free WiFi + study space',
     estimatedTime: 10,
     latitude: 38.9240,
-    longitude: -77.0380,
-    menu: [
-      {
-        id: 'coupe-1',
-        name: 'Maple Chai Latte',
-        category: 'Coffee & Beverages',
-        image: '/src/assets/menu/coupe-1.jpg',
-        description: 'Housemade chai syrup, maple syrup, cinnamon, steamed milk'
-      },
-      {
-        id: 'coupe-2',
-        name: 'Salted Caramel Cold Brew',
-        category: 'Coffee & Beverages',
-        image: '/src/assets/menu/coupe-2.jpg',
-        description: 'Cold brew topped with salted caramel cold foam'
-      },
-      {
-        id: 'coupe-3',
-        name: 'Seasonal Sandwich',
-        category: 'Food',
-        image: '/src/assets/menu/coupe-3.jpg',
-        description: 'Fresh handcrafted sandwich with seasonal ingredients'
-      },
-      {
-        id: 'coupe-4',
-        name: 'Brunch Special',
-        category: 'Food',
-        image: '/src/assets/menu/coupe-4.jpg',
-        description: 'Chef\'s special brunch plate'
-      },
-      {
-        id: 'coupe-5',
-        name: 'Specialty Cocktail',
-        category: 'Specialty Cocktails',
-        image: '/src/assets/menu/coupe-5.jpg',
-        description: 'Handcrafted seasonal cocktail'
-      },
-      {
-        id: 'coupe-6',
-        name: 'Maple Old Fashioned',
-        category: 'Specialty Cocktails',
-        image: '/src/assets/menu/coupe-6.jpg',
-        description: 'Tryst Trading Co. Rye Whiskey, maple syrup'
-      }
-    ]
+    longitude: -77.0380
   },
   {
     id: '9',
