@@ -8,7 +8,7 @@ import indianImage from '@/assets/indian.jpg';
 // The Coupe menu - real photos from Toast Tab
 import coupeLatte from '@/assets/menu/coupe-latte.jpg';
 import coupeIcedLatte from '@/assets/menu/coupe-iced-latte.jpg';
-import coupeBurger from '@/assets/menu/coupe-burger.jpg';
+import coupeBurger from '@/assets/menu/coupe-burger-real.jpg';
 import coupeBreakfastBurrito from '@/assets/menu/coupe-breakfast-burrito.jpg';
 import coupeAvocadoToast from '@/assets/menu/coupe-avocado-toast.jpg';
 import coupePancakes from '@/assets/menu/coupe-pancakes.jpg';
