@@ -1481,10 +1481,10 @@ export const restaurants: Restaurant[] = [
       },
       {
         id: 'french-toast-sandwich',
-        name: 'French Toast Sandwich',
+        name: 'French Toast Bacon Egg & Cheese',
         category: 'French Toast',
         image: heatFrenchToast,
-        description: 'Egg, Cheese, Ham, Sausage or Bacon, on French Toast!',
+        description: 'Bacon, egg, and cheese sandwiched between golden French Toast',
         price: 12.99
       },
       {
