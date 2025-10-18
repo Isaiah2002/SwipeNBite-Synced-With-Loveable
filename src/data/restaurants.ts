@@ -192,6 +192,14 @@ import heatEthiopianCombo from '@/assets/menu/heat-ethiopian-combo.jpg';
 import heatFrenchToast from '@/assets/menu/heat-french-toast.jpg';
 import heatOmeletteWaffle from '@/assets/menu/heat-omelette-waffle.jpg';
 import heatBeyaynetu from '@/assets/menu/heat-beyaynetu.jpg';
+import heatSausageEggCheese from '@/assets/menu/heat-sausage-egg-cheese.jpg';
+import heatChickenBurger from '@/assets/menu/heat-chicken-burger.jpg';
+import heatSteakCheese from '@/assets/menu/heat-steak-cheese.jpg';
+import heatChickenWaffle from '@/assets/menu/heat-chicken-waffle.jpg';
+import heatPancakes from '@/assets/menu/heat-pancakes.jpg';
+import heatWesternOmelette from '@/assets/menu/heat-western-omelette.jpg';
+import heatSalmonBurger from '@/assets/menu/heat-salmon-burger.jpg';
+import heatLentilSoup from '@/assets/menu/heat-lentil-soup.jpg';
 
 export const restaurants: Restaurant[] = [
   {
@@ -1442,10 +1450,90 @@ export const restaurants: Restaurant[] = [
       {
         id: 'bec-bagel',
         name: 'Bacon Egg and Cheese',
-        category: 'Breakfast',
+        category: 'Breakfast Sandwiches',
         image: heatBEC,
         description: 'A fresh Everything Bagel with Bacon Egg and Cheese',
-        price: 8.50
+        price: 10.99
+      },
+      {
+        id: 'sec-bagel',
+        name: 'Sausage Egg & Cheese',
+        category: 'Breakfast Sandwiches',
+        image: heatSausageEggCheese,
+        description: 'Sausage, egg, and cheese on your choice of bread',
+        price: 10.99
+      },
+      {
+        id: 'chicken-waffle',
+        name: 'Chicken and Waffle',
+        category: 'Waffles',
+        image: heatChickenWaffle,
+        description: 'Crispy chicken served on top of a fluffy waffle',
+        price: 13.99
+      },
+      {
+        id: 'pancakes',
+        name: 'Pancake Stack (3)',
+        category: 'Pancakes',
+        image: heatPancakes,
+        description: 'Three fluffy pancakes served with butter and syrup',
+        price: 6.99
+      },
+      {
+        id: 'french-toast-sandwich',
+        name: 'French Toast Sandwich',
+        category: 'French Toast',
+        image: heatFrenchToast,
+        description: 'Egg, Cheese, Ham, Sausage or Bacon, on French Toast!',
+        price: 12.99
+      },
+      {
+        id: 'western-omelette',
+        name: 'Western Omelette',
+        category: 'Omelettes',
+        image: heatWesternOmelette,
+        description: 'Ham omelette with peppers, onions, and cheese',
+        price: 13.99
+      },
+      {
+        id: 'omelette-waffle',
+        name: 'Heat Special Omelette on Waffle',
+        category: 'Waffles',
+        image: heatOmeletteWaffle,
+        description: 'An Omelet made with eggs, cheese, onions, sausage and bacon on top of waffle!',
+        price: 26.99
+      },
+      {
+        id: 'chicken-burger',
+        name: 'Chicken Burger',
+        category: 'Burgers',
+        image: heatChickenBurger,
+        description: 'Juicy chicken burger with lettuce, tomato, and mayo',
+        price: 10.99
+      },
+      {
+        id: 'salmon-burger',
+        name: 'Salmon Burger with Fries',
+        category: 'Burgers',
+        image: heatSalmonBurger,
+        description: 'Grilled salmon burger served with crispy fries',
+        price: 16.99
+      },
+      {
+        id: 'steak-cheese',
+        name: 'Beef Steak Sandwich Sub',
+        category: 'Hot Sandwiches',
+        image: heatSteakCheese,
+        description: 'Philly-style beef steak with melted cheese on a sub roll',
+        price: 12.99
+      },
+      {
+        id: 'lentil-soup',
+        name: 'Lentil Soup',
+        category: 'Soups',
+        image: heatLentilSoup,
+        description: 'Hearty Ethiopian-style lentil soup',
+        price: 7.99
       },
       {
         id: 'beef-tibs',
@@ -1461,31 +1549,15 @@ export const restaurants: Restaurant[] = [
         category: 'Ethiopian',
         image: heatEthiopianCombo,
         description: 'Includes kinche (Ethiopian oatmeal), firfir (injera firfir no meat) and scramble eggs. Vegan',
-        price: 12.00
-      },
-      {
-        id: 'french-toast-sandwich',
-        name: 'French Toast Sandwich',
-        category: 'Breakfast',
-        image: heatFrenchToast,
-        description: 'Egg, Cheese, Ham, Sausage or Bacon, on French Toast!',
-        price: 10.00
-      },
-      {
-        id: 'omelette-waffle',
-        name: 'Heat Special Omelette on Top of Waffle',
-        category: 'Breakfast',
-        image: heatOmeletteWaffle,
-        description: 'An Omelet made with eggs, cheese, onions, sausage and bacon on top of waffle!',
-        price: 11.50
+        price: 25.99
       },
       {
         id: 'beyaynetu',
-        name: 'Beyaynetu Vegetarian & Vegan Ethiopian Dish',
+        name: 'Beyaynetu Vegetarian & Vegan Ethiopian Platter',
         category: 'Ethiopian',
         image: heatBeyaynetu,
-        description: 'Spinach, cabbage, red lentil curry, lentil comes with injera',
-        price: 13.00
+        description: 'Spinach, cabbage, red lentil curry, chickpeas & injera',
+        price: 24.99
       }
     ]
   },
