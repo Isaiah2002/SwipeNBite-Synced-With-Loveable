@@ -1496,14 +1496,6 @@ export const restaurants: Restaurant[] = [
         price: 13.99
       },
       {
-        id: 'omelette-waffle',
-        name: 'Heat Special Omelette on Waffle',
-        category: 'Waffles',
-        image: heatOmeletteWaffle,
-        description: 'An Omelet made with eggs, cheese, onions, sausage and bacon on top of waffle!',
-        price: 26.99
-      },
-      {
         id: 'chicken-burger',
         name: 'Chicken Burger',
         category: 'Burgers',
