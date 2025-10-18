@@ -200,6 +200,18 @@ import heatPancakes from '@/assets/menu/heat-pancakes.jpg';
 import heatWesternOmelette from '@/assets/menu/heat-western-omelette.jpg';
 import heatSalmonBurger from '@/assets/menu/heat-salmon-burger.jpg';
 import heatLentilSoup from '@/assets/menu/heat-lentil-soup.jpg';
+// Call Your Mother Deli menu
+import cymSunCity from '@/assets/menu/cym-sun-city.jpg';
+import cymJetski from '@/assets/menu/cym-jetski.jpg';
+import cymRoyalPalm from '@/assets/menu/cym-royal-palm.jpg';
+import cymHiddenCove from '@/assets/menu/cym-hidden-cove.jpg';
+import cymMoonRiver from '@/assets/menu/cym-moon-river.jpg';
+import cymThunderbird from '@/assets/menu/cym-thunderbird.jpg';
+import cymHummusAvocado from '@/assets/menu/cym-hummus-avocado.jpg';
+import cymGrandezza from '@/assets/menu/cym-grandezza.jpg';
+import cymCinnamonBabka from '@/assets/menu/cym-cinnamon-babka.jpg';
+import cymPotatoLatkes from '@/assets/menu/cym-potato-latkes.jpg';
+import cymBlackWhiteCookie from '@/assets/menu/cym-black-white-cookie.jpg';
 
 export const restaurants: Restaurant[] = [
   {
@@ -1220,7 +1232,86 @@ export const restaurants: Restaurant[] = [
     deals: 'Catering available',
     estimatedTime: 15,
     latitude: 38.9190,
-    longitude: -77.0230
+    longitude: -77.0230,
+    menu: [
+      {
+        id: 'sun-city',
+        name: 'Sun City',
+        category: 'Breakfast Sandwiches',
+        image: cymSunCity,
+        description: 'Bacon, pastrami, or Impossible sausage + egg, American & cheddar, spicy honey on Everything bagel'
+      },
+      {
+        id: 'jetski',
+        name: 'Jetski',
+        category: 'Sandwiches',
+        image: cymJetski,
+        description: 'Brisket and pastrami cheesesteak on a cheddar bagel'
+      },
+      {
+        id: 'royal-palm',
+        name: 'Royal Palm',
+        category: 'Sandwiches',
+        image: cymRoyalPalm,
+        description: 'Smoked salmon, cream cheese, cucumber, tomato, red onion, capers on Everything bagel'
+      },
+      {
+        id: 'hidden-cove',
+        name: 'Hidden Cove',
+        category: 'Sandwiches',
+        image: cymHiddenCove,
+        description: 'Smoked salmon, avocado, marinated cukes, nori & carrots on toasted Sesame bagel'
+      },
+      {
+        id: 'moon-river',
+        name: 'Moon River',
+        category: 'Breakfast Sandwiches',
+        image: cymMoonRiver,
+        description: 'Turkey bacon, egg-whites, American & cheddar, spicy honey on Plain bagel'
+      },
+      {
+        id: 'thunderbird',
+        name: 'Thunderbird',
+        category: 'Breakfast Sandwiches',
+        image: cymThunderbird,
+        description: 'Chicken maple sausage, egg, American & cheddar, spicy honey on Maple Salt & Pepper bagel'
+      },
+      {
+        id: 'hummus-avocado',
+        name: 'Hummus & Avocado',
+        category: 'Vegetarian',
+        image: cymHummusAvocado,
+        description: 'Hummus, avocado, carrots, pickled veggies, crispy chickpeas on rye bread'
+      },
+      {
+        id: 'grandezza',
+        name: 'Grandezza',
+        category: 'Sandwiches',
+        image: cymGrandezza,
+        description: 'Turkey, mozzarella, red pepper relish, nut-free pesto on Plain bagel'
+      },
+      {
+        id: 'cinnamon-babka',
+        name: 'Cinnamon Roll Babka Muffin',
+        category: 'Pastries',
+        image: cymCinnamonBabka,
+        description: 'Cinnamon rolls meet babka in muffin form'
+      },
+      {
+        id: 'potato-latkes',
+        name: 'Potato Latkes',
+        category: 'Sides',
+        image: cymPotatoLatkes,
+        description: 'Extra crispy, gluten-friendly potato pancakes'
+      },
+      {
+        id: 'black-white-cookie',
+        name: 'Black & White Cookie',
+        category: 'Desserts',
+        image: cymBlackWhiteCookie,
+        description: 'Classic deli cookie with chocolate and vanilla frosting'
+      }
+    ]
   },
   {
     id: '8',
