@@ -365,6 +365,7 @@ const Index = () => {
                     onShare={handleShare}
                     isFavorited={favoriteRestaurants.some(fav => fav.id === currentRestaurants[currentIndex + 1]?.id)}
                     isActive={false}
+                    hasLocation={!!location}
                   />
                   </div>
                 )}
@@ -383,6 +384,7 @@ const Index = () => {
                   onShare={handleShare}
                   isFavorited={favoriteRestaurants.some(fav => fav.id === currentRestaurant.id)}
                   isActive={!swipeAnimation}
+                  hasLocation={!!location}
                 />
                 </div>
               </div>

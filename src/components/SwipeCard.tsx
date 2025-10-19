@@ -13,9 +13,10 @@ interface SwipeCardProps {
   onShare?: (restaurant: Restaurant) => void;
   isFavorited?: boolean;
   isActive?: boolean;
+  hasLocation?: boolean;
 }
 
-export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorited = false, isActive = true }: SwipeCardProps) => {
+export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorited = false, isActive = true, hasLocation = false }: SwipeCardProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -201,13 +202,20 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <div className="flex items-center space-x-1">
               <MapPin className="w-4 h-4" />
-              <span>{restaurant.distance} mi</span>
+              <span>{restaurant.distance} mi {hasLocation && '(drive)'}</span>
             </div>
             <div className="flex items-center space-x-1">
               <Clock className="w-4 h-4" />
               <span>{restaurant.estimatedTime} min</span>
             </div>
           </div>
+          
+          {hasLocation && (
+            <div className="flex items-center space-x-1 text-sm text-muted-foreground">
+              <span className="font-medium">🚶</span>
+              <span>{Math.round((restaurant.distance / 3) * 60)} min walk</span>
+            </div>
+          )}
           
           {restaurant.dietary.length > 0 && (
             <div className="flex flex-wrap gap-2">
