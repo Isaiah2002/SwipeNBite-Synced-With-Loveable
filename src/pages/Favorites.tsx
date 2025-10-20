@@ -57,6 +57,27 @@ const Favorites = () => {
     }
   };
 
+  const handleRemoveFavorite = async (restaurantId: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from('liked_restaurants')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('restaurant_id', restaurantId);
+
+      if (error) throw error;
+
+      setLikedRestaurants(prev => prev.filter(r => r.id !== restaurantId));
+      toast.success('Removed from favorites');
+    } catch (error: any) {
+      console.error('Error removing favorite:', error);
+      toast.error('Failed to remove from favorites');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="p-4">
@@ -92,6 +113,7 @@ const Favorites = () => {
                   likedRestaurants={likedRestaurants}
                   onClose={() => navigate('/')}
                   showCloseButton={false}
+                  onRemove={handleRemoveFavorite}
                 />
               )}
             </TabsContent>

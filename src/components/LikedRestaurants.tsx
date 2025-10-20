@@ -1,5 +1,5 @@
 import { Restaurant } from '@/types/restaurant';
-import { Heart, MapPin, Star, X, ExternalLink, Calendar, Info } from 'lucide-react';
+import { Heart, MapPin, Star, X, ExternalLink, Calendar, Info, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { RestaurantDetails } from '@/components/RestaurantDetails';
@@ -10,14 +10,15 @@ interface LikedRestaurantsProps {
   likedRestaurants: Restaurant[];
   onClose: () => void;
   showCloseButton?: boolean;
+  onRemove?: (restaurantId: string) => void;
 }
 
-const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => {
+const RestaurantCard = ({ restaurant, onRemove }: { restaurant: Restaurant; onRemove?: (restaurantId: string) => void }) => {
   const { enrichedRestaurant, loading } = useRestaurantData(restaurant);
   const [detailsOpen, setDetailsOpen] = useState(false);
 
   return (
-    <div className="swipe-card p-4 flex items-start space-x-4 hover:shadow-md">
+    <div className="swipe-card p-4 flex items-start space-x-4 hover:shadow-md relative">
       <img 
         src={restaurant.image}
         alt={restaurant.name}
@@ -28,7 +29,19 @@ const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => {
         <div>
           <div className="flex items-center justify-between gap-2">
             <h3 className="font-bold text-card-foreground truncate">{restaurant.name}</h3>
-            <span className="price-badge text-xs flex-shrink-0">{restaurant.price}</span>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <span className="price-badge text-xs">{restaurant.price}</span>
+              {onRemove && (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => onRemove(restaurant.id)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
           </div>
           
           <p className="text-sm text-muted-foreground">{restaurant.cuisine}</p>
@@ -115,7 +128,7 @@ const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => {
   );
 };
 
-export const LikedRestaurants = ({ likedRestaurants, onClose, showCloseButton = true }: LikedRestaurantsProps) => {
+export const LikedRestaurants = ({ likedRestaurants, onClose, showCloseButton = true, onRemove }: LikedRestaurantsProps) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -140,7 +153,7 @@ export const LikedRestaurants = ({ likedRestaurants, onClose, showCloseButton = 
       ) : (
         <div className="grid gap-4">
           {likedRestaurants.map((restaurant) => (
-            <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+            <RestaurantCard key={restaurant.id} restaurant={restaurant} onRemove={onRemove} />
           ))}
         </div>
       )}
