@@ -10,6 +10,7 @@ import { FilterBar } from '@/components/FilterBar';
 import { LikedRestaurants } from '@/components/LikedRestaurants';
 import { LocationPrompt } from '@/components/LocationPrompt';
 import { ShareDialog } from '@/components/ShareDialog';
+import { AddressInput } from '@/components/AddressInput';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Heart, RotateCcw, LogOut, User, Search, MapPin } from 'lucide-react';
@@ -294,6 +295,9 @@ const Index = () => {
           </div>
           
           <FilterBar filters={filters} onFiltersChange={setFilters} />
+          
+          {/* Delivery Address */}
+          <AddressInput />
           
           {/* Search Bar */}
           <div className="relative">
