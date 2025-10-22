@@ -1994,7 +1994,7 @@ export const restaurants: Restaurant[] = [
         category: 'Platters',
         image: saladImage,
         description: 'Your choice of entrée with two sides',
-        price: 17.00
+        price: 23.60
       },
       {
         id: 'mac-cheese',
