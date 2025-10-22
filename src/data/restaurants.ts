@@ -1206,21 +1206,6 @@ export const restaurants: Restaurant[] = [
     ]
   },
   {
-    id: '4',
-    name: 'Florida Avenue Grill',
-    cuisine: 'Soul Food',
-    price: '$$',
-    rating: 4.5,
-    distance: 1.2,
-    image: indianImage,
-    description: 'World\'s oldest soul food restaurant! Authentic Southern comfort food that feels like home.',
-    dietary: ['Vegetarian Options'],
-    deals: '15% student discount',
-    estimatedTime: 20,
-    latitude: 38.9180,
-    longitude: -77.0210
-  },
-  {
     id: '5',
     name: 'Busboys and Poets',
     cuisine: 'American',
