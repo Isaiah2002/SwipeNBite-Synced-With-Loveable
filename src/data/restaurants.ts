@@ -11,6 +11,7 @@ import nuveganCrabCakes from '@/assets/menu/nuvegan-crab-cakes.png';
 import nuveganGingerTofu from '@/assets/menu/nuvegan-ginger-tofu.png';
 import nuveganFriedSteak from '@/assets/menu/nuvegan-fried-steak.png';
 import nuveganBbqTofu from '@/assets/menu/nuvegan-bbq-tofu.png';
+import nuveganFishFillet from '@/assets/menu/nuvegan-fish-fillet.png';
 // The Coupe menu - real photos from Toast Tab
 import coupeLatte from '@/assets/menu/coupe-latte.jpg';
 import coupeIcedLatte from '@/assets/menu/coupe-iced-latte.jpg';
@@ -1957,7 +1958,7 @@ export const restaurants: Restaurant[] = [
         id: 'vegan-fish-fillet',
         name: 'Vegan Fried Fish Fillet',
         category: 'Chef Specials',
-        image: saladImage,
+        image: nuveganFishFillet,
         description: 'Crispy breaded plant-based fish fillet',
         price: 12.98
       },
