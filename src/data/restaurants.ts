@@ -5,6 +5,7 @@ import pizzaImage from '@/assets/pizza.jpg';
 import saladImage from '@/assets/salad.jpg';
 import dinerImage from '@/assets/diner.jpg';
 import indianImage from '@/assets/indian.jpg';
+import pxTacosImage from '@/assets/px-tacos.jpg';
 import nuveganDrummies from '@/assets/menu/nuvegan-drummies.png';
 import nuveganLasagna from '@/assets/menu/nuvegan-lasagna.png';
 import nuveganCrabCakes from '@/assets/menu/nuvegan-crab-cakes.png';
@@ -1204,6 +1205,21 @@ export const restaurants: Restaurant[] = [
         description: 'Zesty buffalo sauce with a kick'
       }
     ]
+  },
+  {
+    id: '4',
+    name: 'PX Tacos',
+    cuisine: 'Mexican',
+    price: '$$',
+    rating: 4.6,
+    distance: 1.3,
+    image: pxTacosImage,
+    description: 'Authentic tacos & Mexican classics with fresh, bold flavors. Known for slow-cooked beef birria tacos and pork belly fusion tacos.',
+    dietary: ['Vegetarian Options'],
+    deals: 'Loyalty program available',
+    estimatedTime: 20,
+    latitude: 38.9302,
+    longitude: -77.0261
   },
   {
     id: '5',
