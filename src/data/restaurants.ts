@@ -7,6 +7,7 @@ import dinerImage from '@/assets/diner.jpg';
 import indianImage from '@/assets/indian.jpg';
 import nuveganDrummies from '@/assets/menu/nuvegan-drummies.png';
 import nuveganLasagna from '@/assets/menu/nuvegan-lasagna.png';
+import nuveganCrabCakes from '@/assets/menu/nuvegan-crab-cakes.png';
 // The Coupe menu - real photos from Toast Tab
 import coupeLatte from '@/assets/menu/coupe-latte.jpg';
 import coupeIcedLatte from '@/assets/menu/coupe-iced-latte.jpg';
@@ -1921,7 +1922,7 @@ export const restaurants: Restaurant[] = [
         id: 'vegan-crab-cakes',
         name: 'Vegan Crab Cakes',
         category: 'Entrees',
-        image: saladImage,
+        image: nuveganCrabCakes,
         description: 'Expertly seasoned plant-based crab cakes with authentic flavor',
         price: 14.75
       },
