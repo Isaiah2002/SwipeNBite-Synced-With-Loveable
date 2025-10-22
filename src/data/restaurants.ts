@@ -1981,14 +1981,6 @@ export const restaurants: Restaurant[] = [
         price: 12.98
       },
       {
-        id: 'entree-platter-1-side',
-        name: 'Entrée Platter (1 Side)',
-        category: 'Platters',
-        image: saladImage,
-        description: 'Your choice of entrée with one side',
-        price: 13.00
-      },
-      {
         id: 'entree-platter-2-sides',
         name: 'Entrée Platter (2 Sides)',
         category: 'Platters',
