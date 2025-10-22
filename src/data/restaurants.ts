@@ -5,6 +5,7 @@ import pizzaImage from '@/assets/pizza.jpg';
 import saladImage from '@/assets/salad.jpg';
 import dinerImage from '@/assets/diner.jpg';
 import indianImage from '@/assets/indian.jpg';
+import nuveganDrummies from '@/assets/menu/nuvegan-drummies.png';
 // The Coupe menu - real photos from Toast Tab
 import coupeLatte from '@/assets/menu/coupe-latte.jpg';
 import coupeIcedLatte from '@/assets/menu/coupe-iced-latte.jpg';
@@ -1903,7 +1904,7 @@ export const restaurants: Restaurant[] = [
         id: 'drummies',
         name: 'Drummies',
         category: 'Entrees',
-        image: saladImage,
+        image: nuveganDrummies,
         description: 'Crispy vegan chicken drummies - crispy on the outside, tender on the inside',
         price: 14.16
       },
