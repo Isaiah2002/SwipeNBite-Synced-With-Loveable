@@ -2025,14 +2025,6 @@ export const restaurants: Restaurant[] = [
         price: 5.00
       },
       {
-        id: 'ginger-collards',
-        name: 'Ginger Collards',
-        category: 'Cold Sides',
-        image: saladImage,
-        description: 'Fresh collard greens with a ginger twist',
-        price: 5.00
-      },
-      {
         id: 'red-wine-kale',
         name: 'Red Wine Kale',
         category: 'Cold Sides',
