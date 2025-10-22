@@ -9,6 +9,7 @@ import nuveganDrummies from '@/assets/menu/nuvegan-drummies.png';
 import nuveganLasagna from '@/assets/menu/nuvegan-lasagna.png';
 import nuveganCrabCakes from '@/assets/menu/nuvegan-crab-cakes.png';
 import nuveganGingerTofu from '@/assets/menu/nuvegan-ginger-tofu.png';
+import nuveganFriedSteak from '@/assets/menu/nuvegan-fried-steak.png';
 // The Coupe menu - real photos from Toast Tab
 import coupeLatte from '@/assets/menu/coupe-latte.jpg';
 import coupeIcedLatte from '@/assets/menu/coupe-iced-latte.jpg';
@@ -1936,10 +1937,10 @@ export const restaurants: Restaurant[] = [
         price: 12.98
       },
       {
-        id: 'country-fried-steak',
-        name: 'Country Fried Steak',
+        id: 'vegan-fried-steak',
+        name: 'Vegan Fried Steak',
         category: 'Entrees',
-        image: saladImage,
+        image: nuveganFriedSteak,
         description: 'Classic Southern-style fried steak, 100% plant-based',
         price: 12.98
       },
