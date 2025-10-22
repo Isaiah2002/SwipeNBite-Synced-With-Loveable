@@ -12,6 +12,7 @@ import nuveganGingerTofu from '@/assets/menu/nuvegan-ginger-tofu.png';
 import nuveganFriedSteak from '@/assets/menu/nuvegan-fried-steak.png';
 import nuveganBbqTofu from '@/assets/menu/nuvegan-bbq-tofu.png';
 import nuveganFishFillet from '@/assets/menu/nuvegan-fish-fillet.png';
+import nuveganChickenSandwich from '@/assets/menu/nuvegan-chicken-sandwich.png';
 // The Coupe menu - real photos from Toast Tab
 import coupeLatte from '@/assets/menu/coupe-latte.jpg';
 import coupeIcedLatte from '@/assets/menu/coupe-iced-latte.jpg';
@@ -1966,7 +1967,7 @@ export const restaurants: Restaurant[] = [
         id: 'vegan-chicken-sandwich',
         name: 'Vegan Chicken Sandwich',
         category: 'Sandwiches',
-        image: saladImage,
+        image: nuveganChickenSandwich,
         description: 'Amazing soft bun with a little sweetness, crispy vegan chicken - the best!',
         price: 12.98
       },
