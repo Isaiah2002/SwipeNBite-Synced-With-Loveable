@@ -1904,7 +1904,7 @@ export const restaurants: Restaurant[] = [
         name: "Vegan Chick'n Drummies",
         category: 'Entrees',
         image: saladImage,
-        description: 'Crispy plant-based drumsticks with your choice of sauce',
+        description: 'Crispy plant-based drumsticks (gluten free option available)',
         price: 13.50
       },
       {
@@ -1913,55 +1913,127 @@ export const restaurants: Restaurant[] = [
         category: 'Entrees',
         image: saladImage,
         description: 'Two flavorful plant-based crab cakes',
-        price: 14.00
+        price: 12.50
       },
       {
-        id: 'vegan-soul-platter',
-        name: 'Soul Platter',
+        id: 'country-fried-steak',
+        name: 'Country Fried Steak',
         category: 'Entrees',
         image: saladImage,
-        description: 'A hearty plate of vegan comfort food favorites',
-        price: 15.00
+        description: 'Classic Southern-style fried steak, 100% plant-based',
+        price: 9.50
       },
       {
-        id: 'vegan-burger',
-        name: 'Classic Vegan Burger',
-        category: 'Sandwiches',
+        id: 'vegan-lasagna',
+        name: 'Vegan Lasagna',
+        category: 'Entrees',
         image: saladImage,
-        description: 'Plant-based burger with all the fixings',
-        price: 12.00
+        description: 'Layered pasta with plant-based cheese and savory sauce',
+        price: 9.50
       },
       {
-        id: 'vegan-wrap',
-        name: 'Garden Wrap',
-        category: 'Sandwiches',
+        id: 'vegan-bbq-roast',
+        name: 'Vegan Barbecue Roast w. Rice',
+        category: 'Entrees',
         image: saladImage,
-        description: 'Fresh vegetables and hummus in a soft wrap',
-        price: 11.00
+        description: 'Tender BBQ roast served over rice',
+        price: 9.50
       },
       {
-        id: 'collard-greens',
-        name: 'Collard Greens',
+        id: 'ginger-spiced-tofu',
+        name: 'Ginger Spiced Tofu w. Rice',
+        category: 'Entrees',
+        image: saladImage,
+        description: 'Perfectly seasoned tofu with ginger spice blend over rice',
+        price: 9.50
+      },
+      {
+        id: 'vegan-fish-fillet',
+        name: 'Vegan Fried Fish Fillet',
+        category: 'Entrees',
+        image: saladImage,
+        description: 'Crispy breaded plant-based fish fillet',
+        price: 12.50
+      },
+      {
+        id: 'bbq-tofu-rice',
+        name: 'Barbecue Tofu w. Rice',
+        category: 'Entrees',
+        image: saladImage,
+        description: 'BBQ glazed tofu served over fluffy rice',
+        price: 9.50
+      },
+      {
+        id: 'entree-platter-1-side',
+        name: 'Entrée Platter (1 Side)',
+        category: 'Platters',
+        image: saladImage,
+        description: 'Your choice of entrée with one side',
+        price: 13.00
+      },
+      {
+        id: 'entree-platter-2-sides',
+        name: 'Entrée Platter (2 Sides)',
+        category: 'Platters',
+        image: saladImage,
+        description: 'Your choice of entrée with two sides',
+        price: 17.00
+      },
+      {
+        id: 'ginger-collards',
+        name: 'Ginger Collards',
         category: 'Sides',
         image: saladImage,
-        description: 'Southern-style seasoned collard greens',
+        description: 'Fresh collard greens with a ginger twist',
         price: 5.00
       },
       {
-        id: 'mac-cheese',
-        name: 'Vegan Mac & Cheese',
+        id: 'red-wine-kale',
+        name: 'Red Wine Kale',
         category: 'Sides',
         image: saladImage,
-        description: 'Creamy plant-based mac and cheese',
+        description: 'Sautéed kale with red wine seasoning',
+        price: 5.00
+      },
+      {
+        id: 'mushroom-medley',
+        name: 'Mushroom Medley',
+        category: 'Sides',
+        image: saladImage,
+        description: 'Savory mix of seasoned mushrooms',
+        price: 5.00
+      },
+      {
+        id: 'floret-fusion',
+        name: 'Floret Fusion',
+        category: 'Sides',
+        image: saladImage,
+        description: 'Mixed vegetable florets with special seasoning',
+        price: 5.00
+      },
+      {
+        id: 'herbed-quinoa',
+        name: 'Herbed Quinoa',
+        category: 'Sides',
+        image: saladImage,
+        description: 'Fluffy quinoa with herbs and spices',
+        price: 5.50
+      },
+      {
+        id: 'chickn-salad',
+        name: "Chick'n Salad",
+        category: 'Sides',
+        image: saladImage,
+        description: 'Creamy plant-based chicken salad',
         price: 6.00
       },
       {
-        id: 'sweet-potato-pie',
-        name: 'Sweet Potato Pie',
-        category: 'Desserts',
+        id: 'curried-yuba',
+        name: 'Curried Yuba',
+        category: 'Sides',
         image: saladImage,
-        description: 'Classic Southern dessert, 100% vegan',
-        price: 6.50
+        description: 'Tofu skin with aromatic curry spices',
+        price: 5.00
       }
     ]
   }
