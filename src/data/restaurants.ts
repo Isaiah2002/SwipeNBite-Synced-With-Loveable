@@ -2050,14 +2050,6 @@ export const restaurants: Restaurant[] = [
         image: nuveganCakes,
         description: 'Delicious vegan cakes',
         price: 6.49
-      },
-      {
-        id: 'sweet-potato-pie',
-        name: 'Sweet Potato Pie',
-        category: 'Desserts',
-        image: saladImage,
-        description: 'Classic Southern dessert, 100% vegan',
-        price: 6.50
       }
     ]
   }
