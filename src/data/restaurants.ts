@@ -6,6 +6,7 @@ import saladImage from '@/assets/salad.jpg';
 import dinerImage from '@/assets/diner.jpg';
 import indianImage from '@/assets/indian.jpg';
 import nuveganDrummies from '@/assets/menu/nuvegan-drummies.png';
+import nuveganLasagna from '@/assets/menu/nuvegan-lasagna.png';
 // The Coupe menu - real photos from Toast Tab
 import coupeLatte from '@/assets/menu/coupe-latte.jpg';
 import coupeIcedLatte from '@/assets/menu/coupe-iced-latte.jpg';
@@ -1912,7 +1913,7 @@ export const restaurants: Restaurant[] = [
         id: 'vegan-lasagna',
         name: 'Vegan Lasagna',
         category: 'Entrees',
-        image: saladImage,
+        image: nuveganLasagna,
         description: 'Hearty and flavorful plant-based lasagna with layers of savory goodness',
         price: 12.98
       },
