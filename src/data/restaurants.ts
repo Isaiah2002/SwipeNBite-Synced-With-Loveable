@@ -1883,5 +1883,86 @@ export const restaurants: Restaurant[] = [
         price: 4.50
       }
     ]
+  },
+  {
+    id: '11',
+    name: 'NuVegan Cafe',
+    cuisine: 'Vegan',
+    price: '$$',
+    rating: 4.7,
+    distance: 1.2,
+    image: saladImage,
+    description: 'Where nutrition meets compassion. Delicious 100% plant-based comfort food that redefines vegan cuisine.',
+    dietary: ['Vegan', 'Gluten-free Options'],
+    deals: '20% off weekly orders over $50',
+    estimatedTime: 20,
+    latitude: 38.9314,
+    longitude: -77.0228,
+    menu: [
+      {
+        id: 'vegan-drummies',
+        name: "Vegan Chick'n Drummies",
+        category: 'Entrees',
+        image: saladImage,
+        description: 'Crispy plant-based drumsticks with your choice of sauce',
+        price: 13.50
+      },
+      {
+        id: 'vegan-crab-cakes',
+        name: 'Vegan Crab Cakes',
+        category: 'Entrees',
+        image: saladImage,
+        description: 'Two flavorful plant-based crab cakes',
+        price: 14.00
+      },
+      {
+        id: 'vegan-soul-platter',
+        name: 'Soul Platter',
+        category: 'Entrees',
+        image: saladImage,
+        description: 'A hearty plate of vegan comfort food favorites',
+        price: 15.00
+      },
+      {
+        id: 'vegan-burger',
+        name: 'Classic Vegan Burger',
+        category: 'Sandwiches',
+        image: saladImage,
+        description: 'Plant-based burger with all the fixings',
+        price: 12.00
+      },
+      {
+        id: 'vegan-wrap',
+        name: 'Garden Wrap',
+        category: 'Sandwiches',
+        image: saladImage,
+        description: 'Fresh vegetables and hummus in a soft wrap',
+        price: 11.00
+      },
+      {
+        id: 'collard-greens',
+        name: 'Collard Greens',
+        category: 'Sides',
+        image: saladImage,
+        description: 'Southern-style seasoned collard greens',
+        price: 5.00
+      },
+      {
+        id: 'mac-cheese',
+        name: 'Vegan Mac & Cheese',
+        category: 'Sides',
+        image: saladImage,
+        description: 'Creamy plant-based mac and cheese',
+        price: 6.00
+      },
+      {
+        id: 'sweet-potato-pie',
+        name: 'Sweet Potato Pie',
+        category: 'Desserts',
+        image: saladImage,
+        description: 'Classic Southern dessert, 100% vegan',
+        price: 6.50
+      }
+    ]
   }
 ];
