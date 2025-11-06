@@ -98,6 +98,50 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_items: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image: string | null
+          name: string
+          price: number | null
+          restaurant_id: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id: string
+          image?: string | null
+          name: string
+          price?: number | null
+          restaurant_id: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image?: string | null
+          name?: string
+          price?: number | null
+          restaurant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_items_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           address: string | null
@@ -149,6 +193,93 @@ export type Database = {
           updated_at?: string
           user_id?: string
           zip_code?: string | null
+        }
+        Relationships: []
+      }
+      restaurants: {
+        Row: {
+          created_at: string
+          cuisine: string
+          deals: string | null
+          description: string
+          dietary: string[]
+          distance: number
+          estimated_time: number
+          google_rating: number | null
+          id: string
+          image: string
+          last_synced_at: string | null
+          latitude: number | null
+          longitude: number | null
+          maps_url: string | null
+          name: string
+          opentable_available: boolean | null
+          photos: string[] | null
+          place_id: string | null
+          price: string
+          rating: number
+          reservation_url: string | null
+          review_count: number | null
+          updated_at: string
+          yelp_id: string | null
+          yelp_rating: number | null
+          yelp_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          cuisine: string
+          deals?: string | null
+          description: string
+          dietary?: string[]
+          distance: number
+          estimated_time: number
+          google_rating?: number | null
+          id: string
+          image: string
+          last_synced_at?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          maps_url?: string | null
+          name: string
+          opentable_available?: boolean | null
+          photos?: string[] | null
+          place_id?: string | null
+          price: string
+          rating: number
+          reservation_url?: string | null
+          review_count?: number | null
+          updated_at?: string
+          yelp_id?: string | null
+          yelp_rating?: number | null
+          yelp_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          cuisine?: string
+          deals?: string | null
+          description?: string
+          dietary?: string[]
+          distance?: number
+          estimated_time?: number
+          google_rating?: number | null
+          id?: string
+          image?: string
+          last_synced_at?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          maps_url?: string | null
+          name?: string
+          opentable_available?: boolean | null
+          photos?: string[] | null
+          place_id?: string | null
+          price?: string
+          rating?: number
+          reservation_url?: string | null
+          review_count?: number | null
+          updated_at?: string
+          yelp_id?: string | null
+          yelp_rating?: number | null
+          yelp_url?: string | null
         }
         Relationships: []
       }

@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.nearby-restaurants]
 verify_jwt = false
+
+[functions.sync-restaurants]
+verify_jwt = false
