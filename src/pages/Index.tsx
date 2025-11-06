@@ -312,10 +312,10 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="p-4 pb-2">
-        <div className="max-w-md mx-auto space-y-4">
+      <div className="p-4 pb-2 pt-2">
+        <div className="max-w-md mx-auto space-y-3">
           {/* User Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -364,11 +364,11 @@ const Index = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-4">
-        <div className="max-w-md mx-auto space-y-6">
+      <div className="flex-1 p-4 pt-2">
+        <div className="max-w-md mx-auto space-y-4">
           
           {/* Cards Stack */}
-          <div className="relative h-[600px] flex items-center justify-center">
+          <div className="relative h-[500px] flex items-center justify-center">
             {!hasMoreCards ? (
               // No more cards
               <div className="text-center space-y-6">
