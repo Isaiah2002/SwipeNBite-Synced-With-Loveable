@@ -143,24 +143,37 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
             <span className="price-badge">{restaurant.price}</span>
           </div>
           
-          <div className="absolute top-4 right-4 flex items-center space-x-2">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onFavorite?.(restaurant);
-              }}
-              className={`p-2 rounded-full transition-all duration-200 ${
-                isFavorited 
-                  ? 'bg-yellow-400 text-white shadow-lg' 
-                  : 'bg-black/50 text-white hover:bg-yellow-400/80'
-              }`}
-            >
-              <Star className={`w-4 h-4 ${isFavorited ? 'fill-current' : ''}`} />
-            </button>
-            <div className="flex items-center space-x-1 bg-black/50 px-2 py-1 rounded-full">
-              <Star className="w-3 h-3 text-yellow-400 fill-current" />
-              <span className="text-white text-xs font-medium">{restaurant.rating}</span>
+          <div className="absolute top-4 right-4 flex flex-col items-end space-y-2">
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onFavorite?.(restaurant);
+                }}
+                className={`p-2 rounded-full transition-all duration-200 ${
+                  isFavorited 
+                    ? 'bg-yellow-400 text-white shadow-lg' 
+                    : 'bg-black/50 text-white hover:bg-yellow-400/80'
+                }`}
+              >
+                <Star className={`w-4 h-4 ${isFavorited ? 'fill-current' : ''}`} />
+              </button>
+              <div className="flex items-center space-x-1 bg-black/50 px-2 py-1 rounded-full">
+                <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                <span className="text-white text-xs font-medium">{restaurant.rating}</span>
+              </div>
             </div>
+            
+            {enrichedRestaurant.yelpRating && (
+              <div className="flex items-center space-x-1 bg-red-600/90 px-2 py-1 rounded-full">
+                <span className="text-white text-xs font-bold">Yelp</span>
+                <Star className="w-3 h-3 text-white fill-current" />
+                <span className="text-white text-xs font-medium">{enrichedRestaurant.yelpRating}</span>
+                {enrichedRestaurant.reviewCount && (
+                  <span className="text-white/80 text-xs">({enrichedRestaurant.reviewCount})</span>
+                )}
+              </div>
+            )}
           </div>
           
           {/* Image Navigation Dots */}
@@ -228,6 +241,25 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
                 </span>
               ))}
             </div>
+          )}
+
+          {/* Yelp Link */}
+          {enrichedRestaurant.yelpUrl && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(enrichedRestaurant.yelpUrl, '_blank');
+              }}
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              View on Yelp
+              {enrichedRestaurant.reviewCount && (
+                <span className="ml-1 text-muted-foreground">({enrichedRestaurant.reviewCount} reviews)</span>
+              )}
+            </Button>
           )}
 
           {/* Action Buttons */}

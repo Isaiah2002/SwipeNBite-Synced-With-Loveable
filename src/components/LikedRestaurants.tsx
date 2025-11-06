@@ -115,6 +115,18 @@ const RestaurantCard = ({ restaurant, onRemove }: { restaurant: Restaurant; onRe
             </Button>
           )}
 
+          {enrichedRestaurant.yelpUrl && (
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+              onClick={() => window.open(enrichedRestaurant.yelpUrl, '_blank')}
+            >
+              <ExternalLink className="w-3 h-3 mr-1" />
+              Yelp
+            </Button>
+          )}
+
           <Button 
             size="sm" 
             className="gradient-primary text-primary-foreground border-0"
