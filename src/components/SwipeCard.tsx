@@ -24,6 +24,18 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
   const [isImageSwiping, setIsImageSwiping] = useState(false);
   const { enrichedRestaurant, loading: dataLoading } = useRestaurantData(restaurant);
 
+  // Haptic feedback helper
+  const triggerHaptic = (intensity: 'light' | 'medium' | 'heavy' = 'medium') => {
+    if ('vibrate' in navigator) {
+      const patterns = {
+        light: 10,
+        medium: 20,
+        heavy: 50
+      };
+      navigator.vibrate(patterns[intensity]);
+    }
+  };
+
   // Get all available images (menu items with images)
   const availableImages = restaurant.menu?.filter(item => item.image).map(item => ({
     url: item.image!,
@@ -78,16 +90,26 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!isActive || isImageSwiping) return;
     setIsDragging(true);
+    triggerHaptic('light');
     const startX = e.clientX;
+    let lastFeedbackThreshold = 0;
     
     const handleMouseMove = (e: MouseEvent) => {
       const offset = e.clientX - startX;
       setDragOffset(offset);
+      
+      // Haptic feedback at threshold
+      const currentThreshold = Math.floor(Math.abs(offset) / 100);
+      if (currentThreshold > lastFeedbackThreshold && currentThreshold === 1) {
+        triggerHaptic('medium');
+        lastFeedbackThreshold = currentThreshold;
+      }
     };
     
     const handleMouseUp = () => {
       setIsDragging(false);
       if (Math.abs(dragOffset) > 100) {
+        triggerHaptic('heavy');
         onSwipe(dragOffset > 0 ? 'right' : 'left');
       }
       setDragOffset(0);
@@ -99,12 +121,48 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
     document.addEventListener('mouseup', handleMouseUp);
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isActive || isImageSwiping) return;
+    setIsDragging(true);
+    triggerHaptic('light');
+    const startX = e.touches[0].clientX;
+    let lastFeedbackThreshold = 0;
+    
+    const handleTouchMove = (e: TouchEvent) => {
+      const offset = e.touches[0].clientX - startX;
+      setDragOffset(offset);
+      
+      // Haptic feedback at threshold
+      const currentThreshold = Math.floor(Math.abs(offset) / 100);
+      if (currentThreshold > lastFeedbackThreshold && currentThreshold === 1) {
+        triggerHaptic('medium');
+        lastFeedbackThreshold = currentThreshold;
+      }
+    };
+    
+    const handleTouchEnd = () => {
+      setIsDragging(false);
+      if (Math.abs(dragOffset) > 100) {
+        triggerHaptic('heavy');
+        onSwipe(dragOffset > 0 ? 'right' : 'left');
+      }
+      setDragOffset(0);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+    
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', handleTouchEnd);
+  };
+
   const handleButtonClick = (direction: 'left' | 'right') => {
+    triggerHaptic('medium');
     onSwipe(direction);
   };
 
-  const cardRotation = dragOffset * 0.1;
-  const cardOpacity = 1 - Math.abs(dragOffset) * 0.003;
+  const cardRotation = dragOffset * 0.05;
+  const cardScale = isDragging ? 1.02 : 1;
+  const swipeProgress = Math.min(Math.abs(dragOffset) / 100, 1);
 
   return (
     <div className="relative">
@@ -113,10 +171,13 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
           isDragging ? 'cursor-grabbing' : ''
         } ${!isActive ? 'pointer-events-none opacity-50' : ''}`}
         style={{
-          transform: `translateX(${dragOffset}px) rotate(${cardRotation}deg)`,
-          opacity: cardOpacity
+          transform: `translateX(${dragOffset}px) rotate(${cardRotation}deg) scale(${cardScale})`,
+          transition: isDragging 
+            ? 'transform 0.1s cubic-bezier(0.4, 0, 0.2, 1)' 
+            : 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
         onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
       >
         {/* Restaurant Image Carousel */}
         <div 
@@ -148,9 +209,10 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
               <button
                 onClick={(e) => {
                   e.stopPropagation();
+                  triggerHaptic('light');
                   onFavorite?.(restaurant);
                 }}
-                className={`p-2 rounded-full transition-all duration-200 ${
+                className={`p-2 rounded-full transition-all duration-200 active:scale-90 ${
                   isFavorited 
                     ? 'bg-yellow-400 text-white shadow-lg' 
                     : 'bg-black/50 text-white hover:bg-yellow-400/80'
@@ -312,7 +374,7 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
         <div className="flex justify-center items-center space-x-6 mt-8">
           <button
             onClick={() => handleButtonClick('left')}
-            className="pass-button group hover:scale-110"
+            className="pass-button group hover:scale-110 transition-transform duration-200 active:scale-95"
           >
             <X className="w-6 h-6" />
           </button>
@@ -320,41 +382,57 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
             <button
               onClick={(e) => {
                 e.stopPropagation();
+                triggerHaptic('light');
                 onShare(restaurant);
               }}
-              className="action-button bg-secondary text-secondary-foreground group hover:scale-110"
+              className="action-button bg-secondary text-secondary-foreground group hover:scale-110 transition-transform duration-200 active:scale-95"
             >
               <Share2 className="w-5 h-5" />
             </button>
           )}
           <button
             onClick={() => handleButtonClick('right')}
-            className="like-button group hover:scale-110"
+            className="like-button group hover:scale-110 transition-transform duration-200 active:scale-95"
           >
             <Heart className="w-6 h-6" />
           </button>
         </div>
       )}
 
-      {/* Swipe Indicators */}
-      {isDragging && (
-        <>
-          {dragOffset > 50 && (
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-              <div className="bg-accent text-accent-foreground px-6 py-3 rounded-full font-bold text-lg shadow-lg">
-                LIKE! 💚
-              </div>
-            </div>
-          )}
-          {dragOffset < -50 && (
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-              <div className="bg-pass text-pass-foreground px-6 py-3 rounded-full font-bold text-lg shadow-lg">
-                PASS 👋
-              </div>
-            </div>
-          )}
-        </>
-      )}
+      {/* Swipe Indicators with smooth transitions */}
+      <div 
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-opacity duration-200"
+        style={{ 
+          opacity: dragOffset > 50 ? swipeProgress : 0,
+        }}
+      >
+        <div 
+          className="bg-green-500 text-white px-8 py-4 rounded-2xl font-bold text-2xl shadow-2xl"
+          style={{
+            transform: `rotate(12deg) scale(${0.8 + swipeProgress * 0.4})`,
+            transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
+          }}
+        >
+          LIKE! 💚
+        </div>
+      </div>
+      
+      <div 
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-opacity duration-200"
+        style={{ 
+          opacity: dragOffset < -50 ? swipeProgress : 0,
+        }}
+      >
+        <div 
+          className="bg-red-500 text-white px-8 py-4 rounded-2xl font-bold text-2xl shadow-2xl"
+          style={{
+            transform: `rotate(-12deg) scale(${0.8 + swipeProgress * 0.4})`,
+            transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
+          }}
+        >
+          PASS 👋
+        </div>
+      </div>
     </div>
   );
 };
