@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { RestaurantMap } from '@/components/RestaurantMap';
 
 interface RestaurantDetailsProps {
   restaurant: Restaurant;
@@ -32,6 +33,18 @@ export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
 
   return (
     <div className="space-y-6">
+      {/* Map */}
+      {restaurant.latitude && restaurant.longitude && (
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold text-card-foreground">Location</h3>
+          <RestaurantMap
+            latitude={restaurant.latitude}
+            longitude={restaurant.longitude}
+            name={restaurant.name}
+          />
+        </div>
+      )}
+
       {/* Photos Gallery */}
       {restaurant.photos && restaurant.photos.length > 0 && (
         <div className="space-y-2">
