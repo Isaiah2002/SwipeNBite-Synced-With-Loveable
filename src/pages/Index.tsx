@@ -40,11 +40,16 @@ const Index = () => {
       try {
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('address, city, state, zip_code')
+          .select('address, city, state, zip_code, favorite_cuisines')
           .eq('user_id', user.id)
           .single();
 
         if (profileError) throw profileError;
+
+        // Set cuisine preferences
+        if (profile?.favorite_cuisines) {
+          setUserCuisinePreferences(profile.favorite_cuisines);
+        }
 
         if (profile?.address && profile?.city && profile?.state && profile?.zip_code) {
           const { data: geocodeData, error: geocodeError } = await supabase.functions.invoke('geocode-address', {
@@ -84,6 +89,7 @@ const Index = () => {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [restaurantToShare, setRestaurantToShare] = useState<Restaurant | null>(null);
   const [fetchingRestaurants, setFetchingRestaurants] = useState(false);
+  const [userCuisinePreferences, setUserCuisinePreferences] = useState<string[]>([]);
   const [filters, setFilters] = useState<Filters>({
     maxPrice: '$$$',
     maxDistance: 25,
@@ -145,6 +151,7 @@ const Index = () => {
 
     console.log(`User location: ${location?.latitude}, ${location?.longitude}`);
     console.log(`Current filters - maxDistance: ${filters.maxDistance}, minRating: ${filters.minRating}, maxPrice: ${filters.maxPrice}`);
+    console.log(`User cuisine preferences: ${userCuisinePreferences.join(', ')}`);
     
     const filtered = currentRestaurants.filter(restaurant => {
       const restaurantPriceValue = priceValues[restaurant.price];
@@ -153,14 +160,20 @@ const Index = () => {
       const matchesDietary = filters.dietary.length === 0 || 
         filters.dietary.some(diet => restaurant.dietary.includes(diet));
       
-      return matchesPrice && matchesRating && matchesDietary;
+      // Filter by cuisine preferences if user has set any
+      const matchesCuisine = userCuisinePreferences.length === 0 || 
+        userCuisinePreferences.some(pref => 
+          restaurant.cuisine.toLowerCase().includes(pref.toLowerCase())
+        );
+      
+      return matchesPrice && matchesRating && matchesDietary && matchesCuisine;
     });
 
     console.log(`Filtered restaurants count: ${filtered.length}`);
 
     setCurrentRestaurants(filtered);
     setCurrentIndex(0);
-  }, [filters.maxPrice, filters.minRating, filters.dietary]);
+  }, [filters.maxPrice, filters.minRating, filters.dietary, userCuisinePreferences]);
 
   const handleSwipe = async (direction: 'left' | 'right') => {
     const currentRestaurant = currentRestaurants[currentIndex];
