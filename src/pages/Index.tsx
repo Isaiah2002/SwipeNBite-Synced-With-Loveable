@@ -80,7 +80,6 @@ const Index = () => {
   const [favoriteRestaurants, setFavoriteRestaurants] = useState<Restaurant[]>([]);
   const [showLiked, setShowLiked] = useState(false);
   const [swipeAnimation, setSwipeAnimation] = useState<'left' | 'right' | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
   const [showLocationPrompt, setShowLocationPrompt] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [restaurantToShare, setRestaurantToShare] = useState<Restaurant | null>(null);
@@ -153,18 +152,15 @@ const Index = () => {
       const matchesRating = restaurant.rating >= filters.minRating;
       const matchesDietary = filters.dietary.length === 0 || 
         filters.dietary.some(diet => restaurant.dietary.includes(diet));
-      const matchesSearch = searchTerm === '' || 
-        restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        restaurant.cuisine.toLowerCase().includes(searchTerm.toLowerCase());
       
-      return matchesPrice && matchesRating && matchesDietary && matchesSearch;
+      return matchesPrice && matchesRating && matchesDietary;
     });
 
     console.log(`Filtered restaurants count: ${filtered.length}`);
 
     setCurrentRestaurants(filtered);
     setCurrentIndex(0);
-  }, [filters.maxPrice, filters.minRating, filters.dietary, searchTerm]);
+  }, [filters.maxPrice, filters.minRating, filters.dietary]);
 
   const handleSwipe = async (direction: 'left' | 'right') => {
     const currentRestaurant = currentRestaurants[currentIndex];
@@ -316,50 +312,10 @@ const Index = () => {
       {/* Header */}
       <div className="p-4 pb-2 pt-2">
         <div className="max-w-md mx-auto space-y-3">
-          {/* User Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center">
-                <User className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <div>
-                <h2 className="font-semibold text-card-foreground">Welcome back!</h2>
-                <p className="text-sm text-muted-foreground">
-                  {location 
-                    ? `📍 Showing nearby restaurants • ${currentRestaurants.length} found`
-                    : user.email
-                  }
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={signOut}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <LogOut className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-          
           <FilterBar filters={filters} onFiltersChange={setFilters} />
           
           {/* Delivery Address */}
           <AddressInput onAddressUpdate={handleAddressUpdate} />
-          
-          {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              type="text"
-              placeholder="Search restaurants or cuisine..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-card border-border/50"
-            />
-          </div>
         </div>
       </div>
 
