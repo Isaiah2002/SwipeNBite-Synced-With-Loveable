@@ -324,7 +324,7 @@ const Index = () => {
         <div className="max-w-md mx-auto space-y-4">
           
           {/* Cards Stack */}
-          <div className="relative h-[500px] flex items-center justify-center">
+          <div className="relative h-[420px] flex items-center justify-center">
             {!hasMoreCards ? (
               // No more cards
               <div className="text-center space-y-6">
