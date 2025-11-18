@@ -235,7 +235,7 @@ const Profile = () => {
                         className="w-full flex items-center space-x-2"
                       >
                         <Settings className="w-4 h-4" />
-                        <span>Set Address</span>
+                        <span>{hasAddress ? 'Change Address' : 'Set Address'}</span>
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
