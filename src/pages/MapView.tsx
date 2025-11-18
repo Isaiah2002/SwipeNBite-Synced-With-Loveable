@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Popup, useMap, Marker } from 'react-leaflet';
-import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { supabase } from '@/integrations/supabase/client';
@@ -150,99 +149,68 @@ const MapView = () => {
           
           <MapUpdater center={defaultCenter} />
 
-          <MarkerClusterGroup
-            chunkedLoading
-            maxClusterRadius={50}
-            spiderfyOnMaxZoom={true}
-            showCoverageOnHover={false}
-            zoomToBoundsOnClick={true}
-            iconCreateFunction={(cluster) => {
-              const count = cluster.getChildCount();
-              let size = 'small';
-              let color = 'hsl(var(--primary))';
-              
-              if (count > 10) {
-                size = 'large';
-              } else if (count > 5) {
-                size = 'medium';
-              }
-              
-              const sizeMap = {
-                small: 40,
-                medium: 50,
-                large: 60,
-              };
-              
-              return L.divIcon({
-                html: `<div style="background: ${color}; width: ${sizeMap[size as keyof typeof sizeMap]}px; height: ${sizeMap[size as keyof typeof sizeMap]}px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">${count}</div>`,
-                className: 'custom-cluster-icon',
-                iconSize: [sizeMap[size as keyof typeof sizeMap], sizeMap[size as keyof typeof sizeMap]],
-              });
-            }}
-          >
-            {restaurants.map((restaurant) => {
-              if (!restaurant.latitude || !restaurant.longitude) return null;
-              
-              return (
-                <Marker
-                  key={restaurant.id}
-                  position={[restaurant.latitude, restaurant.longitude]}
-                  icon={createRestaurantIcon(restaurant.isOpen)}
-                >
-                  <Popup maxWidth={280} minWidth={280}>
-                    <Card className="border-0 shadow-none">
-                      <div className="space-y-3 p-2">
-                        {/* Restaurant Image */}
-                        <div className="relative h-32 rounded-lg overflow-hidden">
-                          <img
-                            src={restaurant.image}
-                            alt={restaurant.name}
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute top-2 right-2 bg-background/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center space-x-1">
-                            <Star className="w-3 h-3 text-yellow-400 fill-current" />
-                            <span className="text-xs font-bold">{restaurant.rating}</span>
-                          </div>
-                        </div>
-
-                        {/* Restaurant Info */}
-                        <div>
-                          <h3 className="font-bold text-base mb-1">{restaurant.name}</h3>
-                          <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                            {restaurant.description}
-                          </p>
-                          
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
-                            <span className="font-semibold text-secondary">{restaurant.price}</span>
-                            <span>•</span>
-                            <span>{restaurant.cuisine}</span>
-                            <span>•</span>
-                            <span>{restaurant.estimatedTime} min</span>
-                          </div>
-
-                          {restaurant.distance && (
-                            <div className="flex items-center space-x-1 text-xs text-muted-foreground mb-3">
-                              <MapPin className="w-3 h-3" />
-                              <span>{restaurant.distance} mi away</span>
-                            </div>
-                          )}
-
-                          <Button
-                            className="w-full"
-                            size="sm"
-                            onClick={() => handleRestaurantClick(restaurant.id)}
-                          >
-                            <Navigation className="w-3 h-3 mr-2" />
-                            View Details
-                          </Button>
+          {restaurants.map((restaurant) => {
+            if (!restaurant.latitude || !restaurant.longitude) return null;
+            
+            return (
+              <Marker
+                key={restaurant.id}
+                position={[restaurant.latitude, restaurant.longitude]}
+                icon={createRestaurantIcon(restaurant.isOpen)}
+              >
+                <Popup maxWidth={280} minWidth={280}>
+                  <Card className="border-0 shadow-none">
+                    <div className="space-y-3 p-2">
+                      {/* Restaurant Image */}
+                      <div className="relative h-32 rounded-lg overflow-hidden">
+                        <img
+                          src={restaurant.image}
+                          alt={restaurant.name}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-2 right-2 bg-background/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center space-x-1">
+                          <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                          <span className="text-xs font-bold">{restaurant.rating}</span>
                         </div>
                       </div>
-                    </Card>
-                  </Popup>
-                </Marker>
-              );
-            })}
-          </MarkerClusterGroup>
+
+                      {/* Restaurant Info */}
+                      <div>
+                        <h3 className="font-bold text-base mb-1">{restaurant.name}</h3>
+                        <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                          {restaurant.description}
+                        </p>
+                        
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
+                          <span className="font-semibold text-secondary">{restaurant.price}</span>
+                          <span>•</span>
+                          <span>{restaurant.cuisine}</span>
+                          <span>•</span>
+                          <span>{restaurant.estimatedTime} min</span>
+                        </div>
+
+                        {restaurant.distance && (
+                          <div className="flex items-center space-x-1 text-xs text-muted-foreground mb-3">
+                            <MapPin className="w-3 h-3" />
+                            <span>{restaurant.distance} mi away</span>
+                          </div>
+                        )}
+
+                        <Button
+                          className="w-full"
+                          size="sm"
+                          onClick={() => handleRestaurantClick(restaurant.id)}
+                        >
+                          <Navigation className="w-3 h-3 mr-2" />
+                          View Details
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                </Popup>
+              </Marker>
+            );
+          })}
 
           {userLocation && (
             <Marker
