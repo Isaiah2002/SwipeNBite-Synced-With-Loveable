@@ -23,9 +23,12 @@ serve(async (req) => {
       throw new Error('Latitude and longitude are required');
     }
 
-    console.log(`Fetching restaurants near ${latitude}, ${longitude} within ${radius}m`);
+    // Yelp API has a maximum radius of 40000 meters (40km)
+    const validRadius = Math.min(radius, 40000);
+    
+    console.log(`Fetching restaurants near ${latitude}, ${longitude} within ${validRadius}m`);
 
-    const searchUrl = `https://api.yelp.com/v3/businesses/search?latitude=${latitude}&longitude=${longitude}&radius=${radius}&categories=restaurants,food&limit=${limit}&sort_by=distance`;
+    const searchUrl = `https://api.yelp.com/v3/businesses/search?latitude=${latitude}&longitude=${longitude}&radius=${validRadius}&categories=restaurants,food&limit=${limit}&sort_by=distance`;
     
     const searchResponse = await fetch(searchUrl, {
       headers: {
@@ -35,7 +38,9 @@ serve(async (req) => {
     });
 
     if (!searchResponse.ok) {
-      throw new Error(`Yelp API returned ${searchResponse.status}`);
+      const errorData = await searchResponse.text();
+      console.error('Yelp API error response:', errorData);
+      throw new Error(`Yelp API returned ${searchResponse.status}: ${errorData}`);
     }
 
     const data = await searchResponse.json();
