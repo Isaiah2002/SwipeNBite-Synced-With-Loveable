@@ -244,7 +244,6 @@ const MapView = () => {
             })}
           </MarkerClusterGroup>
 
-          {/* User location marker */}
           {userLocation && (
             <Marker
               position={[userLocation.latitude, userLocation.longitude]}
