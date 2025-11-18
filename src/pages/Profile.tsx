@@ -221,20 +221,6 @@ const Profile = () => {
               </div>
             )}
 
-            {/* Cuisine Preferences Section */}
-            {!isEditing && selectedCuisines.length > 0 && (
-              <div className="p-3 bg-muted/50 rounded-xl">
-                <h3 className="text-sm font-semibold text-card-foreground mb-2">Cuisine Preferences</h3>
-                <div className="flex flex-wrap gap-2">
-                  {selectedCuisines.map(cuisine => (
-                    <span key={cuisine} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                      {cuisine}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Actions */}
             <div className="space-y-3">
               {isEditing ? (
