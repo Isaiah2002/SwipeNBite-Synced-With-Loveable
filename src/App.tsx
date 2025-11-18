@@ -12,6 +12,7 @@ import Favorites from "./pages/Favorites";
 import Orders from "./pages/Orders";
 import Profile from "./pages/Profile";
 import RestaurantOrder from "./pages/RestaurantOrder";
+import MapView from "./pages/MapView";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/map" element={<MapView />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/orders" element={<Orders />} />
