@@ -1,5 +1,8 @@
 project_id = "otjtbhrwoxhdsxfvoigr"
 
+[functions.nominatim-geocode]
+verify_jwt = false
+
 [functions.yelp-restaurant]
 verify_jwt = false
 
