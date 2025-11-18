@@ -313,9 +313,6 @@ const Index = () => {
       <div className="p-4 pb-2 pt-2">
         <div className="max-w-md mx-auto space-y-3">
           <FilterBar filters={filters} onFiltersChange={setFilters} />
-          
-          {/* Delivery Address */}
-          <AddressInput onAddressUpdate={handleAddressUpdate} />
         </div>
       </div>
 
@@ -324,7 +321,7 @@ const Index = () => {
         <div className="max-w-md mx-auto space-y-4">
           
           {/* Cards Stack */}
-          <div className="relative h-[580px] flex items-center justify-center">
+          <div className="relative h-[660px] flex items-center justify-center">
             {!hasMoreCards ? (
               // No more cards
               <div className="text-center space-y-6">
