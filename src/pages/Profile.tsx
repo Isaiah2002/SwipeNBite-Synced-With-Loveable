@@ -9,6 +9,14 @@ import BottomNav from '@/components/BottomNav';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
+import { z } from 'zod';
+
+const addressSchema = z.object({
+  address: z.string().trim().min(1, "Street address is required").max(200, "Address is too long"),
+  city: z.string().trim().min(1, "City is required").max(100, "City is too long"),
+  state: z.string().trim().min(2, "State is required").max(2, "State must be 2 characters").toUpperCase(),
+  zipCode: z.string().trim().regex(/^\d{5}(-\d{4})?$/, "Invalid ZIP code format (e.g., 12345 or 12345-6789)")
+});
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -23,6 +31,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [preferencesOpen, setPreferencesOpen] = useState(false);
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
+  const [addressErrors, setAddressErrors] = useState<{ [key: string]: string }>({});
 
   const cuisineOptions = [
     'Italian', 'Mexican', 'Chinese', 'Japanese', 'Thai', 'Indian', 
@@ -67,15 +76,33 @@ const Profile = () => {
   const handleSaveAddress = async () => {
     if (!user) return;
     
+    // Validate form
+    try {
+      addressSchema.parse({ address, city, state, zipCode });
+      setAddressErrors({});
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: { [key: string]: string } = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            errors[err.path[0] as string] = err.message;
+          }
+        });
+        setAddressErrors(errors);
+        toast.error('Please fix the errors in the form');
+        return;
+      }
+    }
+    
     setLoading(true);
     try {
       const { error } = await supabase
         .from('profiles')
         .update({
-          address,
-          city,
-          state,
-          zip_code: zipCode,
+          address: address.trim(),
+          city: city.trim(),
+          state: state.trim().toUpperCase(),
+          zip_code: zipCode.trim(),
           updated_at: new Date().toISOString()
         })
         .eq('user_id', user.id);
@@ -248,18 +275,36 @@ const Profile = () => {
                           <Input
                             id="address"
                             value={address}
-                            onChange={(e) => setAddress(e.target.value)}
+                            onChange={(e) => {
+                              setAddress(e.target.value);
+                              if (addressErrors.address) {
+                                setAddressErrors({ ...addressErrors, address: '' });
+                              }
+                            }}
                             placeholder="123 Main St"
+                            className={addressErrors.address ? 'border-destructive' : ''}
                           />
+                          {addressErrors.address && (
+                            <p className="text-sm text-destructive">{addressErrors.address}</p>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="city">City</Label>
                           <Input
                             id="city"
                             value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                            placeholder="New York"
+                            onChange={(e) => {
+                              setCity(e.target.value);
+                              if (addressErrors.city) {
+                                setAddressErrors({ ...addressErrors, city: '' });
+                              }
+                            }}
+                            placeholder="Washington"
+                            className={addressErrors.city ? 'border-destructive' : ''}
                           />
+                          {addressErrors.city && (
+                            <p className="text-sm text-destructive">{addressErrors.city}</p>
+                          )}
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
@@ -267,20 +312,38 @@ const Profile = () => {
                             <Input
                               id="state"
                               value={state}
-                              onChange={(e) => setState(e.target.value)}
-                              placeholder="NY"
+                              onChange={(e) => {
+                                setState(e.target.value.toUpperCase());
+                                if (addressErrors.state) {
+                                  setAddressErrors({ ...addressErrors, state: '' });
+                                }
+                              }}
+                              placeholder="DC"
                               maxLength={2}
+                              className={addressErrors.state ? 'border-destructive' : ''}
                             />
+                            {addressErrors.state && (
+                              <p className="text-sm text-destructive">{addressErrors.state}</p>
+                            )}
                           </div>
                           <div className="space-y-2">
                             <Label htmlFor="zipCode">ZIP Code</Label>
                             <Input
                               id="zipCode"
                               value={zipCode}
-                              onChange={(e) => setZipCode(e.target.value)}
-                              placeholder="10001"
-                              maxLength={5}
+                              onChange={(e) => {
+                                setZipCode(e.target.value);
+                                if (addressErrors.zipCode) {
+                                  setAddressErrors({ ...addressErrors, zipCode: '' });
+                                }
+                              }}
+                              placeholder="20001"
+                              maxLength={10}
+                              className={addressErrors.zipCode ? 'border-destructive' : ''}
                             />
+                            {addressErrors.zipCode && (
+                              <p className="text-sm text-destructive">{addressErrors.zipCode}</p>
+                            )}
                           </div>
                         </div>
                         <Button
