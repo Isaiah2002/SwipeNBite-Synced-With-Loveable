@@ -44,7 +44,7 @@ serve(async (req) => {
     const placeId = place.place_id;
 
     // Get detailed place information
-    const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,user_ratings_total,photos,url,opening_hours,formatted_phone_number,website,formatted_address,geometry&key=${apiKey}`;
+    const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,user_ratings_total,photos,url,opening_hours,formatted_phone_number,website&key=${apiKey}`;
     
     const detailsResponse = await fetch(detailsUrl);
     const detailsData = await detailsResponse.json();
@@ -69,12 +69,6 @@ serve(async (req) => {
       openingHours: placeDetails.opening_hours?.weekday_text || [],
       phoneNumber: placeDetails.formatted_phone_number,
       website: placeDetails.website,
-      address: placeDetails.formatted_address || place.vicinity,
-      location: {
-        lat: place.geometry.location.lat,
-        lng: place.geometry.location.lng,
-      },
-      isOpen: placeDetails.opening_hours?.open_now,
     };
 
     console.log('Successfully fetched place details:', result);

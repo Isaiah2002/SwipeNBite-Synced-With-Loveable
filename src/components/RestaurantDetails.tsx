@@ -1,31 +1,21 @@
 import { Restaurant } from '@/types/restaurant';
-import { Star, MapPin, Clock, ExternalLink, Phone, Calendar, Navigation } from 'lucide-react';
+import { Star, MapPin, Clock, ExternalLink, Phone, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { OpenStreetMapEmbed } from '@/components/OpenStreetMapEmbed';
-import { useState } from 'react';
-import { useLocation } from '@/hooks/useLocation';
 
 interface RestaurantDetailsProps {
   restaurant: Restaurant;
 }
 
 export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
-  const [showDirections, setShowDirections] = useState(false);
-  const { location: userLocation } = useLocation();
-
   const handleMapsClick = () => {
     if (restaurant.mapsUrl) {
       window.open(restaurant.mapsUrl, '_blank');
     } else if (restaurant.latitude && restaurant.longitude) {
       window.open(`https://www.google.com/maps/search/?api=1&query=${restaurant.latitude},${restaurant.longitude}`, '_blank');
     }
-  };
-
-  const handleDirectionsClick = () => {
-    setShowDirections(!showDirections);
   };
 
   const handleReservationClick = () => {
@@ -106,71 +96,6 @@ export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
         </CardContent>
       </Card>
 
-      {/* Location & Map */}
-      {restaurant.latitude && restaurant.longitude && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-card-foreground">Location</h3>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleDirectionsClick}
-            >
-              <Navigation className="w-4 h-4 mr-2" />
-              {showDirections ? 'Hide' : 'Show'} Directions
-            </Button>
-          </div>
-
-          {restaurant.address && (
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-              <MapPin className="w-4 h-4" />
-              <span>{restaurant.address}</span>
-            </div>
-          )}
-
-          <OpenStreetMapEmbed
-            latitude={restaurant.latitude}
-            longitude={restaurant.longitude}
-            name={restaurant.name}
-            showDirections={showDirections}
-            userLocation={userLocation ? { lat: userLocation.latitude, lng: userLocation.longitude } : undefined}
-          />
-
-          {restaurant.openingHours && restaurant.openingHours.length > 0 && (
-            <Card>
-              <CardContent className="pt-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-semibold">Hours</h4>
-                  {restaurant.isOpen !== undefined && (
-                    <span className={`text-sm font-medium ${restaurant.isOpen ? 'text-green-600' : 'text-red-600'}`}>
-                      {restaurant.isOpen ? 'Open Now' : 'Closed'}
-                    </span>
-                  )}
-                </div>
-                <div className="space-y-1 text-sm">
-                  {restaurant.openingHours.map((hours, index) => (
-                    <div key={index} className="text-muted-foreground">{hours}</div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {restaurant.phoneNumber && (
-            <Card>
-              <CardContent className="pt-4">
-                <div className="flex items-center space-x-3">
-                  <Phone className="w-5 h-5 text-muted-foreground" />
-                  <a href={`tel:${restaurant.phoneNumber}`} className="text-primary hover:underline">
-                    {restaurant.phoneNumber}
-                  </a>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      )}
-
       {/* Reviews */}
       {restaurant.reviews && restaurant.reviews.length > 0 && (
         <div className="space-y-3">
@@ -216,11 +141,11 @@ export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
           <Button 
             variant="outline" 
             className="w-full" 
-            onClick={handleDirectionsClick}
-            disabled={!restaurant.latitude || !restaurant.longitude}
+            onClick={handleMapsClick}
+            disabled={!restaurant.mapsUrl && !restaurant.latitude}
           >
-            <Navigation className="w-4 h-4 mr-2" />
-            {showDirections ? 'Hide' : 'Show'} Directions
+            <MapPin className="w-4 h-4 mr-2" />
+            Directions
           </Button>
 
           {restaurant.reservationUrl && (

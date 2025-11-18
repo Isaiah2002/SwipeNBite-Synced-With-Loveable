@@ -162,19 +162,4 @@
   .rating-stars {
     @apply text-secondary text-sm font-medium;
   }
-
-  /* Leaflet Map Customizations */
-  .leaflet-popup-content-wrapper {
-    @apply rounded-xl shadow-lg border border-border;
-    background: hsl(var(--card));
-    color: hsl(var(--card-foreground));
-  }
-
-  .leaflet-popup-tip {
-    background: hsl(var(--card));
-  }
-
-  .leaflet-container {
-    font-family: inherit;
-  }
 }

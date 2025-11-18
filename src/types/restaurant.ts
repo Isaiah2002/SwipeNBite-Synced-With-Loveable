@@ -27,15 +27,6 @@ export interface Restaurant {
   mapsUrl?: string;
   googleRating?: number;
   photos?: string[];
-  address?: string;
-  openingHours?: string[];
-  phoneNumber?: string;
-  website?: string;
-  isOpen?: boolean;
-  location?: {
-    lat: number;
-    lng: number;
-  };
   // Yelp data
   yelpId?: string;
   yelpUrl?: string;
