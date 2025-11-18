@@ -21,6 +21,15 @@ const Profile = () => {
   const [state, setState] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [loading, setLoading] = useState(false);
+  const [preferencesOpen, setPreferencesOpen] = useState(false);
+  const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
+
+  const cuisineOptions = [
+    'Italian', 'Mexican', 'Chinese', 'Japanese', 'Thai', 'Indian', 
+    'American', 'Mediterranean', 'Korean', 'Vietnamese', 'Greek',
+    'French', 'Spanish', 'Ethiopian', 'Caribbean', 'Middle Eastern',
+    'Pizza', 'Burgers', 'Seafood', 'Steakhouse', 'Vegan', 'Vegetarian'
+  ];
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -29,7 +38,7 @@ const Profile = () => {
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('address, city, state, zip_code')
+          .select('address, city, state, zip_code, favorite_cuisines')
           .eq('user_id', user.id)
           .single();
 
@@ -40,6 +49,7 @@ const Profile = () => {
           setCity(data.city || '');
           setState(data.state || '');
           setZipCode(data.zip_code || '');
+          setSelectedCuisines(data.favorite_cuisines || []);
         }
       } catch (error: any) {
         console.error('Error fetching profile:', error);
@@ -81,6 +91,41 @@ const Profile = () => {
       setLoading(false);
     }
   };
+
+  const handleSavePreferences = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          user_id: user.id,
+          favorite_cuisines: selectedCuisines,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      toast.success('Preferences updated successfully!');
+      setPreferencesOpen(false);
+    } catch (error: any) {
+      console.error('Error updating preferences:', error);
+      toast.error('Failed to update preferences');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleCuisine = (cuisine: string) => {
+    setSelectedCuisines(prev =>
+      prev.includes(cuisine)
+        ? prev.filter(c => c !== cuisine)
+        : [...prev, cuisine]
+    );
+  };
+
+  const hasAddress = address && city && state && zipCode;
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -139,6 +184,30 @@ const Profile = () => {
               </div>
             </div>
 
+            {/* Delivery Address Section */}
+            {hasAddress && !isEditing && (
+              <div className="p-3 bg-muted/50 rounded-xl">
+                <h3 className="text-sm font-semibold text-card-foreground mb-2">Delivery Address</h3>
+                <p className="text-sm text-muted-foreground">
+                  {address}, {city}, {state} {zipCode}
+                </p>
+              </div>
+            )}
+
+            {/* Cuisine Preferences Section */}
+            {!isEditing && selectedCuisines.length > 0 && (
+              <div className="p-3 bg-muted/50 rounded-xl">
+                <h3 className="text-sm font-semibold text-card-foreground mb-2">Cuisine Preferences</h3>
+                <div className="flex flex-wrap gap-2">
+                  {selectedCuisines.map(cuisine => (
+                    <span key={cuisine} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                      {cuisine}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Actions */}
             <div className="space-y-3">
               {isEditing ? (
@@ -166,7 +235,7 @@ const Profile = () => {
                         className="w-full flex items-center space-x-2"
                       >
                         <Settings className="w-4 h-4" />
-                        <span>Settings</span>
+                        <span>Set Address</span>
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
@@ -224,6 +293,51 @@ const Profile = () => {
                       </div>
                     </DialogContent>
                   </Dialog>
+
+                  <Dialog open={preferencesOpen} onOpenChange={setPreferencesOpen}>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full flex items-center space-x-2"
+                      >
+                        <Settings className="w-4 h-4" />
+                        <span>Preferences</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Food Preferences</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 pt-4">
+                        <p className="text-sm text-muted-foreground">
+                          Select your favorite cuisines to personalize your restaurant recommendations
+                        </p>
+                        <div className="grid grid-cols-2 gap-3">
+                          {cuisineOptions.map(cuisine => (
+                            <button
+                              key={cuisine}
+                              onClick={() => toggleCuisine(cuisine)}
+                              className={`p-3 rounded-lg border-2 transition-all ${
+                                selectedCuisines.includes(cuisine)
+                                  ? 'border-primary bg-primary/10 text-primary'
+                                  : 'border-border bg-background text-foreground hover:border-primary/50'
+                              }`}
+                            >
+                              <span className="text-sm font-medium">{cuisine}</span>
+                            </button>
+                          ))}
+                        </div>
+                        <Button
+                          onClick={handleSavePreferences}
+                          disabled={loading}
+                          className="w-full gradient-primary text-primary-foreground border-0"
+                        >
+                          {loading ? 'Saving...' : 'Save Preferences'}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
                   <Button
                     onClick={signOut}
                     variant="outline"
