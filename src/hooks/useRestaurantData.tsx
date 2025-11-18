@@ -3,7 +3,6 @@ import { Restaurant } from '@/types/restaurant';
 import { supabase } from '@/integrations/supabase/client';
 
 interface EnrichedData {
-  googleData?: any;
   yelpData?: any;
   openTableData?: any;
 }
@@ -23,20 +22,6 @@ export const useRestaurantData = (restaurant: Restaurant) => {
       try {
         setLoading(true);
         const promises = [];
-
-        // Fetch Google Maps data
-        promises.push(
-          supabase.functions.invoke('google-maps-place', {
-            body: {
-              latitude: restaurant.latitude,
-              longitude: restaurant.longitude,
-              name: restaurant.name,
-            }
-          }).catch(err => {
-            console.error('Google Maps error:', err);
-            return { data: null };
-          })
-        );
 
         // Fetch Yelp data
         promises.push(
@@ -66,10 +51,9 @@ export const useRestaurantData = (restaurant: Restaurant) => {
           })
         );
 
-        const [googleResponse, yelpResponse, openTableResponse] = await Promise.all(promises);
+        const [yelpResponse, openTableResponse] = await Promise.all(promises);
 
         setEnrichedData({
-          googleData: googleResponse.data,
           yelpData: yelpResponse.data,
           openTableData: openTableResponse.data,
         });
@@ -88,10 +72,6 @@ export const useRestaurantData = (restaurant: Restaurant) => {
   // Merge enriched data with restaurant data
   const enrichedRestaurant: Restaurant = {
     ...restaurant,
-    placeId: enrichedData.googleData?.placeId,
-    mapsUrl: enrichedData.googleData?.mapsUrl,
-    googleRating: enrichedData.googleData?.rating,
-    photos: enrichedData.googleData?.photos || [],
     yelpId: enrichedData.yelpData?.yelpId,
     yelpUrl: enrichedData.yelpData?.yelpUrl,
     yelpRating: enrichedData.yelpData?.rating,

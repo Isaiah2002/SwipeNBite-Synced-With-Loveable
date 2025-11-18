@@ -50,28 +50,8 @@ const Index = () => {
         if (profile?.favorite_cuisines) {
           setUserCuisinePreferences(profile.favorite_cuisines);
         }
-
-        if (profile?.address && profile?.city && profile?.state && profile?.zip_code) {
-          const { data: geocodeData, error: geocodeError } = await supabase.functions.invoke('geocode-address', {
-            body: {
-              address: profile.address,
-              city: profile.city,
-              state: profile.state,
-              zip_code: profile.zip_code
-            }
-          });
-
-          if (geocodeError) throw geocodeError;
-
-          if (geocodeData?.latitude && geocodeData?.longitude) {
-            setLocation({
-              latitude: geocodeData.latitude,
-              longitude: geocodeData.longitude
-            });
-          }
-        }
       } catch (error: any) {
-        console.error('Error geocoding address:', error);
+        console.error('Error loading profile:', error);
       } finally {
         setLocationLoading(false);
       }
@@ -257,26 +237,7 @@ const Index = () => {
 
       if (profileError) throw profileError;
 
-      if (profile?.address && profile?.city && profile?.state && profile?.zip_code) {
-        const { data: geocodeData, error: geocodeError } = await supabase.functions.invoke('geocode-address', {
-          body: {
-            address: profile.address,
-            city: profile.city,
-            state: profile.state,
-            zip_code: profile.zip_code
-          }
-        });
-
-        if (geocodeError) throw geocodeError;
-
-        if (geocodeData?.latitude && geocodeData?.longitude) {
-          setLocation({
-            latitude: geocodeData.latitude,
-            longitude: geocodeData.longitude
-          });
-          toast.success('Location updated based on delivery address!');
-        }
-      }
+      toast.success('Location updated!');
     } catch (error: any) {
       console.error('Error geocoding address:', error);
       toast.error('Failed to update location from address');

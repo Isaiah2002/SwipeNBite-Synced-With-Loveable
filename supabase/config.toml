@@ -1,8 +1,5 @@
 project_id = "otjtbhrwoxhdsxfvoigr"
 
-[functions.google-maps-place]
-verify_jwt = false
-
 [functions.yelp-restaurant]
 verify_jwt = false
 
