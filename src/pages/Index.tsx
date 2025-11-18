@@ -50,6 +50,26 @@ const Index = () => {
         if (profile?.favorite_cuisines) {
           setUserCuisinePreferences(profile.favorite_cuisines);
         }
+
+        if (profile?.address && profile?.city && profile?.state && profile?.zip_code) {
+          const { data: geocodeData, error: geocodeError } = await supabase.functions.invoke('nominatim-geocode', {
+            body: {
+              address: profile.address,
+              city: profile.city,
+              state: profile.state,
+              zip_code: profile.zip_code
+            }
+          });
+
+          if (geocodeError) throw geocodeError;
+
+          if (geocodeData?.latitude && geocodeData?.longitude) {
+            setLocation({
+              latitude: geocodeData.latitude,
+              longitude: geocodeData.longitude
+            });
+          }
+        }
       } catch (error: any) {
         console.error('Error loading profile:', error);
       } finally {
@@ -237,7 +257,26 @@ const Index = () => {
 
       if (profileError) throw profileError;
 
-      toast.success('Location updated!');
+      if (profile?.address && profile?.city && profile?.state && profile?.zip_code) {
+        const { data: geocodeData, error: geocodeError } = await supabase.functions.invoke('nominatim-geocode', {
+          body: {
+            address: profile.address,
+            city: profile.city,
+            state: profile.state,
+            zip_code: profile.zip_code
+          }
+        });
+
+        if (geocodeError) throw geocodeError;
+
+        if (geocodeData?.latitude && geocodeData?.longitude) {
+          setLocation({
+            latitude: geocodeData.latitude,
+            longitude: geocodeData.longitude
+          });
+          toast.success('Location updated based on delivery address!');
+        }
+      }
     } catch (error: any) {
       console.error('Error geocoding address:', error);
       toast.error('Failed to update location from address');
