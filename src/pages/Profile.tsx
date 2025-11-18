@@ -71,22 +71,22 @@ const Profile = () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .upsert({
-          user_id: user.id,
+        .update({
           address,
           city,
           state,
           zip_code: zipCode,
           updated_at: new Date().toISOString()
-        });
+        })
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
-      toast.success('Delivery address updated successfully!');
+      toast.success('Delivery address saved!');
       setSettingsOpen(false);
     } catch (error: any) {
       console.error('Error updating address:', error);
-      toast.error('Failed to update address');
+      toast.error('Failed to save address');
     } finally {
       setLoading(false);
     }
@@ -99,19 +99,19 @@ const Profile = () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .upsert({
-          user_id: user.id,
+        .update({
           favorite_cuisines: selectedCuisines,
           updated_at: new Date().toISOString()
-        });
+        })
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
-      toast.success('Preferences updated successfully!');
+      toast.success('Preferences saved!');
       setPreferencesOpen(false);
     } catch (error: any) {
       console.error('Error updating preferences:', error);
-      toast.error('Failed to update preferences');
+      toast.error('Failed to save preferences');
     } finally {
       setLoading(false);
     }
