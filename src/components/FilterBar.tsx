@@ -1,5 +1,7 @@
 import { Filters } from '@/types/restaurant';
-import { DollarSign, MapPin, Star } from 'lucide-react';
+import { Sliders, DollarSign, MapPin, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 interface FilterBarProps {
   filters: Filters;
@@ -7,21 +9,33 @@ interface FilterBarProps {
 }
 
 export const FilterBar = ({ filters, onFiltersChange }: FilterBarProps) => {
+  const [showFilters, setShowFilters] = useState(false);
+
   const priceOptions = ['$', '$$', '$$$'] as const;
   const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Vegan Options', 'Vegetarian Options'];
   const distanceOptions = [0.5, 1, 2, 5];
 
   return (
     <div className="space-y-4">
-      {/* App Title */}
+      {/* Filter Toggle Button */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold gradient-primary bg-clip-text text-transparent">
           SwipeN'Bite 🍽️
         </h1>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowFilters(!showFilters)}
+          className="flex items-center space-x-2"
+        >
+          <Sliders className="w-4 h-4" />
+          <span>Filters</span>
+        </Button>
       </div>
 
-      {/* Filters */}
-      <div className="bg-card rounded-2xl p-4 border border-border/50 space-y-4 animate-bounce-in">
+      {/* Expandable Filters */}
+      {showFilters && (
+        <div className="bg-card rounded-2xl p-4 border border-border/50 space-y-4 animate-bounce-in">
           
           {/* Max Price */}
           <div className="space-y-2">
@@ -101,6 +115,7 @@ export const FilterBar = ({ filters, onFiltersChange }: FilterBarProps) => {
             </div>
           </div>
         </div>
+      )}
     </div>
   );
 };
