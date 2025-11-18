@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { GoogleMapEmbed } from '@/components/GoogleMapEmbed';
+import { OpenStreetMapEmbed } from '@/components/OpenStreetMapEmbed';
 import { useState } from 'react';
 import { useLocation } from '@/hooks/useLocation';
 
@@ -128,7 +128,7 @@ export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
             </div>
           )}
 
-          <GoogleMapEmbed
+          <OpenStreetMapEmbed
             latitude={restaurant.latitude}
             longitude={restaurant.longitude}
             name={restaurant.name}
