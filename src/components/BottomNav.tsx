@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom';
-import { Heart, ShoppingBag, User } from 'lucide-react';
+import { Heart, ShoppingBag, User, Map } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const BottomNav = () => {
   const navItems = [
+    { to: '/map', icon: Map, label: 'Map' },
     { to: '/favorites', icon: Heart, label: 'Favorites' },
     { to: '/orders', icon: ShoppingBag, label: 'Orders' },
     { to: '/profile', icon: User, label: 'Profile' },

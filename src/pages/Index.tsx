@@ -13,7 +13,7 @@ import { ShareDialog } from '@/components/ShareDialog';
 import { AddressInput } from '@/components/AddressInput';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Heart, RotateCcw, LogOut, User, Search, MapPin } from 'lucide-react';
+import { Heart, RotateCcw, LogOut, User, Search, MapPin, Map } from 'lucide-react';
 import { toast } from 'sonner';
 import BottomNav from '@/components/BottomNav';
 import { supabase } from '@/integrations/supabase/client';
@@ -333,6 +333,15 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/map')}
+                className="text-muted-foreground hover:text-foreground"
+                title="View Map"
+              >
+                <Map className="w-4 h-4" />
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
