@@ -130,7 +130,11 @@ const RestaurantCard = ({ restaurant, onRemove }: { restaurant: Restaurant; onRe
           <Button 
             size="sm" 
             className="gradient-primary text-primary-foreground border-0"
-            onClick={() => window.location.href = `/restaurant/${restaurant.id}`}
+            onClick={() => {
+              // Navigate to order page with restaurant data
+              const orderUrl = `/order/${restaurant.id}`;
+              window.location.href = orderUrl;
+            }}
           >
             Order Now
           </Button>
