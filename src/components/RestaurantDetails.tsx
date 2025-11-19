@@ -11,14 +11,6 @@ interface RestaurantDetailsProps {
 }
 
 export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
-  const handleMapsClick = () => {
-    if (restaurant.mapsUrl) {
-      window.open(restaurant.mapsUrl, '_blank');
-    } else if (restaurant.latitude && restaurant.longitude) {
-      window.open(`https://www.google.com/maps/search/?api=1&query=${restaurant.latitude},${restaurant.longitude}`, '_blank');
-    }
-  };
-
   const handleReservationClick = () => {
     if (restaurant.reservationUrl) {
       window.open(restaurant.reservationUrl, '_blank');
@@ -166,16 +158,6 @@ export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
         <h3 className="text-lg font-semibold text-card-foreground">Quick Actions</h3>
         
         <div className="grid grid-cols-2 gap-3">
-          <Button 
-            variant="outline" 
-            className="w-full" 
-            onClick={handleMapsClick}
-            disabled={!restaurant.mapsUrl && !restaurant.latitude}
-          >
-            <MapPin className="w-4 h-4 mr-2" />
-            Directions
-          </Button>
-
           {restaurant.reservationUrl && (
             <Button 
               variant="outline" 
