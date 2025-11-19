@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Restaurant } from '@/types/restaurant';
 import { Heart, X, Clock, MapPin, Star, Share2, ExternalLink, Info } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -44,6 +44,17 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
   
   // If no menu images, use the restaurant image
   const images = availableImages.length > 0 ? availableImages : [{ url: restaurant.image, name: restaurant.name }];
+
+  // Auto-cycle images every 5 seconds
+  useEffect(() => {
+    if (!isActive || images.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentImageIndex(prev => (prev + 1) % images.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [isActive, images.length]);
 
   const handleImageSwipe = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isActive || images.length <= 1) return;
