@@ -47,6 +47,32 @@ serve(async (req) => {
 
     if (!searchResponse.ok) {
       const errorBody = await searchResponse.text();
+
+      // Handle Yelp rate limiting gracefully to avoid crashing the function
+      if (searchResponse.status === 429) {
+        console.error('Yelp API rate limit reached:', errorBody);
+        console.error('Request URL:', searchUrl);
+
+        const rateLimitedResult = {
+          yelpId: null,
+          rating: null,
+          reviewCount: 0,
+          photos: [],
+          categories: [],
+          yelpUrl: null,
+          price: null,
+          phone: null,
+          reviews: [],
+          transactions: [],
+          error: 'Yelp rate limit exceeded',
+        };
+
+        return new Response(JSON.stringify(rateLimitedResult), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       console.error('Yelp API error response:', errorBody);
       console.error('Request URL:', searchUrl);
       throw new Error(`Yelp API error: ${searchResponse.status} - ${errorBody}`);
