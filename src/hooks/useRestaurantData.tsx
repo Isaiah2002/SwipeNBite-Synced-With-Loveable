@@ -8,12 +8,17 @@ interface EnrichedData {
   documenuData?: any;
 }
 
-export const useRestaurantData = (restaurant: Restaurant) => {
+export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = false) => {
   const [enrichedData, setEnrichedData] = useState<EnrichedData>({});
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!enabled) {
+      setLoading(false);
+      return;
+    }
+
     const fetchEnrichedData = async () => {
       if (!restaurant.latitude || !restaurant.longitude) {
         setLoading(false);
@@ -88,7 +93,7 @@ export const useRestaurantData = (restaurant: Restaurant) => {
     };
 
     fetchEnrichedData();
-  }, [restaurant.id, restaurant.latitude, restaurant.longitude, restaurant.name]);
+  }, [enabled, restaurant.id, restaurant.latitude, restaurant.longitude, restaurant.name]);
 
   // Merge enriched data with restaurant data
   const enrichedRestaurant: Restaurant = {

@@ -14,8 +14,8 @@ interface LikedRestaurantsProps {
 }
 
 const RestaurantCard = ({ restaurant, onRemove }: { restaurant: Restaurant; onRemove?: (restaurantId: string) => void }) => {
-  const { enrichedRestaurant, loading } = useRestaurantData(restaurant);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const { enrichedRestaurant, loading } = useRestaurantData(restaurant, detailsOpen);
 
   return (
     <div className="swipe-card p-4 flex items-start space-x-4 hover:shadow-md relative">

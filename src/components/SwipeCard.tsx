@@ -22,7 +22,7 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isImageSwiping, setIsImageSwiping] = useState(false);
-  const { enrichedRestaurant, loading: dataLoading } = useRestaurantData(restaurant);
+  const { enrichedRestaurant, loading: dataLoading } = useRestaurantData(restaurant, detailsOpen);
 
   // Haptic feedback helper
   const triggerHaptic = (intensity: 'light' | 'medium' | 'heavy' = 'medium') => {
