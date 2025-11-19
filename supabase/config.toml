@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.seed-restaurants]
 verify_jwt = false
+
+[functions.documenu-menu]
+verify_jwt = false
