@@ -2,17 +2,86 @@ import { ArrowLeft, Star, MapPin, Clock, Plus, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useParams } from 'react-router-dom';
 import { restaurants } from '@/data/restaurants';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { MenuItem } from '@/types/restaurant';
+import { MenuItem, Restaurant } from '@/types/restaurant';
+import { supabase } from '@/integrations/supabase/client';
+import { useRestaurantData } from '@/hooks/useRestaurantData';
 
 const RestaurantOrder = () => {
   const navigate = useNavigate();
   const { restaurantId } = useParams();
   const { toast } = useToast();
   const [cart, setCart] = useState<Record<string, number>>({});
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const restaurant = restaurants.find(r => r.id === restaurantId);
+  // Fetch restaurant data - first try from liked_restaurants, fallback to static data
+  useEffect(() => {
+    const fetchRestaurant = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data, error } = await supabase
+            .from('liked_restaurants')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('restaurant_id', restaurantId)
+            .single();
+
+          if (data && !error) {
+            setRestaurant({
+              id: data.restaurant_id,
+              name: data.restaurant_name,
+              cuisine: data.cuisine,
+              rating: data.rating,
+              price: data.price as '$' | '$$' | '$$$',
+              distance: data.distance,
+              image: data.image,
+              description: data.description,
+              dietary: data.dietary,
+              estimatedTime: data.estimated_time,
+              latitude: data.latitude,
+              longitude: data.longitude,
+              deals: data.deals
+            });
+            setLoading(false);
+            return;
+          }
+        }
+
+        // Fallback to static data
+        const staticRestaurant = restaurants.find(r => r.id === restaurantId);
+        setRestaurant(staticRestaurant || null);
+      } catch (error) {
+        console.error('Error fetching restaurant:', error);
+        const staticRestaurant = restaurants.find(r => r.id === restaurantId);
+        setRestaurant(staticRestaurant || null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRestaurant();
+  }, [restaurantId]);
+
+  // Fetch enriched data including Documenu menu
+  const { enrichedRestaurant, loading: menuLoading } = useRestaurantData(
+    restaurant || { id: '', name: '', cuisine: '', price: '$', rating: 0, distance: 0, image: '', description: '', dietary: [], estimatedTime: 0 },
+    !!restaurant
+  );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+          <p className="text-muted-foreground">Loading restaurant...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!restaurant) {
     return (
@@ -27,37 +96,56 @@ const RestaurantOrder = () => {
     );
   }
 
-  // Use restaurant menu if available, otherwise show fallback
-  const menuItems: MenuItem[] = restaurant.menu || [
-    {
-      id: '1',
-      name: 'Signature Special',
-      description: 'Our most popular dish with fresh ingredients',
-      price: 12.99,
-      category: 'Mains'
-    },
-    {
-      id: '2', 
-      name: 'Classic Favorite',
-      description: 'Traditional recipe loved by all',
-      price: 9.99,
-      category: 'Mains'
-    },
-    {
-      id: '3',
-      name: 'Fresh Starter',
-      description: 'Perfect way to begin your meal',
-      price: 6.99,
-      category: 'Appetizers'
-    },
-    {
-      id: '4',
-      name: 'House Beverage',
-      description: 'Refreshing drink to complement your meal',
-      price: 3.99,
-      category: 'Drinks'
-    }
-  ];
+  // Convert Documenu menu items to MenuItem format or use fallback
+  let menuItems: MenuItem[] = [];
+  
+  if (enrichedRestaurant.menuItems && enrichedRestaurant.menuItems.length > 0) {
+    // Use Documenu data
+    enrichedRestaurant.menuItems.forEach((section) => {
+      section.menu_items.forEach((item, index) => {
+        const priceNum = item.price ? parseFloat(item.price.replace(/[^0-9.]/g, '')) : undefined;
+        menuItems.push({
+          id: `${section.section_name}-${index}`,
+          name: item.name,
+          description: item.description || '',
+          price: priceNum,
+          category: section.section_name
+        });
+      });
+    });
+  } else {
+    // Fallback menu
+    menuItems = restaurant.menu || [
+      {
+        id: '1',
+        name: 'Signature Special',
+        description: 'Our most popular dish with fresh ingredients',
+        price: 12.99,
+        category: 'Mains'
+      },
+      {
+        id: '2', 
+        name: 'Classic Favorite',
+        description: 'Traditional recipe loved by all',
+        price: 9.99,
+        category: 'Mains'
+      },
+      {
+        id: '3',
+        name: 'Fresh Starter',
+        description: 'Perfect way to begin your meal',
+        price: 6.99,
+        category: 'Appetizers'
+      },
+      {
+        id: '4',
+        name: 'House Beverage',
+        description: 'Refreshing drink to complement your meal',
+        price: 3.99,
+        category: 'Drinks'
+      }
+    ];
+  }
 
   const addToCart = (itemId: string) => {
     setCart(prev => ({
@@ -149,7 +237,17 @@ const RestaurantOrder = () => {
         <div className="max-w-md mx-auto">
           <h2 className="text-xl font-bold text-card-foreground mb-6">Menu</h2>
           
-          <div className="space-y-4">
+          {menuLoading ? (
+            <div className="text-center py-12">
+              <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-muted-foreground">Loading menu from Documenu...</p>
+            </div>
+          ) : menuItems.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No menu available for this restaurant</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
             {menuItems.map((item) => (
               <div key={item.id} className="swipe-card p-0 overflow-hidden">
                 {item.image && (
@@ -208,6 +306,7 @@ const RestaurantOrder = () => {
               </div>
             ))}
           </div>
+          )}
         </div>
       </div>
 
