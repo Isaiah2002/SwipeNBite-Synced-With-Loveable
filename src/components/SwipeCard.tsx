@@ -251,7 +251,7 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
           
           {/* Image Navigation Dots */}
           {images.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col space-y-2">
               {images.map((_, index) => (
                 <button
                   key={index}
@@ -259,11 +259,12 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
                     e.stopPropagation();
                     setCurrentImageIndex(index);
                   }}
-                  className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                  className={`rounded-full transition-all duration-300 ${
                     index === currentImageIndex 
-                      ? 'bg-white w-6' 
-                      : 'bg-white/50 hover:bg-white/75'
+                      ? 'bg-white w-2 h-6 shadow-lg' 
+                      : 'bg-white/60 w-2 h-2 hover:bg-white/90 hover:h-3'
                   }`}
+                  aria-label={`View image ${index + 1}`}
                 />
               ))}
             </div>
