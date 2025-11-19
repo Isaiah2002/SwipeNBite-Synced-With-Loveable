@@ -22,6 +22,11 @@ export const useRestaurantData = (restaurant: Restaurant) => {
 
       try {
         setLoading(true);
+        
+        // Add a random delay to stagger requests and avoid rate limiting
+        const randomDelay = Math.random() * 1000; // 0-1 second random delay
+        await new Promise(resolve => setTimeout(resolve, randomDelay));
+
         const promises = [];
 
         // Fetch Yelp data
