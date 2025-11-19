@@ -16,10 +16,13 @@ const RestaurantOrder = () => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch restaurant data - first try from liked_restaurants, fallback to static data
+  // Fetch restaurant data - try liked_restaurants first, but always merge with static menu data
   useEffect(() => {
     const fetchRestaurant = async () => {
       try {
+        // First, get the static restaurant data (contains menu)
+        const staticRestaurant = restaurants.find(r => r.id === restaurantId);
+        
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
@@ -31,6 +34,7 @@ const RestaurantOrder = () => {
             .single();
 
           if (data && !error) {
+            // Merge liked restaurant data with static menu
             setRestaurant({
               id: data.restaurant_id,
               name: data.restaurant_name,
@@ -44,7 +48,8 @@ const RestaurantOrder = () => {
               estimatedTime: data.estimated_time,
               latitude: data.latitude,
               longitude: data.longitude,
-              deals: data.deals
+              deals: data.deals,
+              menu: staticRestaurant?.menu || [] // Include menu from static data
             });
             setLoading(false);
             return;
@@ -52,7 +57,6 @@ const RestaurantOrder = () => {
         }
 
         // Fallback to static data
-        const staticRestaurant = restaurants.find(r => r.id === restaurantId);
         setRestaurant(staticRestaurant || null);
       } catch (error) {
         console.error('Error fetching restaurant:', error);
