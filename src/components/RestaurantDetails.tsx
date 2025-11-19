@@ -41,7 +41,22 @@ export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
             latitude={restaurant.latitude}
             longitude={restaurant.longitude}
             name={restaurant.name}
+            address={restaurant.address}
           />
+          {restaurant.address && (
+            <div className="flex items-start space-x-2 text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
+              <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <span>{restaurant.address}</span>
+            </div>
+          )}
+          {restaurant.phone && (
+            <div className="flex items-start space-x-2 text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
+              <Phone className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <a href={`tel:${restaurant.phone}`} className="hover:text-primary">
+                {restaurant.phone}
+              </a>
+            </div>
+          )}
         </div>
       )}
 

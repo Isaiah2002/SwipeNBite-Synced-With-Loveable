@@ -21,6 +21,8 @@ export interface Restaurant {
   estimatedTime: number; // minutes
   latitude?: number;
   longitude?: number;
+  address?: string;
+  phone?: string;
   menu?: MenuItem[];
   // Google Maps data
   placeId?: string;
