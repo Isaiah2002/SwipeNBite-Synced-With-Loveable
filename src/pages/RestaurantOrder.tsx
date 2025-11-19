@@ -100,11 +100,11 @@ const RestaurantOrder = () => {
     );
   }
 
-  // Convert Documenu menu items to MenuItem format or use fallback
+  // Convert Documenu menu items to MenuItem format or use restaurant's static menu
   let menuItems: MenuItem[] = [];
   
   if (enrichedRestaurant.menuItems && enrichedRestaurant.menuItems.length > 0) {
-    // Use Documenu data
+    // Use Documenu data if available
     enrichedRestaurant.menuItems.forEach((section) => {
       section.menu_items.forEach((item, index) => {
         const priceNum = item.price ? parseFloat(item.price.replace(/[^0-9.]/g, '')) : undefined;
@@ -117,38 +117,9 @@ const RestaurantOrder = () => {
         });
       });
     });
-  } else {
-    // Fallback menu
-    menuItems = restaurant.menu || [
-      {
-        id: '1',
-        name: 'Signature Special',
-        description: 'Our most popular dish with fresh ingredients',
-        price: 12.99,
-        category: 'Mains'
-      },
-      {
-        id: '2', 
-        name: 'Classic Favorite',
-        description: 'Traditional recipe loved by all',
-        price: 9.99,
-        category: 'Mains'
-      },
-      {
-        id: '3',
-        name: 'Fresh Starter',
-        description: 'Perfect way to begin your meal',
-        price: 6.99,
-        category: 'Appetizers'
-      },
-      {
-        id: '4',
-        name: 'House Beverage',
-        description: 'Refreshing drink to complement your meal',
-        price: 3.99,
-        category: 'Drinks'
-      }
-    ];
+  } else if (restaurant.menu && restaurant.menu.length > 0) {
+    // Use restaurant's static menu data
+    menuItems = restaurant.menu;
   }
 
   const addToCart = (itemId: string) => {
