@@ -37,10 +37,42 @@ serve(async (req) => {
     if (!searchResponse.ok) {
       const errorText = await searchResponse.text();
       console.error('Documenu API error:', searchResponse.status, errorText);
+      
+      // Check if it's an HTML error page (invalid API key or auth issue)
+      if (errorText.includes('<html>') || errorText.includes('<!DOCTYPE')) {
+        console.error('Documenu API returned HTML - likely invalid API key or authentication issue');
+        return new Response(
+          JSON.stringify({ 
+            error: 'Invalid Documenu API key or authentication failed',
+            available: false 
+          }),
+          { 
+            status: 200,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+      
       return new Response(
         JSON.stringify({ 
           error: 'Failed to fetch from Documenu API',
           details: errorText,
+          available: false 
+        }),
+        { 
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    const contentType = searchResponse.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const errorText = await searchResponse.text();
+      console.error('Documenu API returned non-JSON response:', errorText.substring(0, 200));
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid Documenu API key - received HTML instead of JSON',
           available: false 
         }),
         { 

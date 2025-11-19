@@ -28,7 +28,7 @@ const App = () => (
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/restaurant/:restaurantId" element={<RestaurantOrder />} />
+            <Route path="/order/:restaurantId" element={<RestaurantOrder />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
