@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -19,6 +19,16 @@ interface RestaurantMapProps {
 }
 
 export const RestaurantMap = ({ latitude, longitude, name, address }: RestaurantMapProps) => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return <div className="w-full h-[300px] rounded-lg overflow-hidden border border-border bg-muted animate-pulse" />;
+  }
+
   return (
     <div className="w-full h-[300px] rounded-lg overflow-hidden border border-border">
       <MapContainer
@@ -26,6 +36,7 @@ export const RestaurantMap = ({ latitude, longitude, name, address }: Restaurant
         zoom={15}
         style={{ height: '100%', width: '100%' }}
         scrollWheelZoom={false}
+        key={`${latitude}-${longitude}`}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
