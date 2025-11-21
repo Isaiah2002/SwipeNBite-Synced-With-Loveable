@@ -14,12 +14,23 @@ interface SwipeCardProps {
   isFavorited?: boolean;
   isActive?: boolean;
   hasLocation?: boolean;
+  detailsOpen?: boolean;
+  onDetailsOpenChange?: (open: boolean) => void;
 }
 
-export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorited = false, isActive = true, hasLocation = false }: SwipeCardProps) => {
+export const SwipeCard = ({ 
+  restaurant, 
+  onSwipe, 
+  onFavorite, 
+  onShare, 
+  isFavorited = false, 
+  isActive = true, 
+  hasLocation = false,
+  detailsOpen = false,
+  onDetailsOpenChange
+}: SwipeCardProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
-  const [detailsOpen, setDetailsOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isImageSwiping, setIsImageSwiping] = useState(false);
   const { enrichedRestaurant, loading: dataLoading } = useRestaurantData(restaurant, detailsOpen);
@@ -337,7 +348,7 @@ export const SwipeCard = ({ restaurant, onSwipe, onFavorite, onShare, isFavorite
 
           {/* Action Buttons */}
           <div className="flex gap-2">
-            <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+            <Dialog open={detailsOpen} onOpenChange={onDetailsOpenChange || (() => {})}>
               <DialogTrigger asChild>
                 <Button 
                   variant="outline" 

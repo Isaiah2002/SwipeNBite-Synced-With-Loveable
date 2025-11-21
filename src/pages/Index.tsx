@@ -347,6 +347,45 @@ const Index = () => {
 
   const currentRestaurant = currentRestaurants[currentIndex];
   const hasMoreCards = currentIndex < currentRestaurants.length;
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle keyboard shortcuts when not in an input field
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      // Don't handle if onboarding is showing
+      if (showOnboarding || showLiked) {
+        return;
+      }
+
+      // Don't handle if no cards available
+      if (!hasMoreCards || !currentRestaurant) {
+        return;
+      }
+
+      switch (e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          handleSwipe('left');
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          handleSwipe('right');
+          break;
+        case 'Enter':
+          e.preventDefault();
+          setDetailsOpen(true);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentRestaurant, hasMoreCards, showOnboarding, showLiked]);
 
   // Show loading state while checking auth or fetching restaurants
   if (loading || fetchingRestaurants) {
@@ -361,6 +400,19 @@ const Index = () => {
       </div>
     );
   }
+
+  // Show keyboard shortcuts hint on first visit
+  useEffect(() => {
+    const hasSeenKeyboardHint = localStorage.getItem('swipenbite-keyboard-hint');
+    if (!hasSeenKeyboardHint && user && !showOnboarding) {
+      setTimeout(() => {
+        toast('Keyboard shortcuts: ← Pass, → Like, Enter for details', {
+          duration: 5000,
+        });
+        localStorage.setItem('swipenbite-keyboard-hint', 'true');
+      }, 2000);
+    }
+  }, [user, showOnboarding]);
 
   // Don't render if not authenticated
   if (!user) {
@@ -473,6 +525,8 @@ const Index = () => {
                   isFavorited={favoriteRestaurants.some(fav => fav.id === currentRestaurant.id)}
                   isActive={!swipeAnimation}
                   hasLocation={!!location}
+                  detailsOpen={detailsOpen}
+                  onDetailsOpenChange={setDetailsOpen}
                 />
                 </div>
               </div>
