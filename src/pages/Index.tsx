@@ -92,7 +92,7 @@ const Index = () => {
   const [userCuisinePreferences, setUserCuisinePreferences] = useState<string[]>([]);
   const [filters, setFilters] = useState<Filters>({
     maxPrice: '$$$',
-    maxDistance: 25,
+    maxDistance: 10,
     dietary: [],
     minRating: 3.5
   });

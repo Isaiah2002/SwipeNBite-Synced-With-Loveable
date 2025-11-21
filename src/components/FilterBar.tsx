@@ -13,7 +13,7 @@ export const FilterBar = ({ filters, onFiltersChange }: FilterBarProps) => {
 
   const priceOptions = ['$', '$$', '$$$'] as const;
   const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Vegan Options', 'Vegetarian Options'];
-  const distanceOptions = [0.5, 1, 2, 5];
+  const distanceOptions = [1, 5, 10];
 
   return (
     <div className="space-y-4">
