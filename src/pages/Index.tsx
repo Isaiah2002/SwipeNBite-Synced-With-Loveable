@@ -11,6 +11,7 @@ import { LikedRestaurants } from '@/components/LikedRestaurants';
 import { LocationPrompt } from '@/components/LocationPrompt';
 import { ShareDialog } from '@/components/ShareDialog';
 import { AddressInput } from '@/components/AddressInput';
+import { Onboarding } from '@/components/Onboarding';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Heart, RotateCcw, LogOut, User, Search, MapPin } from 'lucide-react';
@@ -90,6 +91,7 @@ const Index = () => {
   const [restaurantToShare, setRestaurantToShare] = useState<Restaurant | null>(null);
   const [fetchingRestaurants, setFetchingRestaurants] = useState(false);
   const [userCuisinePreferences, setUserCuisinePreferences] = useState<string[]>([]);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   
   // Load saved filters from localStorage or use defaults
   const [filters, setFilters] = useState<Filters>(() => {
@@ -113,6 +115,25 @@ const Index = () => {
   useEffect(() => {
     localStorage.setItem('swipenbite-filters', JSON.stringify(filters));
   }, [filters]);
+
+  // Check if user has completed onboarding
+  useEffect(() => {
+    const hasCompletedOnboarding = localStorage.getItem('swipenbite-onboarding-completed');
+    if (!hasCompletedOnboarding && user) {
+      setShowOnboarding(true);
+    }
+  }, [user]);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('swipenbite-onboarding-completed', 'true');
+    setShowOnboarding(false);
+    toast.success("Welcome to SwipeN'Bite! Start swiping! 🎉");
+  };
+
+  const handleOnboardingSkip = () => {
+    localStorage.setItem('swipenbite-onboarding-completed', 'true');
+    setShowOnboarding(false);
+  };
 
   // Fetch restaurants from Yelp when location is available
   useEffect(() => {
@@ -360,7 +381,15 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <>
+      {showOnboarding && (
+        <Onboarding 
+          onComplete={handleOnboardingComplete}
+          onSkip={handleOnboardingSkip}
+        />
+      )}
+      
+      <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <div className="p-4 pb-2 pt-2">
         <div className="max-w-md mx-auto space-y-3">
@@ -489,6 +518,7 @@ const Index = () => {
         />
       )}
     </div>
+    </>
   );
 };
 
