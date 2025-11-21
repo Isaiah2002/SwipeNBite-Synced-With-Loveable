@@ -152,12 +152,70 @@ const RestaurantOrder = () => {
     return Object.values(cart).reduce((total, quantity) => total + quantity, 0);
   };
 
-  const handleCheckout = () => {
-    toast({
-      title: "Order placed!",
-      description: `Your order from ${restaurant.name} has been placed successfully.`,
-    });
-    navigate('/orders');
+  const handleCheckout = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to place an order.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Prepare order items
+      const orderItems = Object.entries(cart).map(([itemId, quantity]) => {
+        const item = menuItems.find(i => i.id === itemId);
+        return {
+          id: itemId,
+          name: item?.name || '',
+          price: item?.price || 0,
+          quantity,
+          category: item?.category || ''
+        };
+      });
+
+      // Get user profile for delivery address
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('address, city, state, zip_code')
+        .eq('user_id', user.id)
+        .single();
+
+      const deliveryAddress = profile?.address && profile?.city && profile?.state 
+        ? `${profile.address}, ${profile.city}, ${profile.state} ${profile.zip_code || ''}`
+        : null;
+
+      // Save order to database
+      const { error } = await supabase.from('orders').insert({
+        user_id: user.id,
+        restaurant_id: restaurant.id,
+        restaurant_name: restaurant.name,
+        restaurant_image: restaurant.image,
+        items: orderItems,
+        total: getCartTotal(),
+        delivery_address: deliveryAddress,
+        status: 'pending'
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Order placed!",
+        description: `Your order from ${restaurant.name} has been placed successfully.`,
+      });
+      
+      navigate('/orders');
+    } catch (error: any) {
+      console.error('Error placing order:', error);
+      toast({
+        title: "Error",
+        description: "Failed to place order. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
