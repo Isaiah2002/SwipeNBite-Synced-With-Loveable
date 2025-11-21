@@ -181,10 +181,29 @@ const Index = () => {
 
     setSwipeAnimation(direction);
 
+    // Log swipe event for analytics
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('swipe_events').insert({
+          user_id: user.id,
+          restaurant_id: currentRestaurant.id,
+          restaurant_name: currentRestaurant.name,
+          swipe_direction: direction,
+          cuisine: currentRestaurant.cuisine,
+          price: currentRestaurant.price,
+          rating: currentRestaurant.rating,
+          distance: currentRestaurant.distance
+        });
+      }
+    } catch (error: any) {
+      console.error('Error logging swipe event:', error);
+    }
+
     if (direction === 'right') {
       setLikedRestaurants(prev => [...prev, currentRestaurant]);
       
-      // Save to database
+      // Save to liked_restaurants
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
