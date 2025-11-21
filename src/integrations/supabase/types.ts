@@ -142,6 +142,51 @@ export type Database = {
           },
         ]
       }
+      orders: {
+        Row: {
+          created_at: string
+          delivery_address: string | null
+          delivery_instructions: string | null
+          id: string
+          items: Json
+          restaurant_id: string
+          restaurant_image: string
+          restaurant_name: string
+          status: string
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivery_address?: string | null
+          delivery_instructions?: string | null
+          id?: string
+          items: Json
+          restaurant_id: string
+          restaurant_image: string
+          restaurant_name: string
+          status?: string
+          total: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivery_address?: string | null
+          delivery_instructions?: string | null
+          id?: string
+          items?: Json
+          restaurant_id?: string
+          restaurant_image?: string
+          restaurant_name?: string
+          status?: string
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
