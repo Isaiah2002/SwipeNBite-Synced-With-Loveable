@@ -68,7 +68,13 @@ export const Onboarding = ({ onComplete, onSkip }: OnboardingProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm"
+      role="dialog"
+      aria-labelledby="onboarding-title"
+      aria-describedby="onboarding-description"
+      aria-modal="true"
+    >
       <AnimatePresence mode="wait">
         <motion.div
           key={currentStep}
@@ -82,12 +88,13 @@ export const Onboarding = ({ onComplete, onSkip }: OnboardingProps) => {
           <button
             onClick={onSkip}
             className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Skip tutorial"
           >
-            <X className="w-6 h-6" />
+            <X className="w-6 h-6" aria-hidden="true" />
           </button>
 
           {/* Icon/Emoji */}
-          <div className="flex justify-center">
+          <div className="flex justify-center" aria-hidden="true">
             {typeof step.icon === 'string' ? (
               <div className="text-6xl">{step.icon}</div>
             ) : (
@@ -97,16 +104,23 @@ export const Onboarding = ({ onComplete, onSkip }: OnboardingProps) => {
 
           {/* Content */}
           <div className="text-center space-y-3">
-            <h2 className="text-2xl font-bold text-card-foreground">
+            <h2 id="onboarding-title" className="text-2xl font-bold text-card-foreground">
               {step.title}
             </h2>
-            <p className="text-muted-foreground text-base leading-relaxed">
+            <p id="onboarding-description" className="text-muted-foreground text-base leading-relaxed">
               {step.description}
             </p>
           </div>
 
           {/* Progress dots */}
-          <div className="flex justify-center gap-2 pt-4">
+          <div 
+            className="flex justify-center gap-2 pt-4" 
+            role="progressbar"
+            aria-valuenow={currentStep + 1}
+            aria-valuemin={1}
+            aria-valuemax={onboardingSteps.length}
+            aria-label={`Tutorial progress: step ${currentStep + 1} of ${onboardingSteps.length}`}
+          >
             {onboardingSteps.map((_, index) => (
               <button
                 key={index}
@@ -116,33 +130,37 @@ export const Onboarding = ({ onComplete, onSkip }: OnboardingProps) => {
                     ? 'w-8 bg-primary' 
                     : 'w-2 bg-muted hover:bg-muted-foreground/50'
                 }`}
+                aria-label={`Go to step ${index + 1}`}
+                aria-current={index === currentStep ? 'step' : undefined}
               />
             ))}
           </div>
 
           {/* Navigation buttons */}
-          <div className="flex gap-3 pt-2">
+          <nav className="flex gap-3 pt-2" aria-label="Tutorial navigation">
             {!isFirstStep && (
               <Button
                 onClick={handleBack}
                 variant="outline"
                 className="flex-1"
+                aria-label="Go to previous step"
               >
-                <ChevronLeft className="w-4 h-4 mr-1" />
+                <ChevronLeft className="w-4 h-4 mr-1" aria-hidden="true" />
                 Back
               </Button>
             )}
             <Button
               onClick={handleNext}
               className="flex-1 gradient-primary text-primary-foreground border-0"
+              aria-label={isLastStep ? "Complete tutorial and get started" : "Go to next step"}
             >
               {isLastStep ? "Get Started" : "Next"}
-              {!isLastStep && <ChevronRight className="w-4 h-4 ml-1" />}
+              {!isLastStep && <ChevronRight className="w-4 h-4 ml-1" aria-hidden="true" />}
             </Button>
-          </div>
+          </nav>
 
           {/* Step counter */}
-          <p className="text-center text-sm text-muted-foreground pt-2">
+          <p className="text-center text-sm text-muted-foreground pt-2" aria-hidden="true">
             Step {currentStep + 1} of {onboardingSteps.length}
           </p>
         </motion.div>

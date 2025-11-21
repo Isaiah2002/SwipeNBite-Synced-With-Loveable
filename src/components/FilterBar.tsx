@@ -27,77 +27,91 @@ export const FilterBar = ({ filters, onFiltersChange }: FilterBarProps) => {
           size="sm"
           onClick={() => setShowFilters(!showFilters)}
           className="flex items-center space-x-2"
+          aria-expanded={showFilters}
+          aria-controls="restaurant-filters"
+          aria-label={showFilters ? "Hide restaurant filters" : "Show restaurant filters"}
         >
-          <Sliders className="w-4 h-4" />
+          <Sliders className="w-4 h-4" aria-hidden="true" />
           <span>Filters</span>
         </Button>
       </div>
 
       {/* Expandable Filters */}
       {showFilters && (
-        <div className="bg-card rounded-2xl p-4 border border-border/50 space-y-4 animate-bounce-in">
+        <section 
+          id="restaurant-filters"
+          className="bg-card rounded-2xl p-4 border border-border/50 space-y-4 animate-bounce-in"
+          role="region"
+          aria-label="Restaurant filter options"
+        >
           
           {/* Max Price */}
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2 text-sm font-medium text-card-foreground">
-              <DollarSign className="w-4 h-4" />
+          <fieldset className="space-y-2">
+            <legend className="flex items-center space-x-2 text-sm font-medium text-card-foreground">
+              <DollarSign className="w-4 h-4" aria-hidden="true" />
               <span>Max Price</span>
-            </div>
-            <div className="flex space-x-2">
+            </legend>
+            <div className="flex space-x-2" role="group" aria-label="Price range options">
               {priceOptions.map((price) => (
                 <button
                   key={price}
                   onClick={() => onFiltersChange({ ...filters, maxPrice: price })}
                   className={`filter-chip ${filters.maxPrice === price ? 'active' : ''}`}
+                  aria-pressed={filters.maxPrice === price}
+                  aria-label={`Set maximum price to ${price}`}
                 >
                   {price}
                 </button>
               ))}
             </div>
-          </div>
+          </fieldset>
 
           {/* Max Distance */}
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2 text-sm font-medium text-card-foreground">
-              <MapPin className="w-4 h-4" />
+          <fieldset className="space-y-2">
+            <legend className="flex items-center space-x-2 text-sm font-medium text-card-foreground">
+              <MapPin className="w-4 h-4" aria-hidden="true" />
               <span>Max Distance</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
+            </legend>
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Distance range options">
               {distanceOptions.map((distance) => (
                 <button
                   key={distance ?? 'no-limit'}
                   onClick={() => onFiltersChange({ ...filters, maxDistance: distance })}
                   className={`filter-chip ${filters.maxDistance === distance ? 'active' : ''}`}
+                  aria-pressed={filters.maxDistance === distance}
+                  aria-label={distance ? `Set maximum distance to ${distance} miles` : 'No distance limit'}
                 >
                   {distance ? `${distance} mi` : 'No limit'}
                 </button>
               ))}
             </div>
-          </div>
+          </fieldset>
 
           {/* Min Rating */}
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2 text-sm font-medium text-card-foreground">
-              <Star className="w-4 h-4" />
+          <fieldset className="space-y-2">
+            <legend className="flex items-center space-x-2 text-sm font-medium text-card-foreground">
+              <Star className="w-4 h-4" aria-hidden="true" />
               <span>Min Rating</span>
-            </div>
-            <div className="flex space-x-2">
+            </legend>
+            <div className="flex space-x-2" role="group" aria-label="Minimum rating options">
               {[3.5, 4.0, 4.5].map((rating) => (
                 <button
                   key={rating}
                   onClick={() => onFiltersChange({ ...filters, minRating: rating })}
                   className={`filter-chip ${filters.minRating === rating ? 'active' : ''}`}
+                  aria-pressed={filters.minRating === rating}
+                  aria-label={`Set minimum rating to ${rating} stars or higher`}
                 >
                   {rating}+ ⭐
                 </button>
               ))}
             </div>
-          </div>
+          </fieldset>
 
           {/* Dietary Preferences */}
-          <div className="space-y-2">
-            <div className="text-sm font-medium text-card-foreground">Dietary Preferences</div>
-            <div className="flex flex-wrap gap-2">
+          <fieldset className="space-y-2">
+            <legend className="text-sm font-medium text-card-foreground">Dietary Preferences</legend>
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Dietary preference options">
               {dietaryOptions.map((diet) => (
                 <button
                   key={diet}
@@ -108,13 +122,15 @@ export const FilterBar = ({ filters, onFiltersChange }: FilterBarProps) => {
                     onFiltersChange({ ...filters, dietary: newDietary });
                   }}
                   className={`filter-chip ${filters.dietary.includes(diet) ? 'active' : ''}`}
+                  aria-pressed={filters.dietary.includes(diet)}
+                  aria-label={`${filters.dietary.includes(diet) ? 'Remove' : 'Add'} ${diet} filter`}
                 >
                   {diet}
                 </button>
               ))}
             </div>
-          </div>
-        </div>
+          </fieldset>
+        </section>
       )}
     </div>
   );

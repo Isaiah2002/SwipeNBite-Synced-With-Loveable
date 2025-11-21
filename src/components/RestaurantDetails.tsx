@@ -24,11 +24,11 @@ export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" role="document" aria-label={`Details for ${restaurant.name}`}>
       {/* Map */}
       {restaurant.latitude && restaurant.longitude && (
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-card-foreground">Location</h3>
+        <section className="space-y-2" aria-labelledby="location-heading">
+          <h3 id="location-heading" className="text-lg font-semibold text-card-foreground">Location</h3>
           <RestaurantMap
             latitude={restaurant.latitude}
             longitude={restaurant.longitude}
@@ -37,43 +37,44 @@ export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
           />
           {restaurant.address && (
             <div className="flex items-start space-x-2 text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
-              <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              <span>{restaurant.address}</span>
+              <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
+              <address className="not-italic">{restaurant.address}</address>
             </div>
           )}
           {restaurant.phone && (
             <div className="flex items-start space-x-2 text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
-              <Phone className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              <a href={`tel:${restaurant.phone}`} className="hover:text-primary">
+              <Phone className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
+              <a href={`tel:${restaurant.phone}`} className="hover:text-primary" aria-label={`Call ${restaurant.name} at ${restaurant.phone}`}>
                 {restaurant.phone}
               </a>
             </div>
           )}
-        </div>
+        </section>
       )}
 
       {/* Photos Gallery */}
       {restaurant.photos && restaurant.photos.length > 0 && (
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-card-foreground">Photos</h3>
-          <div className="grid grid-cols-3 gap-2">
+        <section className="space-y-2" aria-labelledby="photos-heading">
+          <h3 id="photos-heading" className="text-lg font-semibold text-card-foreground">Photos</h3>
+          <div className="grid grid-cols-3 gap-2" role="list" aria-label={`Photo gallery for ${restaurant.name}`}>
             {restaurant.photos.slice(0, 6).map((photo, index) => (
-              <div key={index} className="aspect-square rounded-lg overflow-hidden">
+              <div key={index} className="aspect-square rounded-lg overflow-hidden" role="listitem">
                 <img 
                   src={photo} 
-                  alt={`${restaurant.name} photo ${index + 1}`}
+                  alt={`${restaurant.name} interior and food, photo ${index + 1} of ${Math.min(restaurant.photos!.length, 6)}`}
                   className="w-full h-full object-cover"
                 />
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       {/* Ratings */}
-      <Card>
-        <CardContent className="pt-6 space-y-3">
-          <h3 className="text-lg font-semibold text-card-foreground mb-4">Ratings</h3>
+      <section className="space-y-3" aria-labelledby="ratings-heading">
+        <Card>
+          <CardContent className="pt-6 space-y-3">
+            <h3 id="ratings-heading" className="text-lg font-semibold text-card-foreground mb-4">Ratings</h3>
           
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -115,47 +116,50 @@ export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
           )}
         </CardContent>
       </Card>
+      </section>
 
       {/* Reviews */}
       {restaurant.reviews && restaurant.reviews.length > 0 && (
-        <div className="space-y-3">
+        <section className="space-y-3" aria-labelledby="reviews-heading">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-card-foreground">Recent Reviews</h3>
+            <h3 id="reviews-heading" className="text-lg font-semibold text-card-foreground">Recent Reviews</h3>
             {restaurant.yelpUrl && (
-              <Button variant="ghost" size="sm" onClick={handleYelpClick}>
-                View all <ExternalLink className="w-3 h-3 ml-1" />
+              <Button variant="ghost" size="sm" onClick={handleYelpClick} aria-label="View all reviews on Yelp">
+                View all <ExternalLink className="w-3 h-3 ml-1" aria-hidden="true" />
               </Button>
             )}
           </div>
           
+          <div role="list" aria-label="Customer reviews">
           {restaurant.reviews.map((review) => (
-            <Card key={review.id}>
+            <Card key={review.id} role="listitem">
               <CardContent className="pt-4 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Avatar className="w-8 h-8">
+                    <Avatar className="w-8 h-8" aria-hidden="true">
                       <AvatarFallback>{review.user[0]}</AvatarFallback>
                     </Avatar>
                     <span className="font-medium text-sm">{review.user}</span>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                  <div className="flex items-center space-x-1" aria-label={`${review.rating} out of 5 stars`}>
+                    <Star className="w-4 h-4 text-yellow-400 fill-current" aria-hidden="true" />
                     <span className="font-medium">{review.rating}</span>
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-3">{review.text}</p>
-                <p className="text-xs text-muted-foreground">
+                <time className="text-xs text-muted-foreground" dateTime={review.timeCreated}>
                   {new Date(review.timeCreated).toLocaleDateString()}
-                </p>
+                </time>
               </CardContent>
             </Card>
           ))}
-        </div>
+          </div>
+        </section>
       )}
 
       {/* Quick Actions */}
-      <div className="space-y-3">
-        <h3 className="text-lg font-semibold text-card-foreground">Quick Actions</h3>
+      <section className="space-y-3" aria-labelledby="actions-heading">
+        <h3 id="actions-heading" className="text-lg font-semibold text-card-foreground">Quick Actions</h3>
         
         <div className="grid grid-cols-2 gap-3">
           {restaurant.reservationUrl && (
@@ -163,8 +167,9 @@ export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
               variant="outline" 
               className="w-full" 
               onClick={handleReservationClick}
+              aria-label={`Make a reservation at ${restaurant.name}`}
             >
-              <Calendar className="w-4 h-4 mr-2" />
+              <Calendar className="w-4 h-4 mr-2" aria-hidden="true" />
               Reserve
             </Button>
           )}
@@ -174,13 +179,14 @@ export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
               variant="outline" 
               className="w-full" 
               onClick={handleYelpClick}
+              aria-label={`View ${restaurant.name} on Yelp`}
             >
-              <ExternalLink className="w-4 h-4 mr-2" />
+              <ExternalLink className="w-4 h-4 mr-2" aria-hidden="true" />
               View on Yelp
             </Button>
           )}
         </div>
-      </div>
+      </section>
 
       {/* Info */}
       <Card>
@@ -216,8 +222,8 @@ export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
 
       {/* Menu */}
       {restaurant.menuAvailable && restaurant.menuItems && restaurant.menuItems.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-card-foreground">Menu</h3>
+        <section className="space-y-4" aria-labelledby="menu-heading">
+          <h3 id="menu-heading" className="text-lg font-semibold text-card-foreground">Menu</h3>
           
           {restaurant.menuItems.map((section, sectionIndex) => (
             <Card key={sectionIndex}>
@@ -254,12 +260,13 @@ export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
               variant="outline" 
               className="w-full" 
               onClick={() => window.open(restaurant.restaurantWebsite, '_blank')}
+              aria-label={`View full menu for ${restaurant.name} on their website`}
             >
-              <ExternalLink className="w-4 h-4 mr-2" />
+              <ExternalLink className="w-4 h-4 mr-2" aria-hidden="true" />
               View Full Menu
             </Button>
           )}
-        </div>
+        </section>
       )}
     </div>
   );
