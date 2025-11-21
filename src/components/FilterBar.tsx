@@ -13,7 +13,7 @@ export const FilterBar = ({ filters, onFiltersChange }: FilterBarProps) => {
 
   const priceOptions = ['$', '$$', '$$$'] as const;
   const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Vegan Options', 'Vegetarian Options'];
-  const distanceOptions = [1, 5, 10];
+  const distanceOptions: (number | null)[] = [1, 5, 10, null];
 
   return (
     <div className="space-y-4">
@@ -65,11 +65,11 @@ export const FilterBar = ({ filters, onFiltersChange }: FilterBarProps) => {
             <div className="flex flex-wrap gap-2">
               {distanceOptions.map((distance) => (
                 <button
-                  key={distance}
+                  key={distance ?? 'no-limit'}
                   onClick={() => onFiltersChange({ ...filters, maxDistance: distance })}
                   className={`filter-chip ${filters.maxDistance === distance ? 'active' : ''}`}
                 >
-                  {distance} mi
+                  {distance ? `${distance} mi` : 'No limit'}
                 </button>
               ))}
             </div>
