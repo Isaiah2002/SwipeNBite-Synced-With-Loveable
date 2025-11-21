@@ -93,6 +93,7 @@ const Index = () => {
   const [fetchingRestaurants, setFetchingRestaurants] = useState(false);
   const [userCuisinePreferences, setUserCuisinePreferences] = useState<string[]>([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   
   // Load saved filters from localStorage or use defaults
   const [filters, setFilters] = useState<Filters>(() => {
@@ -216,6 +217,19 @@ const Index = () => {
     setCurrentRestaurants(filtered);
     setCurrentIndex(0);
   }, [filters.maxPrice, filters.minRating, filters.dietary, userCuisinePreferences]);
+
+  // Show keyboard shortcuts hint on first visit
+  useEffect(() => {
+    const hasSeenKeyboardHint = localStorage.getItem('swipenbite-keyboard-hint');
+    if (!hasSeenKeyboardHint && user && !showOnboarding) {
+      setTimeout(() => {
+        toast('Keyboard shortcuts: ← Pass, → Like, Enter for details', {
+          duration: 5000,
+        });
+        localStorage.setItem('swipenbite-keyboard-hint', 'true');
+      }, 2000);
+    }
+  }, [user, showOnboarding]);
 
   const handleSwipe = async (direction: 'left' | 'right') => {
     const currentRestaurant = currentRestaurants[currentIndex];
@@ -348,7 +362,6 @@ const Index = () => {
 
   const currentRestaurant = currentRestaurants[currentIndex];
   const hasMoreCards = currentIndex < currentRestaurants.length;
-  const [detailsOpen, setDetailsOpen] = useState(false);
 
   // Keyboard navigation
   useEffect(() => {
@@ -401,19 +414,6 @@ const Index = () => {
       </div>
     );
   }
-
-  // Show keyboard shortcuts hint on first visit
-  useEffect(() => {
-    const hasSeenKeyboardHint = localStorage.getItem('swipenbite-keyboard-hint');
-    if (!hasSeenKeyboardHint && user && !showOnboarding) {
-      setTimeout(() => {
-        toast('Keyboard shortcuts: ← Pass, → Like, Enter for details', {
-          duration: 5000,
-        });
-        localStorage.setItem('swipenbite-keyboard-hint', 'true');
-      }, 2000);
-    }
-  }, [user, showOnboarding]);
 
   // Don't render if not authenticated
   if (!user) {
