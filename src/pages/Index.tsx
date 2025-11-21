@@ -108,7 +108,10 @@ const Index = () => {
 
       setFetchingRestaurants(true);
       try {
-        const radiusInMeters = Math.round(filters.maxDistance * 1609.34); // Convert miles to meters
+        // Use 40km (Yelp's max) if no limit is set, otherwise convert miles to meters
+        const radiusInMeters = filters.maxDistance 
+          ? Math.round(filters.maxDistance * 1609.34)
+          : 40000; // Yelp's maximum radius
         
         const { data, error } = await supabase.functions.invoke('nearby-restaurants', {
           body: {

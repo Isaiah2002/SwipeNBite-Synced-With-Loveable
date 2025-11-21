@@ -66,7 +66,7 @@ export interface YelpReview {
 
 export interface Filters {
   maxPrice: '$' | '$$' | '$$$';
-  maxDistance: number;
+  maxDistance: number | null;
   dietary: string[];
   minRating: number;
 }
