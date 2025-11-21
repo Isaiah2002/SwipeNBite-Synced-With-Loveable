@@ -90,12 +90,29 @@ const Index = () => {
   const [restaurantToShare, setRestaurantToShare] = useState<Restaurant | null>(null);
   const [fetchingRestaurants, setFetchingRestaurants] = useState(false);
   const [userCuisinePreferences, setUserCuisinePreferences] = useState<string[]>([]);
-  const [filters, setFilters] = useState<Filters>({
-    maxPrice: '$$$',
-    maxDistance: 10,
-    dietary: [],
-    minRating: 3.5
+  
+  // Load saved filters from localStorage or use defaults
+  const [filters, setFilters] = useState<Filters>(() => {
+    const savedFilters = localStorage.getItem('swipenbite-filters');
+    if (savedFilters) {
+      try {
+        return JSON.parse(savedFilters);
+      } catch (e) {
+        console.error('Failed to parse saved filters:', e);
+      }
+    }
+    return {
+      maxPrice: '$$$',
+      maxDistance: 10,
+      dietary: [],
+      minRating: 3.5
+    };
   });
+
+  // Save filters to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('swipenbite-filters', JSON.stringify(filters));
+  }, [filters]);
 
   // Fetch restaurants from Yelp when location is available
   useEffect(() => {
