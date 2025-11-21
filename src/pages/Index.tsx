@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Heart, RotateCcw, LogOut, User, Search, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
+import { Toaster } from '@/components/ui/toaster';
 import BottomNav from '@/components/BottomNav';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -434,6 +435,20 @@ const Index = () => {
 
   return (
     <>
+      <Toaster />
+      {/* Screen reader live region for swipe feedback */}
+      <div 
+        role="status" 
+        aria-live="polite" 
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {swipeAnimation && (
+          swipeAnimation === 'right' 
+            ? `Added ${currentRestaurant?.name} to favorites` 
+            : `Passed on ${currentRestaurant?.name}`
+        )}
+      </div>
       {showOnboarding && (
         <Onboarding 
           onComplete={handleOnboardingComplete}
@@ -443,26 +458,26 @@ const Index = () => {
       
       <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="p-4 pb-2 pt-2">
+      <header className="p-4 pb-2 pt-2">
         <div className="max-w-md mx-auto space-y-3">
           <FilterBar filters={filters} onFiltersChange={setFilters} />
         </div>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <div className="flex-1 p-4 pt-2">
+      <main className="flex-1 p-4 pt-2" role="main" aria-label="Restaurant discovery">
         <div className="max-w-md mx-auto space-y-4">
           
           {/* Cards Stack */}
           <div className="relative h-[660px] flex items-center justify-center">
             {!hasMoreCards ? (
               // No more cards
-              <div className="text-center space-y-6">
-                <div className="text-8xl">🎉</div>
+              <div className="text-center space-y-6" role="status" aria-live="polite">
+                <div className="text-8xl" aria-hidden="true">🎉</div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-card-foreground">
+                  <h2 className="text-xl font-bold text-card-foreground">
                     You've seen all restaurants!
-                  </h3>
+                  </h2>
                   <p className="text-muted-foreground">
                     {likedRestaurants.length > 0 
                       ? `You have ${likedRestaurants.length} matches waiting for you!`
@@ -476,8 +491,9 @@ const Index = () => {
                   <Button 
                     onClick={resetCards}
                     className="gradient-primary text-primary-foreground border-0 w-full"
+                    aria-label="Reset and start swiping again"
                   >
-                    <RotateCcw className="w-4 h-4 mr-2" />
+                    <RotateCcw className="w-4 h-4 mr-2" aria-hidden="true" />
                     Start Over
                   </Button>
                   {likedRestaurants.length > 0 && (
@@ -485,8 +501,9 @@ const Index = () => {
                       onClick={() => setShowLiked(true)}
                       variant="outline"
                       className="w-full"
+                      aria-label={`View your ${likedRestaurants.length} matched restaurants`}
                     >
-                      <Heart className="w-4 h-4 mr-2 text-accent fill-current" />
+                      <Heart className="w-4 h-4 mr-2 text-accent fill-current" aria-hidden="true" />
                       View Matches ({likedRestaurants.length})
                     </Button>
                   )}
@@ -535,15 +552,15 @@ const Index = () => {
 
           {/* Bottom Stats */}
           {hasMoreCards && (
-            <div className="flex justify-between items-center text-sm text-muted-foreground bg-card p-4 rounded-2xl border border-border/50">
+            <div className="flex justify-between items-center text-sm text-muted-foreground bg-card p-4 rounded-2xl border border-border/50" role="status" aria-label="Swiping progress">
               <div className="text-center">
-                <div className="font-bold text-card-foreground text-base">
+                <div className="font-bold text-card-foreground text-base" aria-label={`Restaurant ${currentIndex + 1} of ${currentRestaurants.length}`}>
                   {currentIndex + 1}
                 </div>
                 <div>of {currentRestaurants.length}</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-card-foreground text-base">
+                <div className="font-bold text-card-foreground text-base" aria-label={`${likedRestaurants.length} matched restaurants`}>
                   {likedRestaurants.length}
                 </div>
                 <div>matches</div>
@@ -560,7 +577,7 @@ const Index = () => {
             </div>
           )}
         </div>
-      </div>
+      </main>
       <BottomNav />
       
       {/* Share Dialog */}

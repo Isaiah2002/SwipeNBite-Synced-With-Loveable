@@ -355,8 +355,9 @@ export const SwipeCard = ({
                   size="sm"
                   className="flex-1"
                   onClick={(e) => e.stopPropagation()}
+                  aria-label={`View details for ${restaurant.name}`}
                 >
-                  <Info className="w-4 h-4 mr-2" />
+                  <Info className="w-4 h-4 mr-2" aria-hidden="true" />
                   More Info
                 </Button>
               </DialogTrigger>
@@ -383,8 +384,9 @@ export const SwipeCard = ({
                   e.stopPropagation();
                   window.open(enrichedRestaurant.mapsUrl, '_blank');
                 }}
+                aria-label={`Navigate to ${restaurant.name}`}
               >
-                <MapPin className="w-4 h-4" />
+                <MapPin className="w-4 h-4" aria-hidden="true" />
               </Button>
             )}
           </div>

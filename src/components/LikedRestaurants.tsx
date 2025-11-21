@@ -18,10 +18,10 @@ const RestaurantCard = ({ restaurant, onRemove }: { restaurant: Restaurant; onRe
   const { enrichedRestaurant, loading } = useRestaurantData(restaurant, detailsOpen);
 
   return (
-    <div className="swipe-card p-4 flex items-start space-x-4 hover:shadow-md relative">
+    <article className="swipe-card p-4 flex items-start space-x-4 hover:shadow-md relative" aria-label={`${restaurant.name} restaurant card`}>
       <img 
         src={restaurant.image}
-        alt={restaurant.name}
+        alt={`${restaurant.name} restaurant`}
         className="w-20 h-20 rounded-xl object-cover flex-shrink-0"
       />
       
@@ -37,8 +37,9 @@ const RestaurantCard = ({ restaurant, onRemove }: { restaurant: Restaurant; onRe
                   variant="ghost"
                   className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                   onClick={() => onRemove(restaurant.id)}
+                  aria-label={`Remove ${restaurant.name} from favorites`}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
                 </Button>
               )}
             </div>
@@ -70,11 +71,11 @@ const RestaurantCard = ({ restaurant, onRemove }: { restaurant: Restaurant; onRe
           </div>
         )}
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="group" aria-label={`Actions for ${restaurant.name}`}>
           <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" variant="outline">
-                <Info className="w-3 h-3 mr-1" />
+              <Button size="sm" variant="outline" aria-label={`View details for ${restaurant.name}`}>
+                <Info className="w-3 h-3 mr-1" aria-hidden="true" />
                 Details
               </Button>
             </DialogTrigger>
@@ -98,8 +99,9 @@ const RestaurantCard = ({ restaurant, onRemove }: { restaurant: Restaurant; onRe
               size="sm" 
               variant="outline"
               onClick={() => window.open(enrichedRestaurant.mapsUrl, '_blank')}
+              aria-label={`Navigate to ${restaurant.name} using Google Maps`}
             >
-              <MapPin className="w-3 h-3 mr-1" />
+              <MapPin className="w-3 h-3 mr-1" aria-hidden="true" />
               Navigate
             </Button>
           )}
@@ -109,8 +111,9 @@ const RestaurantCard = ({ restaurant, onRemove }: { restaurant: Restaurant; onRe
               size="sm" 
               variant="outline"
               onClick={() => window.open(enrichedRestaurant.reservationUrl, '_blank')}
+              aria-label={`Make a reservation at ${restaurant.name}`}
             >
-              <Calendar className="w-3 h-3 mr-1" />
+              <Calendar className="w-3 h-3 mr-1" aria-hidden="true" />
               Reserve
             </Button>
           )}
@@ -121,8 +124,9 @@ const RestaurantCard = ({ restaurant, onRemove }: { restaurant: Restaurant; onRe
               variant="outline"
               className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
               onClick={() => window.open(enrichedRestaurant.yelpUrl, '_blank')}
+              aria-label={`View ${restaurant.name} on Yelp`}
             >
-              <ExternalLink className="w-3 h-3 mr-1" />
+              <ExternalLink className="w-3 h-3 mr-1" aria-hidden="true" />
               Yelp
             </Button>
           )}
@@ -135,43 +139,46 @@ const RestaurantCard = ({ restaurant, onRemove }: { restaurant: Restaurant; onRe
               const orderUrl = `/order/${restaurant.id}`;
               window.location.href = orderUrl;
             }}
+            aria-label={`Place an order from ${restaurant.name}`}
           >
             Order Now
           </Button>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 
 export const LikedRestaurants = ({ likedRestaurants, onClose, showCloseButton = true, onRemove }: LikedRestaurantsProps) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" role="region" aria-label="Favorite restaurants">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Heart className="w-5 h-5 text-accent fill-current" />
+          <Heart className="w-5 h-5 text-accent fill-current" aria-hidden="true" />
           <h2 className="text-xl font-bold text-card-foreground">Your Matches</h2>
         </div>
         {showCloseButton && (
-          <Button variant="outline" onClick={onClose} size="sm">
-            <X className="w-4 h-4 mr-2" />
+          <Button variant="outline" onClick={onClose} size="sm" aria-label="Close favorites and return to swiping">
+            <X className="w-4 h-4 mr-2" aria-hidden="true" />
             Back to Swiping
           </Button>
         )}
       </div>
 
       {likedRestaurants.length === 0 ? (
-        <div className="text-center py-12 space-y-3">
-          <div className="text-6xl">🍽️</div>
+        <div className="text-center py-12 space-y-3" role="status">
+          <div className="text-6xl" aria-hidden="true">🍽️</div>
           <h3 className="text-lg font-medium text-muted-foreground">No matches yet!</h3>
           <p className="text-sm text-muted-foreground">Start swiping to find your perfect meal</p>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <ul className="grid gap-4" role="list" aria-label={`${likedRestaurants.length} favorite restaurants`}>
           {likedRestaurants.map((restaurant) => (
-            <RestaurantCard key={restaurant.id} restaurant={restaurant} onRemove={onRemove} />
+            <li key={restaurant.id}>
+              <RestaurantCard restaurant={restaurant} onRemove={onRemove} />
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
