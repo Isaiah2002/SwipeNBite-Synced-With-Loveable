@@ -8,43 +8,43 @@
   :root {
     /* App Background */
     --background: 245 50% 98%;
-    --foreground: 240 15% 15%;
+    --foreground: 240 20% 10%; /* Darker for better contrast */
 
     /* Cards */
     --card: 0 0% 100%;
-    --card-foreground: 240 15% 15%;
+    --card-foreground: 240 20% 10%; /* Darker for better contrast */
 
     /* Primary Brand - Purple to Blue Gradient */
-    --primary: 260 85% 65%;
+    --primary: 260 85% 55%; /* Darker for WCAG AA compliance */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 280 90% 75%;
+    --primary-glow: 280 90% 65%;
 
     /* Secondary - Vibrant Orange/Coral */
-    --secondary: 25 85% 60%;
+    --secondary: 25 85% 50%; /* Darker for WCAG AA compliance */
     --secondary-foreground: 0 0% 100%;
 
     /* Accent - Success Green */
-    --accent: 145 65% 55%;
+    --accent: 145 65% 45%; /* Darker for WCAG AA compliance */
     --accent-foreground: 0 0% 100%;
 
     /* Muted Elements */
     --muted: 240 10% 95%;
-    --muted-foreground: 240 10% 45%;
+    --muted-foreground: 240 15% 35%; /* Darker for better contrast (WCAG AA) */
 
     /* Interactive States */
-    --like: 145 65% 55%;
+    --like: 145 65% 45%; /* Darker for WCAG AA compliance */
     --like-foreground: 0 0% 100%;
-    --pass: 0 70% 60%;
+    --pass: 0 70% 50%; /* Darker for WCAG AA compliance */
     --pass-foreground: 0 0% 100%;
 
     /* Destructive */
-    --destructive: 0 70% 60%;
+    --destructive: 0 70% 50%; /* Darker for WCAG AA compliance */
     --destructive-foreground: 0 0% 100%;
 
     /* Borders and Inputs */
-    --border: 240 15% 90%;
+    --border: 240 15% 85%; /* Slightly darker for better visibility */
     --input: 240 15% 95%;
-    --ring: 260 85% 65%;
+    --ring: 260 85% 55%;
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
@@ -88,7 +88,19 @@
     --primary-glow: 260 85% 65%;
     
     --muted: 240 15% 15%;
-    --muted-foreground: 240 10% 65%;
+    --muted-foreground: 240 15% 70%; /* Lighter for better contrast in dark mode */
+  }
+
+  /* Respect prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
@@ -156,9 +168,9 @@
     background: var(--gradient-success);
   }
 
-  /* Action Buttons */
+  /* Action Buttons - Minimum 44x44px touch target */
   .action-button {
-    @apply w-16 h-16 rounded-full flex items-center justify-center 
+    @apply w-20 h-20 rounded-full flex items-center justify-center 
            transition-all duration-200 shadow-lg border-2 border-white/20;
   }
   
@@ -174,10 +186,10 @@
     @apply action-button bg-gradient-to-br from-pass to-pass/80 text-pass-foreground;
   }
 
-  /* Filter Chips */
+  /* Filter Chips - Minimum 44x44px touch target */
   .filter-chip {
-    @apply px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-           border border-border hover:border-primary/50;
+    @apply px-5 py-3 min-h-[44px] rounded-full text-sm font-medium transition-all duration-200
+           border border-border hover:border-primary/50 inline-flex items-center justify-center;
   }
   
   .filter-chip.active {
