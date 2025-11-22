@@ -18,7 +18,7 @@ const BottomNav = () => {
               to={to}
               className={({ isActive }) =>
                 cn(
-                  "flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 min-w-[60px]",
+                  "flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 min-w-[60px] min-h-[44px]",
                   isActive
                     ? "text-primary bg-primary/10"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
