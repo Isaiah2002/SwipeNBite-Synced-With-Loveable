@@ -51,7 +51,7 @@ export const LocationInsights = () => {
     if (location.permissionGranted) {
       setProximityEnabled(true);
       startTracking();
-      toast.success('Proximity alerts enabled! We\'ll notify you when you\'re near your favorites.');
+      toast.success('Real-time geofencing enabled! You\'ll be notified when near favorites or new places.');
     } else {
       toast.error('Location permission required for proximity alerts');
     }
