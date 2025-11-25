@@ -14,6 +14,7 @@ import { AddressInput } from '@/components/AddressInput';
 import { Onboarding } from '@/components/Onboarding';
 import { InstallPrompt } from '@/components/InstallPrompt';
 import { OfflineIndicator } from '@/components/OfflineIndicator';
+import { BudgetAlert } from '@/components/BudgetAlert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Heart, RotateCcw, LogOut, User, Search, MapPin } from 'lucide-react';
@@ -464,6 +465,7 @@ const Index = () => {
       <header className="p-4 pb-2 pt-2">
         <div className="max-w-md mx-auto space-y-3">
           <FilterBar filters={filters} onFiltersChange={setFilters} />
+          <BudgetAlert />
         </div>
       </header>
 

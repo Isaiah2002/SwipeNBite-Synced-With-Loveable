@@ -12,6 +12,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 import { ProfileAnalytics } from '@/components/ProfileAnalytics';
 import { NotificationCenter } from '@/components/NotificationCenter';
+import { BudgetTracker } from '@/components/BudgetTracker';
+import { BudgetSettings } from '@/components/BudgetSettings';
 
 const addressSchema = z.object({
   address: z.string().trim().min(1, "Street address is required").max(200, "Address is too long"),
@@ -405,9 +407,13 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Analytics Dashboard */}
-          <div className="mt-6">
-            <h2 className="text-xl font-bold text-card-foreground mb-4">Your Analytics</h2>
+          {/* Budget & Analytics Dashboard */}
+          <div className="mt-6 space-y-6">
+            <h2 className="text-xl font-bold text-card-foreground">Budget & Spending</h2>
+            <BudgetTracker />
+            <BudgetSettings />
+            
+            <h2 className="text-xl font-bold text-card-foreground mt-8">Your Analytics</h2>
             <ProfileAnalytics />
           </div>
         </div>
