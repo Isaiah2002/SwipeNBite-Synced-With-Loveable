@@ -31,8 +31,8 @@ export const useLocationTracking = (enableProximityAlerts: boolean = false) => {
 
       if (error) throw error;
 
-      if (data.nearbyFavorites && data.nearbyFavorites.length > 0) {
-        console.log(`Found ${data.nearbyFavorites.length} nearby favorites`);
+      if (data.nearbyFavorites > 0 || data.nearbyNewPlaces > 0) {
+        console.log(`Geofencing check: ${data.nearbyFavorites} favorites, ${data.nearbyNewPlaces} new places nearby`);
       }
     } catch (error) {
       console.error('Error checking proximity:', error);
