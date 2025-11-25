@@ -1,9 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from "recharts";
 import { Progress } from "@/components/ui/progress";
-import { TrendingDown, TrendingUp, AlertCircle, Lightbulb } from "lucide-react";
+import { TrendingDown, TrendingUp, AlertCircle, Lightbulb, Calendar } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useMemo } from "react";
+import { format, getDay } from "date-fns";
 
 interface Order {
   created_at: string;
@@ -25,6 +26,31 @@ export const BudgetAnalytics = ({ orders, dailyBudget, weeklyBudget, monthlyBudg
       const daysAgo = Math.floor((now.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24));
       return daysAgo <= 30;
     });
+
+    // Day of week analysis
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayOfWeekData = dayNames.map((day, index) => {
+      const daySpending = last30Days
+        .filter(order => getDay(new Date(order.created_at)) === index)
+        .reduce((sum, order) => sum + Number(order.total), 0);
+      
+      return {
+        day: day.slice(0, 3), // Abbreviated day name
+        spending: daySpending,
+        isWeekend: index === 0 || index === 6
+      };
+    });
+
+    // Weekday vs Weekend comparison
+    const weekdaySpending = dayOfWeekData
+      .filter(d => !d.isWeekend)
+      .reduce((sum, d) => sum + d.spending, 0);
+    const weekendSpending = dayOfWeekData
+      .filter(d => d.isWeekend)
+      .reduce((sum, d) => sum + d.spending, 0);
+    
+    const weekdayAvg = weekdaySpending / 5;
+    const weekendAvg = weekendSpending / 2;
 
     // Daily spending data for chart
     const dailyData = Array.from({ length: 30 }, (_, i) => {
@@ -95,7 +121,12 @@ export const BudgetAnalytics = ({ orders, dailyBudget, weeklyBudget, monthlyBudg
       weekSpent,
       monthSpent,
       suggestions,
-      avgDailySpending
+      avgDailySpending,
+      dayOfWeekData,
+      weekdayAvg,
+      weekendAvg,
+      weekdaySpending,
+      weekendSpending
     };
   }, [orders, dailyBudget, weeklyBudget, monthlyBudget]);
 
@@ -145,6 +176,90 @@ export const BudgetAnalytics = ({ orders, dailyBudget, weeklyBudget, monthlyBudg
               />
             </LineChart>
           </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Day of Week Analysis */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="w-5 h-5" />
+            Day of Week Spending
+          </CardTitle>
+          <CardDescription>
+            Which days you spend the most • {analytics.weekendAvg > analytics.weekdayAvg ? 'Higher on weekends' : 'Higher on weekdays'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={analytics.dayOfWeekData}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis 
+                dataKey="day" 
+                tick={{ fontSize: 12 }}
+                className="text-muted-foreground"
+              />
+              <YAxis 
+                tick={{ fontSize: 12 }}
+                className="text-muted-foreground"
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px'
+                }}
+                formatter={(value: number) => [`$${value.toFixed(2)}`, 'Spent']}
+              />
+              <Bar dataKey="spending" radius={[4, 4, 0, 0]}>
+                {analytics.dayOfWeekData.map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`}
+                    fill={entry.isWeekend ? 'hsl(var(--chart-2))' : 'hsl(var(--primary))'}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+
+          {/* Weekday vs Weekend Comparison */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 rounded-lg border bg-card">
+              <div className="text-sm text-muted-foreground mb-1">Weekday Average</div>
+              <div className="text-2xl font-bold">${analytics.weekdayAvg.toFixed(2)}</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                ${analytics.weekdaySpending.toFixed(2)} total
+              </div>
+            </div>
+            <div className="p-4 rounded-lg border bg-card">
+              <div className="text-sm text-muted-foreground mb-1">Weekend Average</div>
+              <div className="text-2xl font-bold">${analytics.weekendAvg.toFixed(2)}</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                ${analytics.weekendSpending.toFixed(2)} total
+              </div>
+            </div>
+          </div>
+
+          {/* Insights */}
+          {analytics.weekendAvg > analytics.weekdayAvg * 1.3 && (
+            <Alert className="border-l-4 border-l-chart-2">
+              <TrendingUp className="h-4 w-4" />
+              <AlertDescription className="text-sm">
+                You spend {((analytics.weekendAvg / analytics.weekdayAvg - 1) * 100).toFixed(0)}% more on weekends than weekdays. 
+                Planning weekend meals could help reduce costs.
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {analytics.weekdayAvg > analytics.weekendAvg * 1.3 && (
+            <Alert className="border-l-4 border-l-primary">
+              <TrendingUp className="h-4 w-4" />
+              <AlertDescription className="text-sm">
+                Your weekday spending is {((analytics.weekdayAvg / analytics.weekendAvg - 1) * 100).toFixed(0)}% higher. 
+                Meal prepping on weekends might help cut weekday costs.
+              </AlertDescription>
+            </Alert>
+          )}
         </CardContent>
       </Card>
 
