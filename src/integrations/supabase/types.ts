@@ -14,6 +14,130 @@ export type Database = {
   }
   public: {
     Tables: {
+      ab_test_assignments: {
+        Row: {
+          assigned_at: string
+          id: string
+          test_name: string
+          user_id: string
+          variant_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          id?: string
+          test_name: string
+          user_id: string
+          variant_id: string
+        }
+        Update: {
+          assigned_at?: string
+          id?: string
+          test_name?: string
+          user_id?: string
+          variant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ab_test_assignments_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "ab_test_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ab_test_metrics: {
+        Row: {
+          acceptance_rate: number | null
+          avg_like_ratio_at_generation: number | null
+          avg_swipes_at_generation: number | null
+          generation_time_ms: number | null
+          id: string
+          negative_feedback_count: number
+          positive_feedback_count: number
+          recorded_at: string
+          session_id: string
+          total_feedback_count: number
+          user_id: string
+          variant_id: string
+        }
+        Insert: {
+          acceptance_rate?: number | null
+          avg_like_ratio_at_generation?: number | null
+          avg_swipes_at_generation?: number | null
+          generation_time_ms?: number | null
+          id?: string
+          negative_feedback_count?: number
+          positive_feedback_count?: number
+          recorded_at?: string
+          session_id: string
+          total_feedback_count?: number
+          user_id: string
+          variant_id: string
+        }
+        Update: {
+          acceptance_rate?: number | null
+          avg_like_ratio_at_generation?: number | null
+          avg_swipes_at_generation?: number | null
+          generation_time_ms?: number | null
+          id?: string
+          negative_feedback_count?: number
+          positive_feedback_count?: number
+          recorded_at?: string
+          session_id?: string
+          total_feedback_count?: number
+          user_id?: string
+          variant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ab_test_metrics_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "ab_test_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ab_test_variants: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          model: string
+          system_prompt: string
+          temperature: number | null
+          test_name: string
+          traffic_allocation: number
+          updated_at: string
+          variant_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          model: string
+          system_prompt: string
+          temperature?: number | null
+          test_name: string
+          traffic_allocation?: number
+          updated_at?: string
+          variant_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          model?: string
+          system_prompt?: string
+          temperature?: number | null
+          test_name?: string
+          traffic_allocation?: number
+          updated_at?: string
+          variant_name?: string
+        }
+        Relationships: []
+      }
       friendships: {
         Row: {
           created_at: string
