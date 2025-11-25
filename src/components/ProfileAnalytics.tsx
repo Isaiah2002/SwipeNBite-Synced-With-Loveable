@@ -9,6 +9,7 @@ import { DollarSign, ShoppingBag, TrendingUp, Heart, Sparkles, ThumbsUp, ThumbsD
 import { toast } from 'sonner';
 import { LocationInsights } from './LocationInsights';
 import { CommuteInsights } from './CommuteInsights';
+import { AIModelAnalytics } from './AIModelAnalytics';
 
 interface AnalyticsData {
   totalOrders: number;
@@ -26,6 +27,14 @@ interface Recommendation {
   insight: string;
 }
 
+interface RecommendationMetadata {
+  sessionId: string;
+  totalSwipes: number;
+  likeRatio: string;
+  modelUsed: string;
+  generatedAt: string;
+}
+
 const CHART_COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--like))', 'hsl(var(--pass))'];
 
 export const ProfileAnalytics = () => {
@@ -33,7 +42,9 @@ export const ProfileAnalytics = () => {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [metadata, setMetadata] = useState<RecommendationMetadata | null>(null);
   const [loadingRecs, setLoadingRecs] = useState(false);
+  const [feedbackGiven, setFeedbackGiven] = useState<{ [key: number]: string }>({});
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -130,12 +141,44 @@ export const ProfileAnalytics = () => {
 
       if (data?.recommendations) {
         setRecommendations(data.recommendations);
+        setMetadata(data.metadata);
+        setFeedbackGiven({});
         toast.success('AI recommendations generated!');
       }
     } catch (error) {
       console.error('Error generating recommendations:', error);
     } finally {
       setLoadingRecs(false);
+    }
+  };
+
+  const submitFeedback = async (index: number, feedbackType: 'positive' | 'negative') => {
+    if (!user || !metadata) return;
+    
+    const rec = recommendations[index];
+    
+    try {
+      const { error } = await supabase
+        .from('recommendation_feedback')
+        .insert({
+          user_id: user.id,
+          recommendation_title: rec.title,
+          recommendation_cuisine: rec.cuisine,
+          recommendation_reason: rec.reason,
+          feedback_type: feedbackType,
+          session_id: metadata.sessionId,
+          model_used: metadata.modelUsed,
+          total_swipes_at_generation: parseInt(metadata.totalSwipes.toString()),
+          like_ratio_at_generation: parseFloat(metadata.likeRatio),
+        });
+
+      if (error) throw error;
+
+      setFeedbackGiven(prev => ({ ...prev, [index]: feedbackType }));
+      toast.success(`Feedback recorded! This helps improve recommendations.`);
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      toast.error('Failed to submit feedback');
     }
   };
 
@@ -320,6 +363,38 @@ export const ProfileAnalytics = () => {
                             {rec.insight}
                           </span>
                         </div>
+                        <div className="flex items-center gap-2 pt-2">
+                          {!feedbackGiven[index] ? (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => submitFeedback(index, 'positive')}
+                                className="gap-2 text-like border-like/20 hover:bg-like/10"
+                              >
+                                <ThumbsUp className="w-3 h-3" />
+                                Helpful
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => submitFeedback(index, 'negative')}
+                                className="gap-2 text-pass border-pass/20 hover:bg-pass/10"
+                              >
+                                <ThumbsDown className="w-3 h-3" />
+                                Not Helpful
+                              </Button>
+                            </>
+                          ) : (
+                            <div className={`flex items-center gap-2 text-sm ${feedbackGiven[index] === 'positive' ? 'text-like' : 'text-pass'}`}>
+                              {feedbackGiven[index] === 'positive' ? (
+                                <><ThumbsUp className="w-4 h-4" /> Marked as helpful</>
+                              ) : (
+                                <><ThumbsDown className="w-4 h-4" /> Marked as not helpful</>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -435,6 +510,22 @@ export const ProfileAnalytics = () => {
 
       {/* Commute Insights */}
       <CommuteInsights />
+
+      {/* AI Model Analytics */}
+      <Card className="border-2 border-accent/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUpIcon className="w-5 h-5 text-accent" />
+            AI Model Performance Analytics
+          </CardTitle>
+          <CardDescription>
+            Track recommendation quality and model effectiveness over time
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AIModelAnalytics />
+        </CardContent>
+      </Card>
     </div>
   );
 };

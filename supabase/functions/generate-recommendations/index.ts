@@ -57,6 +57,11 @@ serve(async (req) => {
     const likedPrices = likedSwipes.map(s => s.price).filter(Boolean);
     const likedRatings = likedSwipes.map(s => s.rating).filter(Boolean);
 
+    // Calculate metrics for tracking
+    const totalSwipes = swipes?.length || 0;
+    const likeRatio = totalSwipes > 0 ? (likedSwipes.length / totalSwipes) * 100 : 0;
+    const sessionId = crypto.randomUUID();
+
     // Create analysis prompt
     const analysisPrompt = `Based on this user's restaurant swipe behavior, provide 3-5 personalized restaurant recommendations.
 
@@ -139,7 +144,19 @@ Provide recommendations in a JSON array format with the following structure:
     
     const recommendations = JSON.parse(jsonContent);
 
-    return new Response(JSON.stringify(recommendations), {
+    // Add metadata for tracking
+    const responseData = {
+      ...recommendations,
+      metadata: {
+        sessionId,
+        totalSwipes,
+        likeRatio: likeRatio.toFixed(1),
+        modelUsed: "google/gemini-2.5-flash",
+        generatedAt: new Date().toISOString()
+      }
+    };
+
+    return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
