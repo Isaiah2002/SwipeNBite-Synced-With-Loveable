@@ -15,6 +15,8 @@ const Orders = lazy(() => import("./pages/Orders"));
 const Profile = lazy(() => import("./pages/Profile"));
 const RestaurantOrder = lazy(() => import("./pages/RestaurantOrder"));
 const Install = lazy(() => import("./pages/Install"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -41,6 +43,8 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               <Route path="/install" element={<Install />} />
               <Route path="/order/:restaurantId" element={<RestaurantOrder />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -118,7 +118,8 @@ export const ConsentBanner = () => {
           <p className="text-sm text-muted-foreground">
             SwipeN'Bite uses location tracking for personalized restaurant suggestions, 
             analytics to improve your experience, and notifications to keep you updated. 
-            You can customize these settings anytime in your profile.
+            You can customize these settings anytime in your profile. Learn more in our{" "}
+            <a href="/privacy" className="text-primary underline">Privacy Policy</a>.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-2">
