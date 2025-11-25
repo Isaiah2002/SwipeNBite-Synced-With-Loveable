@@ -41,3 +41,6 @@ verify_jwt = true
 
 [functions.record-ab-test-feedback]
 verify_jwt = true
+
+[functions.track-recommendation-interaction]
+verify_jwt = true

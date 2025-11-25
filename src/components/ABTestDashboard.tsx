@@ -22,6 +22,11 @@ interface ABTestVariant {
     avgGenerationTime: number;
     avgSwipes: number;
     avgLikeRatio: number;
+    clickThroughRate: number;
+    conversionRate: number;
+    totalClicks: number;
+    totalConversions: number;
+    totalRecommendationsShown: number;
   };
 }
 
@@ -100,6 +105,13 @@ export const ABTestDashboard = () => {
               ? metrics.reduce((sum, m) => sum + (Number(m.avg_like_ratio_at_generation) || 0), 0) / metrics.length
               : 0;
 
+            const totalClicks = metrics?.reduce((sum, m) => sum + (m.clicks_count || 0), 0) || 0;
+            const totalConversions = metrics?.reduce((sum, m) => sum + (m.conversions_count || 0), 0) || 0;
+            const totalRecommendationsShown = metrics?.reduce((sum, m) => sum + (m.recommendations_shown || 0), 0) || 0;
+            
+            const clickThroughRate = totalRecommendationsShown > 0 ? (totalClicks / totalRecommendationsShown) * 100 : 0;
+            const conversionRate = totalClicks > 0 ? (totalConversions / totalClicks) * 100 : 0;
+
             return {
               id: variant.id,
               variant_name: variant.variant_name,
@@ -115,6 +127,11 @@ export const ABTestDashboard = () => {
                 avgGenerationTime,
                 avgSwipes,
                 avgLikeRatio,
+                clickThroughRate,
+                conversionRate,
+                totalClicks,
+                totalConversions,
+                totalRecommendationsShown,
               },
             };
           })
@@ -181,7 +198,24 @@ export const ABTestDashboard = () => {
           acceptanceRate: v.metrics.acceptanceRate,
           totalFeedback: v.metrics.totalFeedback,
           avgGenerationTime: v.metrics.avgGenerationTime,
+          clickThroughRate: v.metrics.clickThroughRate,
+          conversionRate: v.metrics.conversionRate,
         }));
+
+        // Calculate quality score
+        const calculateQualityScore = (metrics: any) => {
+          const acceptanceWeight = 0.4;
+          const ctrWeight = 0.3;
+          const conversionWeight = 0.3;
+          
+          const acceptanceScore = metrics.acceptanceRate || 0;
+          const ctrScore = metrics.clickThroughRate || 0;
+          const conversionScore = metrics.conversionRate || 0;
+          
+          return (acceptanceScore * acceptanceWeight) + 
+                 (ctrScore * ctrWeight) + 
+                 (conversionScore * conversionWeight);
+        };
 
         return (
           <Card key={test.test_name} className="border-2 border-primary/20">
@@ -230,9 +264,9 @@ export const ABTestDashboard = () => {
                         </div>
                         <div className="p-2 bg-muted/50 rounded">
                           <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <TrendingUp className="w-3 h-3" /> Feedback
+                            <TrendingUp className="w-3 h-3" /> Quality
                           </p>
-                          <p className="text-lg font-bold">{variant.metrics.totalFeedback}</p>
+                          <p className="text-lg font-bold text-primary">{calculateQualityScore(variant.metrics).toFixed(1)}</p>
                         </div>
                       </div>
                       
@@ -251,6 +285,17 @@ export const ABTestDashboard = () => {
                         </div>
                       </div>
 
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <p className="text-muted-foreground">Click-Through Rate</p>
+                          <p className="font-medium text-secondary">{variant.metrics.clickThroughRate.toFixed(1)}%</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Conversion Rate</p>
+                          <p className="font-medium text-accent">{variant.metrics.conversionRate.toFixed(1)}%</p>
+                        </div>
+                      </div>
+
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground flex items-center gap-1">
                           <Zap className="w-3 h-3" /> Avg Time
@@ -258,21 +303,18 @@ export const ABTestDashboard = () => {
                         <span className="font-medium">{variant.metrics.avgGenerationTime.toFixed(0)}ms</span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                          <p className="text-muted-foreground">Avg Swipes</p>
-                          <p className="font-medium">{variant.metrics.avgSwipes.toFixed(0)}</p>
+                      <div className="pt-2 text-xs space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-muted-foreground">Recommendations Shown</span>
+                          <span className="font-medium">{variant.metrics.totalRecommendationsShown}</span>
                         </div>
-                        <div>
-                          <p className="text-muted-foreground">Avg Like Ratio</p>
-                          <p className="font-medium text-like">{variant.metrics.avgLikeRatio.toFixed(1)}%</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-muted-foreground">Total Clicks</span>
+                          <span className="font-medium">{variant.metrics.totalClicks}</span>
                         </div>
-                      </div>
-
-                      <div className="pt-2 text-xs">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-like">✓ Positive: {variant.metrics.positiveCount}</span>
-                          <span className="text-pass">✗ Negative: {variant.metrics.negativeCount}</span>
+                        <div className="flex items-center justify-between">
+                          <span className="text-muted-foreground">Conversions</span>
+                          <span className="font-medium">{variant.metrics.totalConversions}</span>
                         </div>
                       </div>
                     </CardContent>
@@ -281,18 +323,18 @@ export const ABTestDashboard = () => {
               </div>
 
               {/* Comparison Charts */}
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-3 gap-4">
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Acceptance Rate Comparison</CardTitle>
+                    <CardTitle className="text-sm">Acceptance Rate</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={200}>
+                    <ResponsiveContainer width="100%" height={180}>
                       <BarChart data={comparisonData}>
-                        <XAxis dataKey="name" />
+                        <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="acceptanceRate" fill="hsl(var(--like))" name="Acceptance Rate (%)" />
+                        <Bar dataKey="acceptanceRate" fill="hsl(var(--like))" name="Acceptance (%)" />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -300,15 +342,31 @@ export const ABTestDashboard = () => {
 
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Generation Time Comparison</CardTitle>
+                    <CardTitle className="text-sm">Click-Through Rate</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={200}>
+                    <ResponsiveContainer width="100%" height={180}>
                       <BarChart data={comparisonData}>
-                        <XAxis dataKey="name" />
+                        <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="avgGenerationTime" fill="hsl(var(--primary))" name="Avg Time (ms)" />
+                        <Bar dataKey="clickThroughRate" fill="hsl(var(--secondary))" name="CTR (%)" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm">Conversion Rate</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={180}>
+                      <BarChart data={comparisonData}>
+                        <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="conversionRate" fill="hsl(var(--accent))" name="Conversion (%)" />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>

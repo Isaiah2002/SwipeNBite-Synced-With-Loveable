@@ -148,6 +148,18 @@ export const ProfileAnalytics = () => {
         setMetadata(data.metadata);
         setFeedbackGiven({});
         toast.success('AI recommendations generated!');
+        
+        // Track that recommendations were viewed
+        if (data.metadata?.sessionId && data.metadata?.variantId) {
+          await supabase.functions.invoke('track-recommendation-interaction', {
+            body: {
+              sessionId: data.metadata.sessionId,
+              variantId: data.metadata.variantId,
+              recommendations: data.recommendations,
+              interactionType: 'view'
+            }
+          });
+        }
       }
     } catch (error) {
       console.error('Error generating recommendations:', error);
@@ -187,6 +199,19 @@ export const ProfileAnalytics = () => {
           }
         });
       }
+
+      // Track as a click interaction
+      await supabase.functions.invoke('track-recommendation-interaction', {
+        body: {
+          sessionId: metadata.sessionId,
+          variantId: metadata.variantId,
+          restaurantData: {
+            title: rec.title,
+            cuisine: rec.cuisine
+          },
+          interactionType: 'click'
+        }
+      });
 
       setFeedbackGiven(prev => ({ ...prev, [index]: feedbackType }));
       toast.success(`Feedback recorded! This helps improve recommendations.`);
