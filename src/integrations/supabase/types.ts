@@ -262,53 +262,65 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          budget_alerts_enabled: boolean | null
           city: string | null
           created_at: string
+          daily_budget: number | null
           dietary_restrictions: string[] | null
           favorite_cuisines: string[] | null
           food_preferences: string[] | null
           full_name: string | null
           id: string
           max_distance_preference: number | null
+          monthly_budget: number | null
           phone_number: string | null
           price_preference: string | null
           state: string | null
           updated_at: string
           user_id: string
+          weekly_budget: number | null
           zip_code: string | null
         }
         Insert: {
           address?: string | null
+          budget_alerts_enabled?: boolean | null
           city?: string | null
           created_at?: string
+          daily_budget?: number | null
           dietary_restrictions?: string[] | null
           favorite_cuisines?: string[] | null
           food_preferences?: string[] | null
           full_name?: string | null
           id?: string
           max_distance_preference?: number | null
+          monthly_budget?: number | null
           phone_number?: string | null
           price_preference?: string | null
           state?: string | null
           updated_at?: string
           user_id: string
+          weekly_budget?: number | null
           zip_code?: string | null
         }
         Update: {
           address?: string | null
+          budget_alerts_enabled?: boolean | null
           city?: string | null
           created_at?: string
+          daily_budget?: number | null
           dietary_restrictions?: string[] | null
           favorite_cuisines?: string[] | null
           food_preferences?: string[] | null
           full_name?: string | null
           id?: string
           max_distance_preference?: number | null
+          monthly_budget?: number | null
           phone_number?: string | null
           price_preference?: string | null
           state?: string | null
           updated_at?: string
           user_id?: string
+          weekly_budget?: number | null
           zip_code?: string | null
         }
         Relationships: []
