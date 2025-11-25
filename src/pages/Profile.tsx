@@ -15,6 +15,7 @@ import { NotificationCenter } from '@/components/NotificationCenter';
 import { BudgetTracker } from '@/components/BudgetTracker';
 import { BudgetSettings } from '@/components/BudgetSettings';
 import { BudgetAnalytics } from '@/components/BudgetAnalytics';
+import { PrivacyDashboard } from '@/components/PrivacyDashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const addressSchema = z.object({
@@ -457,6 +458,9 @@ const Profile = () => {
             
             <h2 className="text-xl font-bold text-card-foreground mt-8">Your Analytics</h2>
             <ProfileAnalytics />
+            
+            <h2 className="text-xl font-bold text-card-foreground mt-8">Privacy & Data</h2>
+            <PrivacyDashboard />
           </div>
         </div>
       </div>
