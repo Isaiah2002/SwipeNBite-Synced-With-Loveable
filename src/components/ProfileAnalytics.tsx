@@ -3,16 +3,25 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-import { DollarSign, ShoppingBag, TrendingUp, Heart } from 'lucide-react';
+import { DollarSign, ShoppingBag, TrendingUp, Heart, Sparkles, ThumbsUp, ThumbsDown, TrendingUpIcon } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface AnalyticsData {
   totalOrders: number;
   totalSpent: number;
   averageOrderValue: number;
-  swipeStats: { right: number; left: number };
+  swipeStats: { right: number; left: number; total: number };
   topCuisines: { name: string; count: number }[];
   topRestaurants: { name: string; count: number; total: number }[];
+}
+
+interface Recommendation {
+  title: string;
+  reason: string;
+  cuisine: string;
+  insight: string;
 }
 
 const CHART_COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--like))', 'hsl(var(--pass))'];
@@ -21,6 +30,8 @@ export const ProfileAnalytics = () => {
   const { user } = useAuth();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [loadingRecs, setLoadingRecs] = useState(false);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -44,9 +55,11 @@ export const ProfileAnalytics = () => {
         const averageOrderValue = totalOrders > 0 ? totalSpent / totalOrders : 0;
 
         // Calculate swipe stats
+        const totalSwipes = swipes?.length || 0;
         const swipeStats = {
           right: swipes?.filter(s => s.swipe_direction === 'right').length || 0,
           left: swipes?.filter(s => s.swipe_direction === 'left').length || 0,
+          total: totalSwipes,
         };
 
         // Calculate top cuisines from swipes
@@ -93,6 +106,37 @@ export const ProfileAnalytics = () => {
     fetchAnalytics();
   }, [user]);
 
+  const generateRecommendations = async () => {
+    if (!user) return;
+    
+    setLoadingRecs(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-recommendations', {
+        body: { userId: user.id }
+      });
+
+      if (error) {
+        if (error.message?.includes('429')) {
+          toast.error('Rate limit reached. Please try again in a moment.');
+        } else if (error.message?.includes('402')) {
+          toast.error('AI credits depleted. Please add credits to your workspace.');
+        } else {
+          toast.error('Failed to generate recommendations');
+        }
+        throw error;
+      }
+
+      if (data?.recommendations) {
+        setRecommendations(data.recommendations);
+        toast.success('AI recommendations generated!');
+      }
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
+    } finally {
+      setLoadingRecs(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -110,9 +154,59 @@ export const ProfileAnalytics = () => {
     { name: 'Passed', value: analytics.swipeStats.left, color: 'hsl(var(--pass))' },
   ];
 
+  const likeRatio = analytics.swipeStats.total > 0 
+    ? ((analytics.swipeStats.right / analytics.swipeStats.total) * 100).toFixed(1)
+    : 0;
+
   return (
     <div className="space-y-6">
-      {/* Stats Cards */}
+      {/* Swipe Insights Section */}
+      <Card className="border-2 border-primary/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUpIcon className="w-5 h-5 text-primary" />
+            Swipe Insights
+          </CardTitle>
+          <CardDescription>Your restaurant browsing behavior</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <ThumbsUp className="w-4 h-4 text-like" />
+                <p className="text-sm font-medium text-muted-foreground">Total Swipes</p>
+              </div>
+              <p className="text-3xl font-bold text-card-foreground">{analytics.swipeStats.total}</p>
+            </div>
+            <div className="p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Heart className="w-4 h-4 text-like" />
+                <p className="text-sm font-medium text-muted-foreground">Like Ratio</p>
+              </div>
+              <p className="text-3xl font-bold text-like">{likeRatio}%</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4 pt-2">
+            <div className="flex items-center gap-3 p-3 bg-like/10 rounded-lg border border-like/20">
+              <ThumbsUp className="w-5 h-5 text-like" />
+              <div>
+                <p className="text-sm text-muted-foreground">Liked</p>
+                <p className="text-2xl font-bold text-like">{analytics.swipeStats.right}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-pass/10 rounded-lg border border-pass/20">
+              <ThumbsDown className="w-5 h-5 text-pass" />
+              <div>
+                <p className="text-sm text-muted-foreground">Passed</p>
+                <p className="text-2xl font-bold text-pass">{analytics.swipeStats.left}</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Order Stats Cards */}
       <div className="grid grid-cols-2 gap-4">
         <Card>
           <CardHeader className="pb-2">
@@ -153,15 +247,104 @@ export const ProfileAnalytics = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Heart className="w-4 h-4 text-like" />
-              Liked
+              <TrendingUpIcon className="w-4 h-4 text-accent" />
+              Swipes
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-card-foreground">{analytics.swipeStats.right}</div>
+            <div className="text-2xl font-bold text-card-foreground">{analytics.swipeStats.total}</div>
           </CardContent>
         </Card>
       </div>
+
+      {/* AI Recommendations Section */}
+      <Card className="border-2 border-secondary/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-secondary" />
+            AI-Powered Recommendations
+          </CardTitle>
+          <CardDescription>Personalized suggestions based on your swipe behavior</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {recommendations.length === 0 ? (
+            <div className="text-center py-6">
+              <p className="text-muted-foreground mb-4">
+                Get personalized restaurant recommendations based on your swipe patterns!
+              </p>
+              <Button
+                onClick={generateRecommendations}
+                disabled={loadingRecs || analytics.swipeStats.total === 0}
+                className="gradient-primary text-primary-foreground border-0"
+              >
+                {loadingRecs ? (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2 animate-pulse" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Generate Recommendations
+                  </>
+                )}
+              </Button>
+              {analytics.swipeStats.total === 0 && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Start swiping to get recommendations!
+                </p>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="space-y-3">
+                {recommendations.map((rec, index) => (
+                  <div
+                    key={index}
+                    className="p-4 bg-gradient-to-br from-secondary/5 to-secondary/10 rounded-lg border border-secondary/20"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-secondary to-secondary/80 flex items-center justify-center text-primary-foreground font-bold text-sm flex-shrink-0">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <h4 className="font-semibold text-card-foreground">{rec.title}</h4>
+                        <p className="text-sm text-muted-foreground">{rec.reason}</p>
+                        <div className="flex items-center gap-2 pt-1">
+                          <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">
+                            {rec.cuisine}
+                          </span>
+                          <span className="text-xs text-muted-foreground italic">
+                            {rec.insight}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Button
+                onClick={generateRecommendations}
+                disabled={loadingRecs}
+                variant="outline"
+                className="w-full"
+              >
+                {loadingRecs ? (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2 animate-pulse" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Refresh Recommendations
+                  </>
+                )}
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Swipe Patterns Chart */}
       {(analytics.swipeStats.right > 0 || analytics.swipeStats.left > 0) && (
