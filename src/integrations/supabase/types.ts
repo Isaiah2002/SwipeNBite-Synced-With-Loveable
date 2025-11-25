@@ -340,6 +340,48 @@ export type Database = {
         }
         Relationships: []
       }
+      recommendation_feedback: {
+        Row: {
+          created_at: string
+          feedback_type: string
+          id: string
+          like_ratio_at_generation: number | null
+          model_used: string | null
+          recommendation_cuisine: string
+          recommendation_reason: string
+          recommendation_title: string
+          session_id: string
+          total_swipes_at_generation: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feedback_type: string
+          id?: string
+          like_ratio_at_generation?: number | null
+          model_used?: string | null
+          recommendation_cuisine: string
+          recommendation_reason: string
+          recommendation_title: string
+          session_id: string
+          total_swipes_at_generation?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feedback_type?: string
+          id?: string
+          like_ratio_at_generation?: number | null
+          model_used?: string | null
+          recommendation_cuisine?: string
+          recommendation_reason?: string
+          recommendation_title?: string
+          session_id?: string
+          total_swipes_at_generation?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       restaurants: {
         Row: {
           created_at: string
