@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Restaurant } from '@/types/restaurant';
 import { Heart, X, Clock, MapPin, Star, Share2, ExternalLink, Info } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { RestaurantDetails } from '@/components/RestaurantDetails';
 import { useRestaurantData } from '@/hooks/useRestaurantData';
 import { Button } from '@/components/ui/button';
+import { LazyImage } from '@/components/LazyImage';
 
 interface SwipeCardProps {
   restaurant: Restaurant;
@@ -18,7 +19,7 @@ interface SwipeCardProps {
   onDetailsOpenChange?: (open: boolean) => void;
 }
 
-export const SwipeCard = ({ 
+export const SwipeCard = memo(({ 
   restaurant, 
   onSwipe, 
   onFavorite, 
@@ -213,10 +214,10 @@ export const SwipeCard = ({
           >
             {images.map((image, index) => (
               <div key={index} className="min-w-full h-full relative">
-                <img 
+                <LazyImage 
                   src={image.url} 
                   alt={image.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full"
                 />
               </div>
             ))}
@@ -459,4 +460,12 @@ export const SwipeCard = ({
       </div>
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison for memo optimization
+  return (
+    prevProps.restaurant.id === nextProps.restaurant.id &&
+    prevProps.isFavorited === nextProps.isFavorited &&
+    prevProps.isActive === nextProps.isActive &&
+    prevProps.detailsOpen === nextProps.detailsOpen
+  );
+});

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -18,7 +18,7 @@ interface RestaurantMapProps {
   address?: string;
 }
 
-export const RestaurantMap = ({ latitude, longitude, name, address }: RestaurantMapProps) => {
+export const RestaurantMap = memo(({ latitude, longitude, name, address }: RestaurantMapProps) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
 
@@ -63,5 +63,11 @@ export const RestaurantMap = ({ latitude, longitude, name, address }: Restaurant
       className="w-full h-[300px] rounded-lg overflow-hidden border border-border bg-muted"
     />
   );
-};
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.latitude === nextProps.latitude &&
+    prevProps.longitude === nextProps.longitude &&
+    prevProps.name === nextProps.name
+  );
+});
 
