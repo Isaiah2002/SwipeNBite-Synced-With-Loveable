@@ -20,6 +20,29 @@ export const useLocationTracking = (enableProximityAlerts: boolean = false) => {
     error: null,
     permissionGranted: false,
   });
+  const [hasConsent, setHasConsent] = useState<boolean>(false);
+
+  useEffect(() => {
+    checkLocationConsent();
+  }, [user]);
+
+  const checkLocationConsent = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('location_tracking_consent')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) throw error;
+      setHasConsent(data?.location_tracking_consent || false);
+    } catch (error) {
+      console.error('Error checking location consent:', error);
+      setHasConsent(false);
+    }
+  };
 
   const checkProximity = useCallback(async (lat: number, lon: number) => {
     if (!user) return;
@@ -40,6 +63,11 @@ export const useLocationTracking = (enableProximityAlerts: boolean = false) => {
   }, [user]);
 
   const requestLocation = useCallback(async () => {
+    if (!hasConsent) {
+      toast.error('Location tracking consent required. Enable in Profile → Privacy & Data.');
+      return;
+    }
+
     if (!navigator.geolocation) {
       setLocation(prev => ({
         ...prev,
@@ -110,9 +138,14 @@ export const useLocationTracking = (enableProximityAlerts: boolean = false) => {
         permissionGranted: false,
       });
     }
-  }, [enableProximityAlerts, checkProximity]);
+  }, [hasConsent, enableProximityAlerts, checkProximity]);
 
   const startTracking = useCallback(() => {
+    if (!hasConsent) {
+      toast.error('Location tracking consent required. Enable in Profile → Privacy & Data.');
+      return;
+    }
+
     if (!navigator.geolocation) return;
 
     const watchId = navigator.geolocation.watchPosition(
@@ -159,7 +192,7 @@ export const useLocationTracking = (enableProximityAlerts: boolean = false) => {
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [enableProximityAlerts, checkProximity]);
+  }, [hasConsent, enableProximityAlerts, checkProximity]);
 
   return {
     location,

@@ -262,8 +262,11 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          analytics_consent: boolean | null
           budget_alerts_enabled: boolean | null
           city: string | null
+          consent_given_at: string | null
+          consent_updated_at: string | null
           created_at: string
           daily_budget: number | null
           dietary_restrictions: string[] | null
@@ -271,8 +274,10 @@ export type Database = {
           food_preferences: string[] | null
           full_name: string | null
           id: string
+          location_tracking_consent: boolean | null
           max_distance_preference: number | null
           monthly_budget: number | null
+          notifications_consent: boolean | null
           phone_number: string | null
           price_preference: string | null
           state: string | null
@@ -283,8 +288,11 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          analytics_consent?: boolean | null
           budget_alerts_enabled?: boolean | null
           city?: string | null
+          consent_given_at?: string | null
+          consent_updated_at?: string | null
           created_at?: string
           daily_budget?: number | null
           dietary_restrictions?: string[] | null
@@ -292,8 +300,10 @@ export type Database = {
           food_preferences?: string[] | null
           full_name?: string | null
           id?: string
+          location_tracking_consent?: boolean | null
           max_distance_preference?: number | null
           monthly_budget?: number | null
+          notifications_consent?: boolean | null
           phone_number?: string | null
           price_preference?: string | null
           state?: string | null
@@ -304,8 +314,11 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          analytics_consent?: boolean | null
           budget_alerts_enabled?: boolean | null
           city?: string | null
+          consent_given_at?: string | null
+          consent_updated_at?: string | null
           created_at?: string
           daily_budget?: number | null
           dietary_restrictions?: string[] | null
@@ -313,8 +326,10 @@ export type Database = {
           food_preferences?: string[] | null
           full_name?: string | null
           id?: string
+          location_tracking_consent?: boolean | null
           max_distance_preference?: number | null
           monthly_budget?: number | null
+          notifications_consent?: boolean | null
           phone_number?: string | null
           price_preference?: string | null
           state?: string | null
