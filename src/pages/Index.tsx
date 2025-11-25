@@ -15,6 +15,7 @@ import { Onboarding } from '@/components/Onboarding';
 import { InstallPrompt } from '@/components/InstallPrompt';
 import { OfflineIndicator } from '@/components/OfflineIndicator';
 import { BudgetAlert } from '@/components/BudgetAlert';
+import { ConsentBanner } from '@/components/ConsentBanner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Heart, RotateCcw, LogOut, User, Search, MapPin } from 'lucide-react';
@@ -597,6 +598,9 @@ const Index = () => {
     
     {/* Install Prompt */}
     <InstallPrompt />
+    
+    {/* Consent Banner */}
+    <ConsentBanner />
     </>
   );
 };
