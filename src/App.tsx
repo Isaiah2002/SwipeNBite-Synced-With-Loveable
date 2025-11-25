@@ -12,6 +12,7 @@ import Favorites from "./pages/Favorites";
 import Orders from "./pages/Orders";
 import Profile from "./pages/Profile";
 import RestaurantOrder from "./pages/RestaurantOrder";
+import Install from "./pages/Install";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/install" element={<Install />} />
             <Route path="/order/:restaurantId" element={<RestaurantOrder />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
