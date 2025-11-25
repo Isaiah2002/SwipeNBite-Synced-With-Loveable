@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 import { ProfileAnalytics } from '@/components/ProfileAnalytics';
+import { NotificationCenter } from '@/components/NotificationCenter';
 
 const addressSchema = z.object({
   address: z.string().trim().min(1, "Street address is required").max(200, "Address is too long"),
@@ -172,14 +173,17 @@ const Profile = () => {
               </Button>
               <h1 className="text-2xl font-bold text-card-foreground">Profile</h1>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsEditing(!isEditing)}
-              className="p-2"
-            >
-              <Edit3 className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center space-x-2">
+              <NotificationCenter />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditing(!isEditing)}
+                className="p-2"
+              >
+                <Edit3 className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
 
           {/* Profile Card */}
