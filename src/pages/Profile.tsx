@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
+import { ProfileAnalytics } from '@/components/ProfileAnalytics';
 
 const addressSchema = z.object({
   address: z.string().trim().min(1, "Street address is required").max(200, "Address is too long"),
@@ -398,6 +399,12 @@ const Profile = () => {
                 </>
               )}
             </div>
+          </div>
+
+          {/* Analytics Dashboard */}
+          <div className="mt-6">
+            <h2 className="text-xl font-bold text-card-foreground mb-4">Your Analytics</h2>
+            <ProfileAnalytics />
           </div>
         </div>
       </div>
