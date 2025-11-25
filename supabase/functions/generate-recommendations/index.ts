@@ -225,6 +225,8 @@ Provide recommendations in a JSON array format with the following structure:
     };
 
     // Record initial metrics for A/B testing
+    const recommendationsCount = recommendations?.recommendations?.length || 0;
+    
     if (variantConfig.variantId) {
       await supabase
         .from("ab_test_metrics")
@@ -235,7 +237,10 @@ Provide recommendations in a JSON array format with the following structure:
           total_feedback_count: 0,
           avg_swipes_at_generation: totalSwipes,
           avg_like_ratio_at_generation: likeRatio,
-          generation_time_ms: generationTime
+          generation_time_ms: generationTime,
+          recommendations_shown: recommendationsCount,
+          clicks_count: 0,
+          conversions_count: 0
         });
     }
 

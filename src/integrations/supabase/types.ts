@@ -51,10 +51,15 @@ export type Database = {
           acceptance_rate: number | null
           avg_like_ratio_at_generation: number | null
           avg_swipes_at_generation: number | null
+          click_through_rate: number | null
+          clicks_count: number | null
+          conversion_rate: number | null
+          conversions_count: number | null
           generation_time_ms: number | null
           id: string
           negative_feedback_count: number
           positive_feedback_count: number
+          recommendations_shown: number | null
           recorded_at: string
           session_id: string
           total_feedback_count: number
@@ -65,10 +70,15 @@ export type Database = {
           acceptance_rate?: number | null
           avg_like_ratio_at_generation?: number | null
           avg_swipes_at_generation?: number | null
+          click_through_rate?: number | null
+          clicks_count?: number | null
+          conversion_rate?: number | null
+          conversions_count?: number | null
           generation_time_ms?: number | null
           id?: string
           negative_feedback_count?: number
           positive_feedback_count?: number
+          recommendations_shown?: number | null
           recorded_at?: string
           session_id: string
           total_feedback_count?: number
@@ -79,10 +89,15 @@ export type Database = {
           acceptance_rate?: number | null
           avg_like_ratio_at_generation?: number | null
           avg_swipes_at_generation?: number | null
+          click_through_rate?: number | null
+          clicks_count?: number | null
+          conversion_rate?: number | null
+          conversions_count?: number | null
           generation_time_ms?: number | null
           id?: string
           negative_feedback_count?: number
           positive_feedback_count?: number
+          recommendations_shown?: number | null
           recorded_at?: string
           session_id?: string
           total_feedback_count?: number
@@ -503,6 +518,39 @@ export type Database = {
           session_id?: string
           total_swipes_at_generation?: number | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      recommendation_interactions: {
+        Row: {
+          created_at: string | null
+          id: string
+          interaction_type: string
+          recommendation_cuisine: string
+          recommendation_title: string
+          session_id: string
+          user_id: string
+          variant_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          interaction_type: string
+          recommendation_cuisine: string
+          recommendation_title: string
+          session_id: string
+          user_id: string
+          variant_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          interaction_type?: string
+          recommendation_cuisine?: string
+          recommendation_title?: string
+          session_id?: string
+          user_id?: string
+          variant_id?: string | null
         }
         Relationships: []
       }
