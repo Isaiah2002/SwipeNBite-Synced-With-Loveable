@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { LocationInsights } from './LocationInsights';
 import { CommuteInsights } from './CommuteInsights';
 import { AIModelAnalytics } from './AIModelAnalytics';
+import { ABTestDashboard } from './ABTestDashboard';
 
 interface AnalyticsData {
   totalOrders: number;
@@ -32,6 +33,9 @@ interface RecommendationMetadata {
   totalSwipes: number;
   likeRatio: string;
   modelUsed: string;
+  variantId: string | null;
+  testName: string;
+  generationTime: number;
   generatedAt: string;
 }
 
@@ -173,6 +177,16 @@ export const ProfileAnalytics = () => {
         });
 
       if (error) throw error;
+
+      // Also record for A/B testing if applicable
+      if (metadata.variantId) {
+        await supabase.functions.invoke('record-ab-test-feedback', {
+          body: {
+            sessionId: metadata.sessionId,
+            feedbackType
+          }
+        });
+      }
 
       setFeedbackGiven(prev => ({ ...prev, [index]: feedbackType }));
       toast.success(`Feedback recorded! This helps improve recommendations.`);
@@ -526,6 +540,9 @@ export const ProfileAnalytics = () => {
           <AIModelAnalytics />
         </CardContent>
       </Card>
+
+      {/* A/B Testing Dashboard */}
+      <ABTestDashboard />
     </div>
   );
 };

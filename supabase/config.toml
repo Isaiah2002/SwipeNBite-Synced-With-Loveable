@@ -38,3 +38,6 @@ verify_jwt = true
 
 [functions.commute-suggestions]
 verify_jwt = true
+
+[functions.record-ab-test-feedback]
+verify_jwt = true

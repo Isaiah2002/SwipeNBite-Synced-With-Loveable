@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { userId } = await req.json();
+    const { userId, testName = "default_recommendations" } = await req.json();
     
     if (!userId) {
       return new Response(JSON.stringify({ error: "userId is required" }), {
@@ -20,6 +20,8 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const startTime = Date.now();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -30,6 +32,67 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // A/B Testing: Get or assign variant for this user
+    let variantConfig = { model: "google/gemini-2.5-flash", systemPrompt: "You are a restaurant recommendation expert. Analyze user behavior and provide personalized, actionable recommendations. Always respond with valid JSON only.", temperature: 0.7, variantId: null };
+    
+    // Check if user has an assignment for this test
+    const { data: assignment } = await supabase
+      .from("ab_test_assignments")
+      .select("variant_id, ab_test_variants(id, model, system_prompt, temperature)")
+      .eq("user_id", userId)
+      .eq("test_name", testName)
+      .maybeSingle();
+
+    if (assignment && assignment.ab_test_variants) {
+      const variant = assignment.ab_test_variants as any;
+      variantConfig = {
+        model: variant.model,
+        systemPrompt: variant.system_prompt,
+        temperature: variant.temperature,
+        variantId: variant.id
+      };
+    } else {
+      // Get active variants for this test
+      const { data: variants } = await supabase
+        .from("ab_test_variants")
+        .select("*")
+        .eq("test_name", testName)
+        .eq("is_active", true);
+
+      if (variants && variants.length > 0) {
+        // Weighted random selection based on traffic_allocation
+        const totalWeight = variants.reduce((sum, v) => sum + Number(v.traffic_allocation), 0);
+        let random = Math.random() * totalWeight;
+        let selectedVariant = variants[0];
+        
+        for (const variant of variants) {
+          random -= Number(variant.traffic_allocation);
+          if (random <= 0) {
+            selectedVariant = variant;
+            break;
+          }
+        }
+
+        variantConfig = {
+          model: selectedVariant.model,
+          systemPrompt: selectedVariant.system_prompt,
+          temperature: selectedVariant.temperature,
+          variantId: selectedVariant.id
+        };
+
+        // Assign user to variant
+        await supabase
+          .from("ab_test_assignments")
+          .insert({
+            user_id: userId,
+            test_name: testName,
+            variant_id: selectedVariant.id
+          })
+          .select()
+          .single();
+      }
+    }
 
     // Fetch user's swipe history
     const { data: swipes, error: swipesError } = await supabase
@@ -90,7 +153,7 @@ Provide recommendations in a JSON array format with the following structure:
   ]
 }`;
 
-    // Call Lovable AI Gateway
+    // Call Lovable AI Gateway with A/B test variant config
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -98,18 +161,18 @@ Provide recommendations in a JSON array format with the following structure:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: variantConfig.model,
         messages: [
           {
             role: "system",
-            content: "You are a restaurant recommendation expert. Analyze user behavior and provide personalized, actionable recommendations. Always respond with valid JSON only.",
+            content: variantConfig.systemPrompt,
           },
           {
             role: "user",
             content: analysisPrompt,
           },
         ],
-        temperature: 0.7,
+        temperature: variantConfig.temperature,
       }),
     });
 
@@ -143,6 +206,8 @@ Provide recommendations in a JSON array format with the following structure:
     }
     
     const recommendations = JSON.parse(jsonContent);
+    
+    const generationTime = Date.now() - startTime;
 
     // Add metadata for tracking
     const responseData = {
@@ -151,10 +216,28 @@ Provide recommendations in a JSON array format with the following structure:
         sessionId,
         totalSwipes,
         likeRatio: likeRatio.toFixed(1),
-        modelUsed: "google/gemini-2.5-flash",
+        modelUsed: variantConfig.model,
+        variantId: variantConfig.variantId,
+        testName,
+        generationTime,
         generatedAt: new Date().toISOString()
       }
     };
+
+    // Record initial metrics for A/B testing
+    if (variantConfig.variantId) {
+      await supabase
+        .from("ab_test_metrics")
+        .insert({
+          variant_id: variantConfig.variantId,
+          session_id: sessionId,
+          user_id: userId,
+          total_feedback_count: 0,
+          avg_swipes_at_generation: totalSwipes,
+          avg_like_ratio_at_generation: likeRatio,
+          generation_time_ms: generationTime
+        });
+    }
 
     return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
