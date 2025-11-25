@@ -14,6 +14,8 @@ import { ProfileAnalytics } from '@/components/ProfileAnalytics';
 import { NotificationCenter } from '@/components/NotificationCenter';
 import { BudgetTracker } from '@/components/BudgetTracker';
 import { BudgetSettings } from '@/components/BudgetSettings';
+import { BudgetAnalytics } from '@/components/BudgetAnalytics';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const addressSchema = z.object({
   address: z.string().trim().min(1, "Street address is required").max(200, "Address is too long"),
@@ -36,6 +38,8 @@ const Profile = () => {
   const [preferencesOpen, setPreferencesOpen] = useState(false);
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
   const [addressErrors, setAddressErrors] = useState<{ [key: string]: string }>({});
+  const [orders, setOrders] = useState<any[]>([]);
+  const [profile, setProfile] = useState<any>(null);
 
   const cuisineOptions = [
     'Italian', 'Mexican', 'Chinese', 'Japanese', 'Thai', 'Indian', 
@@ -51,7 +55,7 @@ const Profile = () => {
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('address, city, state, zip_code, favorite_cuisines')
+          .select('address, city, state, zip_code, favorite_cuisines, daily_budget, weekly_budget, monthly_budget')
           .eq('user_id', user.id)
           .single();
 
@@ -63,13 +67,32 @@ const Profile = () => {
           setState(data.state || '');
           setZipCode(data.zip_code || '');
           setSelectedCuisines(data.favorite_cuisines || []);
+          setProfile(data);
         }
       } catch (error: any) {
         console.error('Error fetching profile:', error);
       }
     };
 
+    const fetchOrders = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('created_at, total')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setOrders(data || []);
+      } catch (error: any) {
+        console.error('Error fetching orders:', error);
+      }
+    };
+
     fetchProfile();
+    fetchOrders();
   }, [user]);
 
   const handleSave = () => {
@@ -410,8 +433,27 @@ const Profile = () => {
           {/* Budget & Analytics Dashboard */}
           <div className="mt-6 space-y-6">
             <h2 className="text-xl font-bold text-card-foreground">Budget & Spending</h2>
-            <BudgetTracker />
-            <BudgetSettings />
+            <Tabs defaultValue="tracker" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="tracker">Current</TabsTrigger>
+                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                <TabsTrigger value="settings">Settings</TabsTrigger>
+              </TabsList>
+              <TabsContent value="tracker" className="space-y-4 mt-4">
+                <BudgetTracker />
+              </TabsContent>
+              <TabsContent value="analytics" className="space-y-4 mt-4">
+                <BudgetAnalytics 
+                  orders={orders}
+                  dailyBudget={profile?.daily_budget}
+                  weeklyBudget={profile?.weekly_budget}
+                  monthlyBudget={profile?.monthly_budget}
+                />
+              </TabsContent>
+              <TabsContent value="settings" className="space-y-4 mt-4">
+                <BudgetSettings />
+              </TabsContent>
+            </Tabs>
             
             <h2 className="text-xl font-bold text-card-foreground mt-8">Your Analytics</h2>
             <ProfileAnalytics />
