@@ -165,7 +165,9 @@ export const PrivacyDashboard = () => {
             Privacy & Data Control
           </CardTitle>
           <CardDescription>
-            View, export, and delete your personal data
+            View, export, and delete your personal data. See our{" "}
+            <a href="/privacy" className="text-primary underline">Privacy Policy</a> and{" "}
+            <a href="/terms" className="text-primary underline">Terms of Service</a>.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
