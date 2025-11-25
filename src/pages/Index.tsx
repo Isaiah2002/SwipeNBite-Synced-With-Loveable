@@ -12,6 +12,8 @@ import { LocationPrompt } from '@/components/LocationPrompt';
 import { ShareDialog } from '@/components/ShareDialog';
 import { AddressInput } from '@/components/AddressInput';
 import { Onboarding } from '@/components/Onboarding';
+import { InstallPrompt } from '@/components/InstallPrompt';
+import { OfflineIndicator } from '@/components/OfflineIndicator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Heart, RotateCcw, LogOut, User, Search, MapPin } from 'lucide-react';
@@ -435,9 +437,10 @@ const Index = () => {
 
   return (
     <>
+      <OfflineIndicator />
       <Toaster />
       {/* Screen reader live region for swipe feedback */}
-      <div 
+      <div
         role="status" 
         aria-live="polite" 
         aria-atomic="true"
@@ -589,6 +592,9 @@ const Index = () => {
         />
       )}
     </div>
+    
+    {/* Install Prompt */}
+    <InstallPrompt />
     </>
   );
 };
