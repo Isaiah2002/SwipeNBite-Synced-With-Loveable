@@ -69,6 +69,24 @@ export const useLocationTracking = (enableProximityAlerts: boolean = false) => {
         permissionGranted: true,
       });
 
+      // Log location history for commute analysis
+      if (user) {
+        const now = new Date();
+        const dayOfWeek = now.getDay();
+        const hourOfDay = now.getHours();
+        const isCommuteTime = (dayOfWeek >= 1 && dayOfWeek <= 5) && 
+          ((hourOfDay >= 6 && hourOfDay <= 9) || (hourOfDay >= 16 && hourOfDay <= 19));
+
+        await supabase.from('location_history').insert({
+          user_id: user.id,
+          latitude,
+          longitude,
+          day_of_week: dayOfWeek,
+          hour_of_day: hourOfDay,
+          is_commute_time: isCommuteTime
+        });
+      }
+
       // Check proximity if enabled
       if (enableProximityAlerts) {
         await checkProximity(latitude, longitude);
@@ -98,7 +116,7 @@ export const useLocationTracking = (enableProximityAlerts: boolean = false) => {
     if (!navigator.geolocation) return;
 
     const watchId = navigator.geolocation.watchPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude } = position.coords;
         setLocation({
           latitude,
@@ -107,6 +125,24 @@ export const useLocationTracking = (enableProximityAlerts: boolean = false) => {
           error: null,
           permissionGranted: true,
         });
+
+        // Log location for commute tracking
+        if (user) {
+          const now = new Date();
+          const dayOfWeek = now.getDay();
+          const hourOfDay = now.getHours();
+          const isCommuteTime = (dayOfWeek >= 1 && dayOfWeek <= 5) && 
+            ((hourOfDay >= 6 && hourOfDay <= 9) || (hourOfDay >= 16 && hourOfDay <= 19));
+
+          await supabase.from('location_history').insert({
+            user_id: user.id,
+            latitude,
+            longitude,
+            day_of_week: dayOfWeek,
+            hour_of_day: hourOfDay,
+            is_commute_time: isCommuteTime
+          });
+        }
 
         if (enableProximityAlerts) {
           checkProximity(latitude, longitude);

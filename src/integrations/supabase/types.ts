@@ -98,6 +98,42 @@ export type Database = {
         }
         Relationships: []
       }
+      location_history: {
+        Row: {
+          created_at: string
+          day_of_week: number
+          hour_of_day: number
+          id: string
+          is_commute_time: boolean | null
+          latitude: number
+          longitude: number
+          recorded_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: number
+          hour_of_day: number
+          id?: string
+          is_commute_time?: boolean | null
+          latitude: number
+          longitude: number
+          recorded_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number
+          hour_of_day?: number
+          id?: string
+          is_commute_time?: boolean | null
+          latitude?: number
+          longitude?: number
+          recorded_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       menu_items: {
         Row: {
           category: string
