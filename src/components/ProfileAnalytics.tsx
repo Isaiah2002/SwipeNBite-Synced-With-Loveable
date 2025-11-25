@@ -8,6 +8,7 @@ import { BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, 
 import { DollarSign, ShoppingBag, TrendingUp, Heart, Sparkles, ThumbsUp, ThumbsDown, TrendingUpIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { LocationInsights } from './LocationInsights';
+import { CommuteInsights } from './CommuteInsights';
 
 interface AnalyticsData {
   totalOrders: number;
@@ -431,6 +432,9 @@ export const ProfileAnalytics = () => {
 
       {/* Location Insights */}
       <LocationInsights />
+
+      {/* Commute Insights */}
+      <CommuteInsights />
     </div>
   );
 };

@@ -157,6 +157,21 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Check for commute-based suggestions
+    const now = new Date();
+    const currentHour = now.getHours();
+    const isCommuteTime = (currentHour >= 6 && currentHour <= 9) || (currentHour >= 16 && currentHour <= 19);
+    
+    if (isCommuteTime) {
+      try {
+        await supabase.functions.invoke('commute-suggestions', {
+          body: { latitude, longitude }
+        });
+      } catch (error) {
+        console.log('Commute suggestions check:', error);
+      }
+    }
+
   return new Response(
     JSON.stringify({ 
       nearbyFavorites: nearbyFavorites.length,
