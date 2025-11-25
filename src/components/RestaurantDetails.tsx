@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Restaurant } from '@/types/restaurant';
 import { Star, MapPin, Clock, ExternalLink, Phone, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ interface RestaurantDetailsProps {
   restaurant: Restaurant;
 }
 
-export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
+export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) => {
   const handleReservationClick = () => {
     if (restaurant.reservationUrl) {
       window.open(restaurant.reservationUrl, '_blank');
@@ -270,4 +271,6 @@ export const RestaurantDetails = ({ restaurant }: RestaurantDetailsProps) => {
       )}
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  return prevProps.restaurant.id === nextProps.restaurant.id;
+});
