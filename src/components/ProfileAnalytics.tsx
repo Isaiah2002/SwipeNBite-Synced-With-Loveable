@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { DollarSign, ShoppingBag, TrendingUp, Heart, Sparkles, ThumbsUp, ThumbsDown, TrendingUpIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { LocationInsights } from './LocationInsights';
 
 interface AnalyticsData {
   totalOrders: number;
@@ -427,6 +428,9 @@ export const ProfileAnalytics = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Location Insights */}
+      <LocationInsights />
     </div>
   );
 };
