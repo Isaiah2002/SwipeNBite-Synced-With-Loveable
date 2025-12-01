@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
+import { useInferredPreferences } from "@/hooks/useInferredPreferences";
 
 // Lazy load route components for better code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -31,6 +32,9 @@ const queryClient = new QueryClient();
 const SyncManager = () => {
   const { user } = useAuth();
   const { syncData, isOnline } = useOfflineSync();
+  
+  // Prefetch inferred preferences in background
+  useInferredPreferences();
 
   useEffect(() => {
     // Sync data when user logs in or app becomes visible

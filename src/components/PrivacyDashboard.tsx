@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { clearPreferencesCache } from "@/hooks/useInferredPreferences";
 
 interface DataCounts {
   orders: number;
@@ -69,10 +70,13 @@ export const PrivacyDashboard = () => {
       if (error) throw error;
 
       setPersonalizationEnabled(enabled);
-      toast.success(`AI personalization ${enabled ? 'enabled' : 'disabled'}`);
       
+      // Clear preferences cache when personalization is disabled
       if (!enabled) {
+        clearPreferencesCache();
         toast.info('Feed will no longer use behavioral data for personalization');
+      } else {
+        toast.success('AI personalization enabled');
       }
     } catch (error: any) {
       console.error('Error updating personalization:', error);
