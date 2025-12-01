@@ -127,6 +127,39 @@ const Index = () => {
 
     fetchExcludedRestaurants();
   }, [user]);
+
+  // Fetch inferred preferences from behavioral data
+  useEffect(() => {
+    const fetchInferredPreferences = async () => {
+      if (!user) return;
+
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        const { data, error } = await supabase.functions.invoke('infer-user-preferences', {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          }
+        });
+
+        if (error) throw error;
+
+        if (data?.preferredCuisines) {
+          const cuisines = data.preferredCuisines
+            .filter((c: any) => c.confidence > 30) // Only use high-confidence inferences
+            .map((c: any) => c.cuisine);
+          
+          setInferredCuisines(cuisines);
+          console.log(`Inferred ${cuisines.length} preferred cuisines:`, cuisines);
+        }
+      } catch (error: any) {
+        console.error('Error fetching inferred preferences:', error);
+      }
+    };
+
+    fetchInferredPreferences();
+  }, [user]);
   const [currentRestaurants, setCurrentRestaurants] = useState<Restaurant[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likedRestaurants, setLikedRestaurants] = useState<Restaurant[]>([]);
@@ -140,6 +173,7 @@ const Index = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [likedRestaurantIds, setLikedRestaurantIds] = useState<Set<string>>(new Set());
   const [recentlyPassedIds, setRecentlyPassedIds] = useState<Set<string>>(new Set());
+  const [inferredCuisines, setInferredCuisines] = useState<string[]>([]);
   
   // Load saved filters from localStorage or use defaults
   const [filters, setFilters] = useState<Filters>(() => {
@@ -250,8 +284,10 @@ const Index = () => {
         filters.dietary.some(diet => restaurant.dietary.includes(diet));
       
       // Filter by cuisine preferences if user has set any
-      const matchesCuisine = userCuisinePreferences.length === 0 || 
-        userCuisinePreferences.some(pref => 
+      // Combine explicit preferences with inferred cuisines for better personalization
+      const allCuisinePreferences = [...userCuisinePreferences, ...inferredCuisines];
+      const matchesCuisine = allCuisinePreferences.length === 0 || 
+        allCuisinePreferences.some(pref => 
           restaurant.cuisine.toLowerCase().includes(pref.toLowerCase())
         );
       
@@ -266,7 +302,7 @@ const Index = () => {
 
     setCurrentRestaurants(filtered);
     setCurrentIndex(0);
-  }, [filters.maxPrice, filters.minRating, filters.dietary, userCuisinePreferences, likedRestaurantIds, recentlyPassedIds]);
+  }, [filters.maxPrice, filters.minRating, filters.dietary, userCuisinePreferences, likedRestaurantIds, recentlyPassedIds, inferredCuisines]);
 
   // Show keyboard shortcuts hint on first visit
   useEffect(() => {
