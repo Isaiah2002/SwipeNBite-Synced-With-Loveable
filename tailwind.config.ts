@@ -93,6 +93,10 @@ export default {
 					'50%': { transform: 'scale(1.05)' },
 					'70%': { transform: 'scale(0.9)' },
 					'100%': { transform: 'scale(1)', opacity: '1' }
+				},
+				'shimmer': {
+					'0%': { transform: 'translateX(-100%)' },
+					'100%': { transform: 'translateX(100%)' }
 				}
 			},
 			animation: {
@@ -100,7 +104,8 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'swipe-right': 'swipe-right 0.6s ease-out forwards',
 				'swipe-left': 'swipe-left 0.6s ease-out forwards',
-				'bounce-in': 'bounce-in 0.6s ease-out'
+				'bounce-in': 'bounce-in 0.6s ease-out',
+				'shimmer': 'shimmer 2s infinite'
 			}
 		}
 	},
