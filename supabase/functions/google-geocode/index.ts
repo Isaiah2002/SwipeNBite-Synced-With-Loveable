@@ -39,12 +39,31 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('Google Maps response status:', data.status);
+    console.log('Google Maps response:', JSON.stringify(data));
+
+    if (data.status === 'REQUEST_DENIED') {
+      console.error('Google Maps API Request Denied:', data.error_message);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Google Maps API key configuration issue',
+          details: data.error_message || 'Please enable Geocoding API in Google Cloud Console and ensure API key has no restrictions',
+          status: data.status
+        }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
 
     if (data.status !== 'OK' || !data.results || data.results.length === 0) {
-      console.log('No results found for address');
+      console.log('No results found for address. Status:', data.status);
       return new Response(
-        JSON.stringify({ error: 'Unable to geocode address' }),
+        JSON.stringify({ 
+          error: 'Unable to geocode address',
+          status: data.status,
+          message: data.error_message
+        }),
         { 
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
