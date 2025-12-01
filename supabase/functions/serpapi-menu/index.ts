@@ -105,7 +105,7 @@ serve(async (req) => {
     const detailsParams = new URLSearchParams({
       engine: 'google_maps',
       type: 'place',
-      data_id: dataId,
+      data: dataId,
       api_key: SERPAPI_API_KEY,
     });
 
