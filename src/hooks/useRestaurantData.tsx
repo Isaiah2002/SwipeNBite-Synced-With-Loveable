@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface EnrichedData {
   yelpData?: any;
   openTableData?: any;
-  documenuData?: any;
+  serpapiData?: any;
 }
 
 export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = false) => {
@@ -62,26 +62,27 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
           })
         );
 
-        // Fetch Documenu data
+        // Fetch SerpAPI menu data (primary source)
         promises.push(
-          supabase.functions.invoke('documenu-menu', {
+          supabase.functions.invoke('serpapi-menu', {
             body: {
               restaurantName: restaurant.name,
+              address: restaurant.address,
               latitude: restaurant.latitude,
               longitude: restaurant.longitude,
             }
           }).catch(err => {
-            console.error('Documenu error:', err);
+            console.error('SerpAPI error:', err);
             return { data: null };
           })
         );
 
-        const [yelpResponse, openTableResponse, documenuResponse] = await Promise.all(promises);
+        const [yelpResponse, openTableResponse, serpapiResponse] = await Promise.all(promises);
 
         setEnrichedData({
           yelpData: yelpResponse.data,
           openTableData: openTableResponse.data,
-          documenuData: documenuResponse.data,
+          serpapiData: serpapiResponse.data,
         });
 
       } catch (err: any) {
@@ -96,19 +97,28 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
   }, [enabled, restaurant.id, restaurant.latitude, restaurant.longitude, restaurant.name]);
 
   // Merge enriched data with restaurant data
+  // SerpAPI is primary source for menus, Yelp for ratings and business info
   const enrichedRestaurant: Restaurant = {
     ...restaurant,
+    // Yelp data for ratings, reviews, and business info
     yelpId: enrichedData.yelpData?.yelpId,
     yelpUrl: enrichedData.yelpData?.yelpUrl,
     yelpRating: enrichedData.yelpData?.rating,
     reviewCount: enrichedData.yelpData?.reviewCount,
     reviews: enrichedData.yelpData?.reviews,
+    // OpenTable for reservations
     reservationUrl: enrichedData.openTableData?.reservationUrl,
     openTableAvailable: enrichedData.openTableData?.available,
-    menuAvailable: enrichedData.documenuData?.available,
-    menuItems: enrichedData.documenuData?.menuItems,
-    restaurantPhone: enrichedData.documenuData?.restaurantPhone,
-    restaurantWebsite: enrichedData.documenuData?.restaurantWebsite,
+    // SerpAPI for menu data (primary source)
+    menuAvailable: enrichedData.serpapiData?.available,
+    menuItems: enrichedData.serpapiData?.menuItems,
+    restaurantPhone: enrichedData.serpapiData?.restaurantPhone || enrichedData.yelpData?.phone,
+    restaurantWebsite: enrichedData.serpapiData?.restaurantWebsite,
+    // Merge photos from both Yelp and SerpAPI
+    photos: [
+      ...(restaurant.photos || []),
+      ...(enrichedData.serpapiData?.photos || []),
+    ].filter((photo, index, self) => self.indexOf(photo) === index).slice(0, 10),
   };
 
   return { enrichedRestaurant, loading, error };
