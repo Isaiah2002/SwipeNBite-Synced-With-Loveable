@@ -59,7 +59,7 @@ const Index = () => {
         }
 
         if (profile?.address && profile?.city && profile?.state && profile?.zip_code) {
-          const { data: geocodeData, error: geocodeError } = await supabase.functions.invoke('nominatim-geocode', {
+          const { data: geocodeData, error: geocodeError } = await supabase.functions.invoke('google-geocode', {
             body: {
               address: profile.address,
               city: profile.city,

@@ -1,3 +1,4 @@
+/// <reference path="../types/google-maps.d.ts" />
 import { useEffect, useRef, memo } from 'react';
 
 interface RestaurantMapProps {
