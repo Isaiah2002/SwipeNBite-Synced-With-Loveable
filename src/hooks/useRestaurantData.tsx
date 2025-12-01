@@ -6,13 +6,11 @@ interface EnrichedData {
   googlePlacesData?: any;
   yelpData?: any;
   openTableData?: any;
-  serpapiData?: any;
 }
 
 interface ApiStatus {
   yelp: 'success' | 'failed' | 'rate_limited' | 'loading';
   openTable: 'success' | 'failed' | 'rate_limited' | 'loading';
-  menu: 'success' | 'failed' | 'rate_limited' | 'loading';
 }
 
 export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = false) => {
@@ -21,8 +19,7 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
   const [error, setError] = useState<string | null>(null);
   const [apiStatus, setApiStatus] = useState<ApiStatus>({
     yelp: 'loading',
-    openTable: 'loading',
-    menu: 'loading'
+    openTable: 'loading'
   });
 
   useEffect(() => {
@@ -39,7 +36,7 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
 
       try {
         setLoading(true);
-        setApiStatus({ yelp: 'loading', openTable: 'loading', menu: 'loading' });
+        setApiStatus({ yelp: 'loading', openTable: 'loading' });
         
         // Try to fetch from cache first
         const cacheKey = `restaurant_${restaurant.id}`;
@@ -51,7 +48,7 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
         if (cachedData && cacheAge < 3600000) {
           const parsed = JSON.parse(cachedData);
           setEnrichedData(parsed);
-          setApiStatus({ yelp: 'success', openTable: 'success', menu: 'success' });
+          setApiStatus({ yelp: 'success', openTable: 'success' });
           setLoading(false);
           return;
         }
@@ -81,8 +78,6 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
                 sources.yelp?.error?.includes('Rate limited') ? 'rate_limited' : 'failed',
           openTable: sources.opentable?.success ? 'success' :
                      sources.opentable?.error?.includes('Rate limited') ? 'rate_limited' : 'failed',
-          menu: sources.menu?.success ? 'success' :
-                sources.menu?.error?.includes('Rate limited') ? 'rate_limited' : 'failed',
         });
 
         // Structure data for component consumption
@@ -112,13 +107,6 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
             reservationUrl: merged.reservationUrl,
             available: merged.openTableAvailable,
           } : null,
-          serpapiData: sources.menu?.success ? {
-            available: merged.menuAvailable,
-            menuItems: merged.menuItems,
-            restaurantPhone: merged.phone,
-            restaurantWebsite: merged.website,
-            photos: merged.photos,
-          } : null,
         };
 
         setEnrichedData(finalData);
@@ -145,7 +133,7 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
         if (cachedData) {
           const parsed = JSON.parse(cachedData);
           setEnrichedData(parsed);
-          setApiStatus({ yelp: 'failed', openTable: 'failed', menu: 'failed' });
+          setApiStatus({ yelp: 'failed', openTable: 'failed' });
           console.log('Using stale cached data as fallback');
         }
       } finally {
@@ -157,7 +145,7 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
   }, [enabled, restaurant.id, restaurant.latitude, restaurant.longitude, restaurant.name]);
 
   // Merge enriched data with restaurant data
-  // Google Places is primary source for location, SerpAPI for menus, Yelp for ratings
+  // Google Places is primary source for location, Yelp for ratings
   const enrichedRestaurant: Restaurant = {
     ...restaurant,
     // Google Places verified location data (highest priority)
@@ -178,16 +166,10 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
     // OpenTable for reservations
     reservationUrl: enrichedData.openTableData?.reservationUrl,
     openTableAvailable: enrichedData.openTableData?.available,
-    // SerpAPI for menu data (primary source)
-    menuAvailable: enrichedData.serpapiData?.available,
-    menuItems: enrichedData.serpapiData?.menuItems,
-    restaurantPhone: enrichedData.googlePlacesData?.phone || enrichedData.serpapiData?.restaurantPhone || enrichedData.yelpData?.phone,
-    restaurantWebsite: enrichedData.serpapiData?.restaurantWebsite || enrichedData.googlePlacesData?.website,
-    // Merge photos from Google Places, Yelp and SerpAPI
+    // Merge photos from Google Places and Yelp
     photos: [
       ...(restaurant.photos || []),
       ...(enrichedData.googlePlacesData?.photos || []),
-      ...(enrichedData.serpapiData?.photos || []),
     ].filter((photo, index, self) => self.indexOf(photo) === index).slice(0, 10),
   };
 

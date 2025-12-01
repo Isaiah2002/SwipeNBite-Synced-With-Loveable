@@ -242,13 +242,6 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
               </AlertDescription>
             </Alert>
           )}
-          {apiStatus.menu === 'rate_limited' && (
-            <Alert>
-              <AlertDescription>
-                Menu data temporarily unavailable. Check back in a few minutes.
-              </AlertDescription>
-            </Alert>
-          )}
           {apiStatus.yelp === 'rate_limited' && (
             <Alert>
               <AlertDescription>
@@ -363,7 +356,7 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
         </CardContent>
       </Card>
 
-      {/* Menu */}
+      {/* Menu - Shows menu items from Supabase if available */}
       {enrichedRestaurant.menuAvailable && enrichedRestaurant.menuItems && enrichedRestaurant.menuItems.length > 0 && (
         <section className="space-y-4" aria-labelledby="menu-heading">
           <h3 id="menu-heading" className="text-lg font-semibold text-card-foreground">Menu</h3>
@@ -410,14 +403,6 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
             </Button>
           )}
         </section>
-      )}
-
-      {!loading && apiStatus?.menu === 'failed' && !enrichedRestaurant.menuAvailable && (
-        <Alert>
-          <AlertDescription>
-            Menu data currently unavailable for this restaurant.
-          </AlertDescription>
-        </Alert>
       )}
     </div>
   );

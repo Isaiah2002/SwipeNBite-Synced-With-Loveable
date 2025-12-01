@@ -150,7 +150,7 @@ export default function TermsOfService() {
 
               <h3 className="text-xl font-medium mb-3 mt-4">7.3 Third-Party Content</h3>
               <p className="text-muted-foreground">
-                Restaurant information, menus, images, and reviews are provided by third parties (Yelp, OpenTable, Documenu). We do not guarantee accuracy, completeness, or quality of third-party content.
+                Restaurant information, images, and reviews are provided by third parties (Yelp, OpenTable, Google Maps). We do not guarantee accuracy, completeness, or quality of third-party content.
               </p>
             </section>
 

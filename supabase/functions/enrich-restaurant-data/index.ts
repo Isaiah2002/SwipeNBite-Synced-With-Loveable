@@ -10,16 +10,14 @@ interface DataSourcePriority {
   location: 'google' | 'yelp' | 'database';
   rating: 'google' | 'yelp' | 'database';
   reviews: 'yelp' | 'google';
-  menu: 'mealme' | 'serpapi';
   reservations: 'opentable';
-  photos: 'google' | 'yelp' | 'serpapi';
+  photos: 'google' | 'yelp';
 }
 
 const PRIORITY_RULES: DataSourcePriority = {
   location: 'google',      // Google Places most accurate for location
   rating: 'yelp',          // Yelp has most comprehensive ratings
   reviews: 'yelp',         // Yelp reviews are most detailed
-  menu: 'mealme',          // MealMe primary, SerpAPI fallback
   reservations: 'opentable', // OpenTable only source
   photos: 'google',        // Google Places photos highest quality
 };
@@ -30,7 +28,6 @@ interface EnrichedResult {
     google?: { success: boolean; timestamp: string; error?: string };
     yelp?: { success: boolean; timestamp: string; error?: string };
     opentable?: { success: boolean; timestamp: string; error?: string };
-    menu?: { success: boolean; timestamp: string; source: string; error?: string };
   };
   merged: any;
   lastUpdated: string;
@@ -128,46 +125,7 @@ serve(async (req) => {
       sources.opentable = { success: false, timestamp, error: error.message };
     }
 
-    // 4. Fetch Menu data (PRIORITY: MealMe > SerpAPI)
-    let menuData = null;
-    let menuSource = 'none';
-    try {
-      console.log('[MealMe] Fetching...');
-      const { data: mealmeData } = await supabase.functions.invoke('mealme-menu', {
-        body: { restaurantName, address, latitude, longitude }
-      });
-      
-      if (mealmeData?.available) {
-        menuData = mealmeData;
-        menuSource = 'mealme';
-        console.log('[MealMe] ✓ Success');
-      } else {
-        console.log('[MealMe] No data, trying SerpAPI...');
-        const { data: serpapiData } = await supabase.functions.invoke('serpapi-menu', {
-          body: { restaurantName, address, latitude, longitude }
-        });
-        
-        if (serpapiData?.available) {
-          menuData = serpapiData;
-          menuSource = 'serpapi';
-          console.log('[SerpAPI] ✓ Success');
-        } else {
-          console.log('[SerpAPI] ✗ No data');
-        }
-      }
-      
-      sources.menu = { 
-        success: !!menuData, 
-        timestamp, 
-        source: menuSource,
-        error: menuData ? undefined : 'Menu not available from any source'
-      };
-    } catch (error) {
-      console.error('[Menu APIs] Error:', error.message);
-      sources.menu = { success: false, timestamp, source: 'none', error: error.message };
-    }
-
-    // 5. MERGE DATA USING PRIORITY RULES
+    // 4. MERGE DATA USING PRIORITY RULES
     console.log('=== MERGING DATA ===');
     
     const merged = {
@@ -177,9 +135,9 @@ serve(async (req) => {
       address: googleData?.address || address,
       placeId: googleData?.place_id,
       
-      // Contact info (Priority: Google > Yelp > Menu APIs)
-      phone: googleData?.phone || yelpData?.phone || menuData?.restaurantPhone,
-      website: googleData?.website || menuData?.restaurantWebsite,
+      // Contact info (Priority: Google > Yelp)
+      phone: googleData?.phone || yelpData?.phone,
+      website: googleData?.website,
       
       // Ratings (Store all, Priority: Yelp > Google for display)
       primaryRating: yelpData?.rating || googleData?.googleRating,
@@ -201,15 +159,10 @@ serve(async (req) => {
       reservationUrl: openTableData?.reservationUrl,
       openTableAvailable: openTableData?.available || false,
       
-      // Menu (Priority: MealMe > SerpAPI)
-      menuAvailable: menuData?.available || false,
-      menuItems: menuData?.menuItems || [],
-      
-      // Photos (Priority: Google > Yelp > SerpAPI)
+      // Photos (Priority: Google > Yelp)
       photos: [
         ...(googleData?.photos || []),
         ...(yelpData?.photos || []),
-        ...(menuData?.photos || []),
       ].filter((photo, index, self) => self.indexOf(photo) === index).slice(0, 10),
       
       // Business hours (Priority: Google)

@@ -18,12 +18,6 @@ verify_jwt = false
 [functions.seed-restaurants]
 verify_jwt = false
 
-[functions.documenu-menu]
-verify_jwt = false
-
-[functions.serpapi-menu]
-verify_jwt = false
-
 [functions.generate-recommendations]
 verify_jwt = true
 
@@ -56,9 +50,6 @@ verify_jwt = true
 
 [functions.check-achievements]
 verify_jwt = true
-
-[functions.mealme-menu]
-verify_jwt = false
 
 [functions.google-geocode]
 verify_jwt = true
