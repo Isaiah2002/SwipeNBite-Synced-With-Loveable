@@ -1,10 +1,9 @@
 import { useState, useEffect, memo } from 'react';
 import { Restaurant } from '@/types/restaurant';
-import { Heart, X, Clock, MapPin, Star, Share2, Info, GraduationCap } from 'lucide-react';
+import { Heart, X, Clock, MapPin, Star, Share2, Info } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { RestaurantDetails } from '@/components/RestaurantDetails';
 import { useRestaurantData } from '@/hooks/useRestaurantData';
-import { useMealPlanCheck } from '@/hooks/useMealPlanCheck';
 import { Button } from '@/components/ui/button';
 import { LazyImage } from '@/components/LazyImage';
 
@@ -36,7 +35,6 @@ export const SwipeCard = memo(({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isImageSwiping, setIsImageSwiping] = useState(false);
   const { enrichedRestaurant, loading: dataLoading } = useRestaurantData(restaurant, detailsOpen);
-  const { acceptsMealPlan, verified: mealPlanVerified } = useMealPlanCheck(restaurant.id);
 
   // Haptic feedback helper
   const triggerHaptic = (intensity: 'light' | 'medium' | 'heavy' = 'medium') => {
@@ -316,18 +314,6 @@ export const SwipeCard = memo(({
                   {diet}
                 </span>
               ))}
-            </div>
-          )}
-          
-          {acceptsMealPlan && (
-            <div className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl">
-              <GraduationCap className="w-4 h-4 text-blue-600" />
-              <span className="text-sm font-semibold text-blue-600">
-                Student Meal Plan Accepted
-              </span>
-              {mealPlanVerified && (
-                <span className="text-xs text-blue-500">✓ Verified</span>
-              )}
             </div>
           )}
 

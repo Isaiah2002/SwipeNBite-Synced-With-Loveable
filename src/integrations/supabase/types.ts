@@ -782,50 +782,6 @@ export type Database = {
         }
         Relationships: []
       }
-      university_meal_plan_restaurants: {
-        Row: {
-          created_at: string
-          id: string
-          notes: string | null
-          restaurant_id: string
-          restaurant_name: string
-          university: string
-          updated_at: string
-          verified: boolean
-          verified_date: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          notes?: string | null
-          restaurant_id: string
-          restaurant_name: string
-          university: string
-          updated_at?: string
-          verified?: boolean
-          verified_date?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          notes?: string | null
-          restaurant_id?: string
-          restaurant_name?: string
-          university?: string
-          updated_at?: string
-          verified?: boolean
-          verified_date?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "university_meal_plan_restaurants_restaurant_id_fkey"
-            columns: ["restaurant_id"]
-            isOneToOne: false
-            referencedRelation: "restaurants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_achievements: {
         Row: {
           achievement_id: string

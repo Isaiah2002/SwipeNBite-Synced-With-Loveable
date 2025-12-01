@@ -55,9 +55,6 @@ export interface Restaurant {
   menuItems?: DocumenuMenuSection[];
   restaurantPhone?: string;
   restaurantWebsite?: string;
-  // Meal plan data
-  acceptsMealPlan?: boolean;
-  mealPlanVerified?: boolean;
 }
 
 export interface YelpReview {
