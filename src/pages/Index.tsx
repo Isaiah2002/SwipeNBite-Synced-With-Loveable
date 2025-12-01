@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
@@ -145,12 +145,14 @@ const Index = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [likedRestaurantIds, setLikedRestaurantIds] = useState<Set<string>>(new Set());
   const [recentlyPassedIds, setRecentlyPassedIds] = useState<Set<string>>(new Set());
+  const [filterPerformance, setFilterPerformance] = useState<{ timeMs: number; resultCount: number } | null>(null);
   
   // Use prefetched inferred preferences (loaded in background via App.tsx)
   const { cuisines: inferredCuisineData } = useInferredPreferences();
-  const inferredCuisines = inferredCuisineData
-    .filter(c => c.confidence > 30)
-    .map(c => c.cuisine);
+  const inferredCuisines = useMemo(
+    () => inferredCuisineData.filter(c => c.confidence > 30).map(c => c.cuisine),
+    [inferredCuisineData]
+  );
   
   // Load cached favorites for instant feed personalization
   const { cuisines: favoriteCuisines } = useFavoritesCache();
@@ -245,10 +247,10 @@ const Index = () => {
     fetchNearbyRestaurants();
   }, [location, filters.maxDistance]);
 
-  // Filter restaurants based on current filters and search
-  useEffect(() => {
-    if (currentRestaurants.length === 0) return;
-
+  // Memoized filter function with performance tracking
+  const applyFilters = useCallback((restaurants: Restaurant[]) => {
+    const startTime = performance.now();
+    
     const priceValues: { [key: string]: number } = { '$': 1, '$$': 2, '$$$': 3 };
     const maxPriceValue = priceValues[filters.maxPrice];
 
@@ -256,7 +258,14 @@ const Index = () => {
     console.log(`Current filters - maxDistance: ${filters.maxDistance}, minRating: ${filters.minRating}, maxPrice: ${filters.maxPrice}`);
     console.log(`User cuisine preferences: ${userCuisinePreferences.join(', ')}`);
     
-    const filtered = currentRestaurants.filter(restaurant => {
+    const favoriteCuisineNames = favoriteCuisines.map(fc => fc.cuisine);
+    const allCuisinePreferences = [
+      ...favoriteCuisineNames, 
+      ...userCuisinePreferences, 
+      ...inferredCuisines
+    ];
+    
+    const filtered = restaurants.filter(restaurant => {
       const restaurantPriceValue = priceValues[restaurant.price];
       const matchesPrice = restaurantPriceValue <= maxPriceValue;
       const matchesRating = restaurant.rating >= filters.minRating;
@@ -264,13 +273,6 @@ const Index = () => {
         filters.dietary.some(diet => restaurant.dietary.includes(diet));
       
       // Filter by cuisine preferences if user has set any
-      // Prioritize favorite cuisines, then user preferences, then inferred cuisines
-      const favoriteCuisineNames = favoriteCuisines.map(fc => fc.cuisine);
-      const allCuisinePreferences = [
-        ...favoriteCuisineNames, 
-        ...userCuisinePreferences, 
-        ...inferredCuisines
-      ];
       const matchesCuisine = allCuisinePreferences.length === 0 || 
         allCuisinePreferences.some(pref => 
           restaurant.cuisine.toLowerCase().includes(pref.toLowerCase())
@@ -283,11 +285,39 @@ const Index = () => {
       return matchesPrice && matchesRating && matchesDietary && matchesCuisine && notLiked && notRecentlyPassed;
     });
 
-    console.log(`Filtered restaurants count: ${filtered.length}`);
+    const endTime = performance.now();
+    const timeMs = Math.round(endTime - startTime);
+    
+    console.log(`Filtered ${filtered.length} restaurants in ${timeMs}ms`);
+    
+    setFilterPerformance({ timeMs, resultCount: filtered.length });
+    
+    return filtered;
+  }, [
+    filters.maxPrice, 
+    filters.minRating, 
+    filters.dietary, 
+    userCuisinePreferences, 
+    likedRestaurantIds, 
+    recentlyPassedIds, 
+    inferredCuisines, 
+    favoriteCuisines, 
+    location
+  ]);
 
-    setCurrentRestaurants(filtered);
-    setCurrentIndex(0);
-  }, [filters.maxPrice, filters.minRating, filters.dietary, userCuisinePreferences, likedRestaurantIds, recentlyPassedIds, inferredCuisines]);
+  // Memoized filtered restaurants
+  const filteredRestaurants = useMemo(() => {
+    if (currentRestaurants.length === 0) return [];
+    return applyFilters(currentRestaurants);
+  }, [currentRestaurants, applyFilters]);
+
+  // Update display when filters change
+  useEffect(() => {
+    if (filteredRestaurants.length > 0) {
+      setCurrentRestaurants(filteredRestaurants);
+      setCurrentIndex(0);
+    }
+  }, [filteredRestaurants]);
 
   // Show keyboard shortcuts hint on first visit
   useEffect(() => {
@@ -598,7 +628,11 @@ const Index = () => {
       {/* Header */}
       <header className="p-4 pb-2 pt-2">
         <div className="max-w-md mx-auto space-y-3">
-          <FilterBar filters={filters} onFiltersChange={setFilters} />
+          <FilterBar 
+            filters={filters} 
+            onFiltersChange={setFilters} 
+            filterPerformance={filterPerformance}
+          />
           <BudgetAlert />
         </div>
       </header>
