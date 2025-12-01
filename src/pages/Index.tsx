@@ -775,33 +775,6 @@ const Index = () => {
             )}
           </div>
 
-          {/* Bottom Stats */}
-          {hasMoreCards && (
-            <div className="flex justify-between items-center text-sm text-muted-foreground bg-card p-4 rounded-2xl border border-border/50" role="status" aria-label="Swiping progress">
-              <div className="text-center">
-                <div className="font-bold text-card-foreground text-base" aria-label={`Restaurant ${currentIndex + 1} of ${currentRestaurants.length}`}>
-                  {currentIndex + 1}
-                </div>
-                <div>of {currentRestaurants.length}</div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-card-foreground text-base" aria-label={`${likedRestaurants.length} matched restaurants`}>
-                  {likedRestaurants.length}
-                </div>
-                <div>matches</div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowLiked(true)}
-                className="flex items-center space-x-2"
-              >
-                <Heart className="w-4 h-4 text-accent fill-current" />
-                <span>Matches</span>
-              </Button>
-            </div>
-          )}
-          
           {/* Endless Recommendations Indicator */}
           {remainingRestaurants <= 5 && remainingRestaurants > 0 && !isRefreshing && (
             <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-xl text-center">
