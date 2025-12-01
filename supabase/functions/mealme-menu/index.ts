@@ -43,19 +43,20 @@ serve(async (req) => {
     }
 
     // Search for restaurant using MealMe API
-    const searchUrl = new URL('https://api.mealme.ai/v1/restaurants/search');
+    const searchUrl = new URL('https://api.mealme.ai/search/store/v3');
     searchUrl.searchParams.append('latitude', latitude.toString());
     searchUrl.searchParams.append('longitude', longitude.toString());
-    searchUrl.searchParams.append('radius', '500'); // 500 meters
     searchUrl.searchParams.append('query', restaurantName);
+    searchUrl.searchParams.append('store_type', 'restaurant');
+    searchUrl.searchParams.append('maximum_miles', '1');
 
     console.log('Searching MealMe for:', restaurantName, 'at', latitude, longitude);
 
     const searchResponse = await fetch(searchUrl.toString(), {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${MEALME_API_KEY}`,
-        'Content-Type': 'application/json',
+        'Id-Token': MEALME_API_KEY,
+        'accept': 'application/json',
       },
     });
 
@@ -76,7 +77,7 @@ serve(async (req) => {
 
     const searchData = await searchResponse.json();
     
-    if (!searchData.restaurants || searchData.restaurants.length === 0) {
+    if (!searchData.stores || searchData.stores.length === 0) {
       console.log('No restaurants found in MealMe for:', restaurantName);
       return new Response(
         JSON.stringify({ 
@@ -91,24 +92,67 @@ serve(async (req) => {
     }
 
     // Find best match by name
-    const restaurant = searchData.restaurants.find((r: any) => 
+    const restaurant = searchData.stores.find((r: any) => 
       r.name.toLowerCase().includes(restaurantName.toLowerCase()) ||
       restaurantName.toLowerCase().includes(r.name.toLowerCase())
-    ) || searchData.restaurants[0];
+    ) || searchData.stores[0];
 
-    console.log('Found restaurant in MealMe:', restaurant.name);
+    console.log('Found restaurant in MealMe:', restaurant.name, 'ID:', restaurant.mealme_store_id);
 
-    // Fetch full menu details
-    const menuResponse = await fetch(
-      `https://api.mealme.ai/v1/restaurants/${restaurant.id}/menu`,
-      {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${MEALME_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    // Fetch full menu details using store lookup and inventory APIs
+    const storeUrl = new URL('https://api.mealme.ai/store/lookup/v2');
+    storeUrl.searchParams.append('store_ids', restaurant.mealme_store_id);
+    
+    const storeResponse = await fetch(storeUrl.toString(), {
+      method: 'GET',
+      headers: {
+        'Id-Token': MEALME_API_KEY,
+        'accept': 'application/json',
+      },
+    });
+
+    if (!storeResponse.ok) {
+      const errorText = await storeResponse.text();
+      console.error('MealMe store lookup error:', storeResponse.status, errorText);
+      return new Response(
+        JSON.stringify({ 
+          available: false,
+          message: 'Failed to fetch store details from MealMe' 
+        }),
+        { 
+          status: 200, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    const storeData = await storeResponse.json();
+    const storeDetails = storeData.stores?.[0];
+
+    if (!storeDetails) {
+      return new Response(
+        JSON.stringify({ 
+          available: false,
+          message: 'Store details not found' 
+        }),
+        { 
+          status: 200, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    // Fetch inventory/menu
+    const inventoryUrl = new URL('https://api.mealme.ai/inventory/details/v4');
+    inventoryUrl.searchParams.append('store_id', restaurant.mealme_store_id);
+
+    const menuResponse = await fetch(inventoryUrl.toString(), {
+      method: 'GET',
+      headers: {
+        'Id-Token': MEALME_API_KEY,
+        'accept': 'application/json',
+      },
+    });
 
     if (!menuResponse.ok) {
       const errorText = await menuResponse.text();
@@ -130,26 +174,26 @@ serve(async (req) => {
     // Transform MealMe menu data to our format
     const menuItems = [];
     
-    if (menuData.menu && Array.isArray(menuData.menu.categories)) {
-      for (const category of menuData.menu.categories) {
-        const section = {
-          section_name: category.name || 'Menu Items',
+    if (menuData.sections && Array.isArray(menuData.sections)) {
+      for (const section of menuData.sections) {
+        const menuSection = {
+          section_name: section.name || 'Menu Items',
           menu_items: [] as any[]
         };
 
-        if (Array.isArray(category.items)) {
-          for (const item of category.items) {
-            section.menu_items.push({
+        if (Array.isArray(section.items)) {
+          for (const item of section.items) {
+            menuSection.menu_items.push({
               name: item.name || '',
               description: item.description || '',
               price: item.price ? `$${(item.price / 100).toFixed(2)}` : undefined,
-              image: item.image_url || undefined
+              image: item.image || undefined
             });
           }
         }
 
-        if (section.menu_items.length > 0) {
-          menuItems.push(section);
+        if (menuSection.menu_items.length > 0) {
+          menuItems.push(menuSection);
         }
       }
     }
@@ -158,9 +202,9 @@ serve(async (req) => {
       JSON.stringify({
         available: menuItems.length > 0,
         menuItems: menuItems,
-        restaurantPhone: restaurant.phone || undefined,
-        restaurantWebsite: restaurant.website || undefined,
-        photos: restaurant.images || [],
+        restaurantPhone: storeDetails.phone_number || undefined,
+        restaurantWebsite: storeDetails.website || undefined,
+        photos: storeDetails.images || [],
       }),
       { 
         status: 200, 
