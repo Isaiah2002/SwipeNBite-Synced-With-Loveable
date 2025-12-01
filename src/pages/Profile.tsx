@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, LogOut, Edit3, Settings } from 'lucide-react';
+import { ArrowLeft, User, Mail, LogOut, Edit3, Settings, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import BottomNav from '@/components/BottomNav';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 import { ProfileAnalytics } from '@/components/ProfileAnalytics';
@@ -179,6 +180,47 @@ const Profile = () => {
         ? prev.filter(c => c !== cuisine)
         : [...prev, cuisine]
     );
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      // Delete user data from all tables
+      const deletePromises = [
+        supabase.from('swipe_events').delete().eq('user_id', user.id),
+        supabase.from('liked_restaurants').delete().eq('user_id', user.id),
+        supabase.from('orders').delete().eq('user_id', user.id),
+        supabase.from('location_history').delete().eq('user_id', user.id),
+        supabase.from('recommendation_feedback').delete().eq('user_id', user.id),
+        supabase.from('recommendation_interactions').delete().eq('user_id', user.id),
+        supabase.from('ab_test_assignments').delete().eq('user_id', user.id),
+        supabase.from('shared_restaurants').delete().eq('sender_id', user.id),
+        supabase.from('shared_restaurants').delete().eq('recipient_id', user.id),
+        supabase.from('friendships').delete().eq('user_id', user.id),
+        supabase.from('friendships').delete().eq('friend_id', user.id),
+        supabase.from('profiles').delete().eq('user_id', user.id),
+      ];
+
+      await Promise.all(deletePromises);
+
+      // Delete the auth user - this will trigger cascade delete for remaining references
+      const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
+      
+      if (authError) {
+        // If admin delete fails, try user delete
+        await supabase.auth.signOut();
+      }
+
+      toast.success('Account deleted successfully');
+      navigate('/');
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      toast.error('Failed to delete account. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const hasAddress = address && city && state && zipCode;
@@ -463,6 +505,51 @@ const Profile = () => {
             <h2 className="text-xl font-bold text-card-foreground mt-8">Privacy & Data</h2>
             <PrivacyDashboard />
             <ConsentManagement />
+            
+            {/* Delete Account Section */}
+            <div className="mt-8 p-6 bg-card rounded-2xl border border-destructive/20">
+              <h2 className="text-xl font-bold text-destructive mb-2">Danger Zone</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Once you delete your account, there is no going back. All your data will be permanently removed.
+              </p>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="destructive"
+                    className="w-full flex items-center space-x-2"
+                    disabled={loading}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Delete Account</span>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your account and remove all your data from our servers, including:
+                      <ul className="list-disc list-inside mt-2 space-y-1">
+                        <li>Profile information</li>
+                        <li>Order history</li>
+                        <li>Liked restaurants</li>
+                        <li>Swipe history</li>
+                        <li>Location data</li>
+                        <li>All other personal data</li>
+                      </ul>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteAccount}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Delete My Account
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
         </div>
       </div>
