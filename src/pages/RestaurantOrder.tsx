@@ -17,6 +17,7 @@ const RestaurantOrder = () => {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
+  const [menuExtracting, setMenuExtracting] = useState(false);
 
   // Fetch restaurant data - try liked_restaurants first, but always merge with static menu data
   useEffect(() => {
@@ -77,6 +78,58 @@ const RestaurantOrder = () => {
     restaurant || { id: '', name: '', cuisine: '', price: '$', rating: 0, distance: 0, image: '', description: '', dietary: [], estimatedTime: 0 },
     !!restaurant
   );
+
+  // Check for menu and trigger Veryfi extraction if needed
+  useEffect(() => {
+    const checkAndExtractMenu = async () => {
+      if (!restaurant || menuLoading) return;
+      
+      // Check if menu data exists
+      const hasMenu = (enrichedRestaurant.menuItems && enrichedRestaurant.menuItems.length > 0) ||
+                     (restaurant.menu && restaurant.menu.length > 0);
+      
+      if (hasMenu) return;
+      
+      // No menu found - trigger Veryfi extraction
+      try {
+        setMenuExtracting(true);
+        console.log('[Menu] Extracting menu for:', restaurant.name);
+        
+        const { data, error } = await supabase.functions.invoke('veryfi-menu-extract', {
+          body: {
+            restaurant_id: restaurant.id,
+            restaurant_name: restaurant.name,
+            website_url: enrichedRestaurant.restaurantWebsite,
+            maps_url: enrichedRestaurant.mapsUrl,
+          }
+        });
+
+        if (error) {
+          console.error('[Menu] Extraction failed:', error);
+          toast({
+            title: "Menu unavailable",
+            description: "Unable to load menu at this time.",
+            variant: "destructive"
+          });
+        } else {
+          console.log('[Menu] Extraction complete');
+          toast({
+            title: "Menu loaded",
+            description: "Restaurant menu has been extracted."
+          });
+          
+          // Refresh restaurant data to get the new menu
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error('[Menu] Error:', error);
+      } finally {
+        setMenuExtracting(false);
+      }
+    };
+
+    checkAndExtractMenu();
+  }, [restaurant, enrichedRestaurant, menuLoading]);
 
   if (loading) {
     return (
@@ -276,10 +329,12 @@ const RestaurantOrder = () => {
         <div className="max-w-md mx-auto">
           <h2 className="text-xl font-bold text-card-foreground mb-6">Menu</h2>
           
-          {menuLoading ? (
+          {(menuLoading || menuExtracting) ? (
             <div className="text-center py-12">
               <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-muted-foreground">Loading menu...</p>
+              <p className="text-muted-foreground">
+                {menuExtracting ? 'Extracting menu from restaurant website...' : 'Loading menu...'}
+              </p>
             </div>
           ) : menuItems.length === 0 ? (
             <div className="text-center py-12">
