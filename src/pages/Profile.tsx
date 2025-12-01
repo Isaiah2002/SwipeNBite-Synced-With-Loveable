@@ -22,6 +22,7 @@ import { ConsentManagement } from '@/components/ConsentManagement';
 import { AchievementsBadge } from '@/components/AchievementsBadge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const addressSchema = z.object({
   address: z.string().trim().min(1, "Street address is required").max(200, "Address is too long"),
@@ -53,6 +54,35 @@ const Profile = () => {
   const [addFriendEmail, setAddFriendEmail] = useState('');
   const [friendRequests, setFriendRequests] = useState<any[]>([]);
   const [friends, setFriends] = useState<any[]>([]);
+  const [university, setUniversity] = useState('');
+
+  const universities = [
+    'Harvard University', 'Stanford University', 'MIT', 'Yale University', 
+    'Princeton University', 'Columbia University', 'University of Pennsylvania',
+    'Duke University', 'Northwestern University', 'Johns Hopkins University',
+    'Dartmouth College', 'Brown University', 'Vanderbilt University', 
+    'Rice University', 'Cornell University', 'University of Notre Dame',
+    'UCLA', 'UC Berkeley', 'University of Michigan', 'University of Virginia',
+    'Georgetown University', 'Carnegie Mellon University', 'Emory University',
+    'University of Southern California', 'New York University', 
+    'Boston College', 'University of North Carolina', 'University of Texas',
+    'University of Florida', 'University of Georgia', 'University of Wisconsin',
+    'University of Illinois', 'Ohio State University', 'Penn State University',
+    'University of Washington', 'University of Maryland', 'Boston University',
+    'Northeastern University', 'Tulane University', 'University of Miami',
+    'University of Rochester', 'Case Western Reserve University',
+    'Rensselaer Polytechnic Institute', 'Lehigh University', 'Syracuse University',
+    'Purdue University', 'University of Pittsburgh', 'Rutgers University',
+    'University of Minnesota', 'Indiana University', 'University of Iowa',
+    'Michigan State University', 'University of Delaware', 'University of Connecticut',
+    'Clemson University', 'Florida State University', 'Auburn University',
+    'University of Alabama', 'University of Tennessee', 'University of Kentucky',
+    'University of South Carolina', 'University of Arizona', 'Arizona State University',
+    'University of Colorado Boulder', 'University of Oregon', 'University of Utah',
+    'George Washington University', 'American University', 'Howard University',
+    'Georgia Tech', 'Virginia Tech', 'Texas A&M University', 'UC San Diego',
+    'UC Irvine', 'UC Davis', 'UC Santa Barbara', 'University of Chicago'
+  ].sort();
 
   const cuisineOptions = [
     'Italian', 'Mexican', 'Chinese', 'Japanese', 'Thai', 'Indian', 
@@ -68,7 +98,7 @@ const Profile = () => {
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('address, city, state, zip_code, favorite_cuisines, daily_budget, weekly_budget, monthly_budget')
+          .select('address, city, state, zip_code, favorite_cuisines, daily_budget, weekly_budget, monthly_budget, university')
           .eq('user_id', user.id)
           .single();
 
@@ -80,6 +110,7 @@ const Profile = () => {
           setState(data.state || '');
           setZipCode(data.zip_code || '');
           setSelectedCuisines(data.favorite_cuisines || []);
+          setUniversity(data.university || '');
           setProfile(data);
         }
       } catch (error: any) {
@@ -204,6 +235,7 @@ const Profile = () => {
         .from('profiles')
         .update({
           favorite_cuisines: selectedCuisines,
+          university: university,
           updated_at: new Date().toISOString()
         })
         .eq('user_id', user.id);
@@ -567,9 +599,30 @@ const Profile = () => {
                         <DialogTitle>Food Preferences</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 pt-4">
-                        <p className="text-sm text-muted-foreground">
-                          Select your favorite cuisines to personalize your restaurant recommendations
-                        </p>
+                        {/* University Selection */}
+                        <div className="space-y-2">
+                          <Label htmlFor="university">Primary University</Label>
+                          <Select value={university} onValueChange={setUniversity}>
+                            <SelectTrigger id="university" className="w-full">
+                              <SelectValue placeholder="Select your university" />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-[300px]">
+                              {universities.map((uni) => (
+                                <SelectItem key={uni} value={uni}>
+                                  {uni}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Cuisine Preferences */}
+                        <div className="space-y-2">
+                          <Label>Favorite Cuisines</Label>
+                          <p className="text-sm text-muted-foreground">
+                            Select your favorite cuisines to personalize your restaurant recommendations
+                          </p>
+                        </div>
                         <div className="grid grid-cols-2 gap-3">
                           {cuisineOptions.map(cuisine => (
                             <button

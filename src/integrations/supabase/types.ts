@@ -453,6 +453,7 @@ export type Database = {
           phone_number: string | null
           price_preference: string | null
           state: string | null
+          university: string | null
           updated_at: string
           user_id: string
           weekly_budget: number | null
@@ -479,6 +480,7 @@ export type Database = {
           phone_number?: string | null
           price_preference?: string | null
           state?: string | null
+          university?: string | null
           updated_at?: string
           user_id: string
           weekly_budget?: number | null
@@ -505,6 +507,7 @@ export type Database = {
           phone_number?: string | null
           price_preference?: string | null
           state?: string | null
+          university?: string | null
           updated_at?: string
           user_id?: string
           weekly_budget?: number | null
