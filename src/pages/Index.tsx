@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
 import { useAchievements } from '@/hooks/useAchievements';
+import { useInferredPreferences } from '@/hooks/useInferredPreferences';
 import { Restaurant, Filters } from '@/types/restaurant';
 import { restaurants } from '@/data/restaurants';
 import { calculateDistance } from '@/utils/distance';
@@ -128,38 +129,7 @@ const Index = () => {
     fetchExcludedRestaurants();
   }, [user]);
 
-  // Fetch inferred preferences from behavioral data
-  useEffect(() => {
-    const fetchInferredPreferences = async () => {
-      if (!user) return;
-
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
-
-        const { data, error } = await supabase.functions.invoke('infer-user-preferences', {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          }
-        });
-
-        if (error) throw error;
-
-        if (data?.preferredCuisines) {
-          const cuisines = data.preferredCuisines
-            .filter((c: any) => c.confidence > 30) // Only use high-confidence inferences
-            .map((c: any) => c.cuisine);
-          
-          setInferredCuisines(cuisines);
-          console.log(`Inferred ${cuisines.length} preferred cuisines:`, cuisines);
-        }
-      } catch (error: any) {
-        console.error('Error fetching inferred preferences:', error);
-      }
-    };
-
-    fetchInferredPreferences();
-  }, [user]);
+  // Preferences are now prefetched via useInferredPreferences hook in App.tsx
   const [currentRestaurants, setCurrentRestaurants] = useState<Restaurant[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likedRestaurants, setLikedRestaurants] = useState<Restaurant[]>([]);
@@ -173,7 +143,12 @@ const Index = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [likedRestaurantIds, setLikedRestaurantIds] = useState<Set<string>>(new Set());
   const [recentlyPassedIds, setRecentlyPassedIds] = useState<Set<string>>(new Set());
-  const [inferredCuisines, setInferredCuisines] = useState<string[]>([]);
+  
+  // Use prefetched inferred preferences (loaded in background via App.tsx)
+  const { cuisines: inferredCuisineData } = useInferredPreferences();
+  const inferredCuisines = inferredCuisineData
+    .filter(c => c.confidence > 30)
+    .map(c => c.cuisine);
   
   // Load saved filters from localStorage or use defaults
   const [filters, setFilters] = useState<Filters>(() => {
