@@ -62,7 +62,22 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
           })
         );
 
-        // Fetch SerpAPI menu data (primary source)
+        // Fetch MealMe menu data (primary source)
+        promises.push(
+          supabase.functions.invoke('mealme-menu', {
+            body: {
+              restaurantName: restaurant.name,
+              address: restaurant.address,
+              latitude: restaurant.latitude,
+              longitude: restaurant.longitude,
+            }
+          }).catch(err => {
+            console.error('MealMe error:', err);
+            return { data: null };
+          })
+        );
+
+        // Fetch SerpAPI menu data (fallback source)
         promises.push(
           supabase.functions.invoke('serpapi-menu', {
             body: {
@@ -77,12 +92,17 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
           })
         );
 
-        const [yelpResponse, openTableResponse, serpapiResponse] = await Promise.all(promises);
+        const [yelpResponse, openTableResponse, mealmeResponse, serpapiResponse] = await Promise.all(promises);
+
+        // Prioritize MealMe for menu data, fallback to SerpAPI
+        const menuData = mealmeResponse.data?.available 
+          ? mealmeResponse.data 
+          : serpapiResponse.data;
 
         setEnrichedData({
           yelpData: yelpResponse.data,
           openTableData: openTableResponse.data,
-          serpapiData: serpapiResponse.data,
+          serpapiData: menuData,
         });
 
       } catch (err: any) {
