@@ -53,33 +53,41 @@ serve(async (req) => {
     const searchData = await searchResponse.json();
     console.log('SerpAPI search results:', JSON.stringify(searchData, null, 2));
 
-    // Find the best matching restaurant
-    const localResults = searchData.local_results || [];
-    if (localResults.length === 0) {
-      console.log('No restaurants found in search results');
-      return new Response(
-        JSON.stringify({ 
-          available: false, 
-          message: 'Restaurant not found in Google Maps' 
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    // Check for both place_results (direct match) and local_results (multiple matches)
+    let matchedRestaurant = searchData.place_results;
+    let dataId = matchedRestaurant?.data_id;
+
+    // If no direct match, look in local_results
+    if (!dataId) {
+      const localResults = searchData.local_results || [];
+      if (localResults.length === 0) {
+        console.log('No restaurants found in search results');
+        return new Response(
+          JSON.stringify({ 
+            available: false, 
+            message: 'Restaurant not found in Google Maps' 
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Match by name (case-insensitive)
+      const normalizedSearchName = restaurantName.toLowerCase();
+      matchedRestaurant = localResults.find((r: any) => 
+        r.title?.toLowerCase().includes(normalizedSearchName) || 
+        normalizedSearchName.includes(r.title?.toLowerCase())
       );
+
+      // If no match, use the first result
+      if (!matchedRestaurant) {
+        matchedRestaurant = localResults[0];
+        console.log('No exact match found, using first result:', matchedRestaurant.title);
+      }
+
+      dataId = matchedRestaurant.data_id;
+    } else {
+      console.log('Found direct place match:', matchedRestaurant.title);
     }
-
-    // Match by name (case-insensitive)
-    const normalizedSearchName = restaurantName.toLowerCase();
-    let matchedRestaurant = localResults.find((r: any) => 
-      r.title?.toLowerCase().includes(normalizedSearchName) || 
-      normalizedSearchName.includes(r.title?.toLowerCase())
-    );
-
-    // If no match, use the first result
-    if (!matchedRestaurant) {
-      matchedRestaurant = localResults[0];
-      console.log('No exact match found, using first result:', matchedRestaurant.title);
-    }
-
-    const dataId = matchedRestaurant.data_id;
     if (!dataId) {
       console.log('No data_id found for restaurant');
       return new Response(
