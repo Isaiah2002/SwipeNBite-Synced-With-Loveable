@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, LogOut, Edit3, Settings, Trash2, UserPlus, Users, Check, X, ChevronsUpDown } from 'lucide-react';
+import { ArrowLeft, User, Mail, LogOut, Edit3, Settings, Trash2, UserPlus, Users, Check, X, ChevronsUpDown, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -452,6 +452,13 @@ const Profile = () => {
               <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-xl">
                 <Mail className="w-5 h-5 text-muted-foreground" />
                 <span className="text-card-foreground">{user?.email}</span>
+              </div>
+              
+              <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-xl">
+                <GraduationCap className="w-5 h-5 text-muted-foreground" />
+                <span className="text-card-foreground">
+                  {university || "Not Chosen"}
+                </span>
               </div>
             </div>
 
