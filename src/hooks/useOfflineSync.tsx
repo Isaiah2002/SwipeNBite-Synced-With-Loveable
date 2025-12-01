@@ -18,7 +18,7 @@ export const useOfflineSync = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-  // Monitor online/offline status
+  // Monitor online/offline status and sync on mount
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
@@ -33,6 +33,11 @@ export const useOfflineSync = () => {
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+
+    // Sync data on mount if user is logged in and online
+    if (user && isOnline) {
+      syncData();
+    }
 
     return () => {
       window.removeEventListener('online', handleOnline);
@@ -63,9 +68,12 @@ export const useOfflineSync = () => {
       }
 
       // Fetch and cache latest data from server
-      await syncRestaurants();
-      await syncOrders();
-      await syncLikedRestaurants();
+      await Promise.all([
+        syncRestaurants(),
+        syncOrders(),
+        syncLikedRestaurants(),
+        syncProfile()
+      ]);
 
       if (unsyncedOrders.length > 0) {
         toast.success('Data synced successfully!');
@@ -132,6 +140,25 @@ export const useOfflineSync = () => {
     }
   };
 
+  const syncProfile = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!error && data) {
+        // Cache profile data in localStorage for quick access
+        localStorage.setItem('cached_profile', JSON.stringify(data));
+      }
+    } catch (error) {
+      console.error('Error syncing profile:', error);
+    }
+  };
+
   // Get data with offline fallback
   const getRestaurants = async () => {
     if (isOnline) {
@@ -186,12 +213,18 @@ export const useOfflineSync = () => {
     return getCachedLikedRestaurants();
   };
 
+  const getProfile = () => {
+    const cached = localStorage.getItem('cached_profile');
+    return cached ? JSON.parse(cached) : null;
+  };
+
   return {
     isOnline,
     isSyncing,
     syncData,
     getRestaurants,
     getOrders,
-    getLikedRestaurants
+    getLikedRestaurants,
+    getProfile
   };
 };
