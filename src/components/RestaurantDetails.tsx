@@ -101,12 +101,12 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
             name={restaurant.name}
             address={enrichedRestaurant.address || restaurant.address}
           />
-          {(enrichedRestaurant.address || restaurant.address) && (
-            <div className="flex items-start space-x-2 text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
-              <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
-              <address className="not-italic">{enrichedRestaurant.address || restaurant.address}</address>
-            </div>
-          )}
+          <div className="flex items-start space-x-3 text-base bg-card border border-border p-4 rounded-lg shadow-sm">
+            <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0 text-primary" aria-hidden="true" />
+            <address className="not-italic text-card-foreground font-medium">
+              {enrichedRestaurant.address || restaurant.address || 'Address not available'}
+            </address>
+          </div>
           {(enrichedRestaurant.phone || restaurant.phone) && (
             <div className="flex items-start space-x-2 text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
               <Phone className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
