@@ -92,13 +92,13 @@ const Favorites = () => {
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h1 className="text-2xl font-bold text-card-foreground">Likes</h1>
+            <h1 className="text-2xl font-bold text-card-foreground">Favorites</h1>
           </div>
 
           {/* Content */}
           <Tabs defaultValue="my-favorites" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="my-favorites">My Likes</TabsTrigger>
+              <TabsTrigger value="my-favorites">My Favorites</TabsTrigger>
               <TabsTrigger value="friends-picks">Friends' Picks</TabsTrigger>
             </TabsList>
             
