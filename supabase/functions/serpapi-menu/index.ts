@@ -55,10 +55,10 @@ serve(async (req) => {
 
     // Check for both place_results (direct match) and local_results (multiple matches)
     let matchedRestaurant = searchData.place_results;
-    let dataId = matchedRestaurant?.data_id;
+    let placeId = matchedRestaurant?.place_id;
 
     // If no direct match, look in local_results
-    if (!dataId) {
+    if (!placeId) {
       const localResults = searchData.local_results || [];
       if (localResults.length === 0) {
         console.log('No restaurants found in search results');
@@ -84,12 +84,12 @@ serve(async (req) => {
         console.log('No exact match found, using first result:', matchedRestaurant.title);
       }
 
-      dataId = matchedRestaurant.data_id;
+      placeId = matchedRestaurant.place_id;
     } else {
       console.log('Found direct place match:', matchedRestaurant.title);
     }
-    if (!dataId) {
-      console.log('No data_id found for restaurant');
+    if (!placeId) {
+      console.log('No place_id found for restaurant');
       return new Response(
         JSON.stringify({ 
           available: false,
@@ -99,13 +99,12 @@ serve(async (req) => {
       );
     }
 
-    console.log('Found restaurant with data_id:', dataId);
+    console.log('Found restaurant with place_id:', placeId);
 
     // Step 2: Fetch detailed restaurant information including menu
     const detailsParams = new URLSearchParams({
       engine: 'google_maps',
-      type: 'place',
-      data: dataId,
+      place_id: placeId,
       api_key: SERPAPI_API_KEY,
     });
 
