@@ -66,10 +66,11 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: 'Failed to search MealMe',
-          available: false 
+          available: false,
+          statusCode: searchResponse.status
         }),
         { 
-          status: searchResponse.status, 
+          status: 200, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       );
