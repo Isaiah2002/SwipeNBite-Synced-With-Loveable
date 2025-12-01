@@ -122,7 +122,7 @@ serve(async (req) => {
     const detailsData = await detailsResponse.json();
     console.log('Restaurant details received');
 
-    // Extract menu information
+    // Extract menu information including photos
     const menu = detailsData.menu;
     const menuSections: any[] = [];
 
@@ -134,6 +134,7 @@ serve(async (req) => {
             name: item.title || '',
             description: item.description || '',
             price: item.price || '',
+            image: item.thumbnail || item.image || null,
           })),
         };
         menuSections.push(menuSection);

@@ -11,6 +11,7 @@ export interface DocumenuMenuItem {
   name: string;
   description?: string;
   price?: string;
+  image?: string;
 }
 
 export interface DocumenuMenuSection {
@@ -49,7 +50,7 @@ export interface Restaurant {
   // OpenTable data
   reservationUrl?: string;
   openTableAvailable?: boolean;
-  // Documenu data
+  // SerpAPI menu data
   menuAvailable?: boolean;
   menuItems?: DocumenuMenuSection[];
   restaurantPhone?: string;
