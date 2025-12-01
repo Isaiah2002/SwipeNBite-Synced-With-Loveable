@@ -18,15 +18,11 @@ Unified middleware layer that orchestrates Google Maps, Yelp, and OpenTable data
 - **Primary**: Yelp (detailed user reviews)
 - **Fallback**: None (reviews require Yelp)
 
-### Menu Data
-- **Primary**: MealMe API (structured menu data)
-- **Secondary**: SerpAPI (fallback when MealMe unavailable)
-
 ### Reservations
 - **Only Source**: OpenTable
 
 ### Photos
-- **Priority Order**: Google Places > Yelp > Menu APIs
+- **Priority Order**: Google Places > Yelp
 - **Max**: 10 photos per restaurant
 
 ## Architecture

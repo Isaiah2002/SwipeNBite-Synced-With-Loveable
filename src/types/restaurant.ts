@@ -7,16 +7,16 @@ export interface MenuItem {
   image?: string;
 }
 
-export interface DocumenuMenuItem {
+export interface MenuSection {
+  section_name: string;
+  menu_items: MenuItemData[];
+}
+
+export interface MenuItemData {
   name: string;
   description?: string;
   price?: string;
   image?: string;
-}
-
-export interface DocumenuMenuSection {
-  section_name: string;
-  menu_items: DocumenuMenuItem[];
 }
 
 export interface Restaurant {
@@ -50,9 +50,9 @@ export interface Restaurant {
   // OpenTable data
   reservationUrl?: string;
   openTableAvailable?: boolean;
-  // SerpAPI menu data
+  // Menu data (from Supabase or future integrations)
   menuAvailable?: boolean;
-  menuItems?: DocumenuMenuSection[];
+  menuItems?: MenuSection[];
   restaurantPhone?: string;
   restaurantWebsite?: string;
 }

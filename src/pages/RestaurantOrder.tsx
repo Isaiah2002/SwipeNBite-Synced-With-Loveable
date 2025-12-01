@@ -72,7 +72,7 @@ const RestaurantOrder = () => {
     fetchRestaurant();
   }, [restaurantId]);
 
-  // Fetch enriched data including SerpAPI menu
+  // Fetch enriched data including menu from Supabase if available
   const { enrichedRestaurant, loading: menuLoading } = useRestaurantData(
     restaurant || { id: '', name: '', cuisine: '', price: '$', rating: 0, distance: 0, image: '', description: '', dietary: [], estimatedTime: 0 },
     !!restaurant
@@ -102,11 +102,11 @@ const RestaurantOrder = () => {
     );
   }
 
-  // Convert SerpAPI menu items to MenuItem format or use restaurant's static menu
+  // Convert menu items to MenuItem format or use restaurant's static menu
   let menuItems: MenuItem[] = [];
   
   if (enrichedRestaurant.menuItems && enrichedRestaurant.menuItems.length > 0) {
-    // Use SerpAPI data if available
+    // Use menu data from Supabase or enrichment if available
     enrichedRestaurant.menuItems.forEach((section) => {
       section.menu_items.forEach((item, index) => {
         const priceNum = item.price ? parseFloat(item.price.replace(/[^0-9.]/g, '')) : undefined;
@@ -279,7 +279,7 @@ const RestaurantOrder = () => {
           {menuLoading ? (
             <div className="text-center py-12">
               <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-muted-foreground">Loading menu from SerpAPI...</p>
+              <p className="text-muted-foreground">Loading menu...</p>
             </div>
           ) : menuItems.length === 0 ? (
             <div className="text-center py-12">

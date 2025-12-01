@@ -107,8 +107,8 @@ export default function PrivacyPolicy() {
               <h3 className="text-xl font-medium mb-3 mt-4">5.1 Third-Party Services</h3>
               <p className="text-muted-foreground mb-3">We share data with:</p>
               <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-                <li><strong>Restaurant Data Providers:</strong> Yelp, OpenTable, Documenu for restaurant information</li>
-                <li><strong>Mapping Services:</strong> OpenStreetMap for geocoding and location services</li>
+                <li><strong>Restaurant Data Providers:</strong> Yelp, OpenTable for restaurant information</li>
+                <li><strong>Mapping Services:</strong> Google Maps for geocoding and location services</li>
                 <li><strong>Analytics Providers:</strong> Service analytics (only with your consent)</li>
                 <li><strong>Cloud Infrastructure:</strong> Supabase for secure data storage and authentication</li>
               </ul>
