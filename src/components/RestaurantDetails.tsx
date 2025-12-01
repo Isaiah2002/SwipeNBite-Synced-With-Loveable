@@ -1,11 +1,12 @@
 import { memo } from 'react';
 import { Restaurant } from '@/types/restaurant';
-import { Star, MapPin, Clock, ExternalLink, Phone, Calendar } from 'lucide-react';
+import { Star, MapPin, Clock, ExternalLink, Phone, Calendar, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { RestaurantMap } from '@/components/RestaurantMap';
+import { toast } from 'sonner';
 
 interface RestaurantDetailsProps {
   restaurant: Restaurant;
@@ -21,6 +22,38 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
   const handleYelpClick = () => {
     if (restaurant.yelpUrl) {
       window.open(restaurant.yelpUrl, '_blank');
+    }
+  };
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/?restaurant=${encodeURIComponent(restaurant.id)}`;
+    const shareData = {
+      title: `Check out ${restaurant.name}!`,
+      text: `${restaurant.name} - ${restaurant.cuisine} • ${restaurant.price}\n${restaurant.description}`,
+      url: shareUrl
+    };
+
+    try {
+      // Check if Web Share API is supported
+      if (navigator.share) {
+        await navigator.share(shareData);
+        toast.success('Shared successfully!');
+      } else {
+        // Fallback: Copy to clipboard
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('Link copied to clipboard!');
+      }
+    } catch (error: any) {
+      // User cancelled or error occurred
+      if (error.name !== 'AbortError') {
+        // Fallback to clipboard if share fails
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          toast.success('Link copied to clipboard!');
+        } catch (clipboardError) {
+          toast.error('Failed to share restaurant');
+        }
+      }
     }
   };
 
@@ -163,6 +196,16 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
         <h3 id="actions-heading" className="text-lg font-semibold text-card-foreground">Quick Actions</h3>
         
         <div className="grid grid-cols-2 gap-3">
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            onClick={handleShare}
+            aria-label={`Share ${restaurant.name}`}
+          >
+            <Share2 className="w-4 h-4 mr-2" aria-hidden="true" />
+            Share
+          </Button>
+
           {restaurant.reservationUrl && (
             <Button 
               variant="outline" 
