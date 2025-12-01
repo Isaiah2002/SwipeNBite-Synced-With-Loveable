@@ -1,6 +1,6 @@
 import { useState, useEffect, memo } from 'react';
 import { Restaurant } from '@/types/restaurant';
-import { Heart, X, Clock, MapPin, Star, Share2, ExternalLink, Info } from 'lucide-react';
+import { Heart, X, Clock, MapPin, Star, Share2, Info } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { RestaurantDetails } from '@/components/RestaurantDetails';
 import { useRestaurantData } from '@/hooks/useRestaurantData';
@@ -248,17 +248,6 @@ export const SwipeCard = memo(({
                 <span className="text-white text-xs font-medium">{restaurant.rating}</span>
               </div>
             </div>
-            
-            {enrichedRestaurant.yelpRating && (
-              <div className="flex items-center space-x-1 bg-red-600/90 px-2 py-1 rounded-full">
-                <span className="text-white text-xs font-bold">Yelp</span>
-                <Star className="w-3 h-3 text-white fill-current" />
-                <span className="text-white text-xs font-medium">{enrichedRestaurant.yelpRating}</span>
-                {enrichedRestaurant.reviewCount && (
-                  <span className="text-white/80 text-xs">({enrichedRestaurant.reviewCount})</span>
-                )}
-              </div>
-            )}
           </div>
           
           {/* Image Navigation Dots */}
@@ -326,25 +315,6 @@ export const SwipeCard = memo(({
                 </span>
               ))}
             </div>
-          )}
-
-          {/* Yelp Link */}
-          {enrichedRestaurant.yelpUrl && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(enrichedRestaurant.yelpUrl, '_blank');
-              }}
-            >
-              <ExternalLink className="w-4 h-4 mr-2" />
-              View on Yelp
-              {enrichedRestaurant.reviewCount && (
-                <span className="ml-1 text-muted-foreground">({enrichedRestaurant.reviewCount} reviews)</span>
-              )}
-            </Button>
           )}
 
           {/* Action Buttons */}
