@@ -5,6 +5,7 @@ import { useLocation } from '@/hooks/useLocation';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useInferredPreferences } from '@/hooks/useInferredPreferences';
 import { useFavoritesCache } from '@/hooks/useFavoritesCache';
+import { useEndlessRecommendations } from '@/hooks/useEndlessRecommendations';
 import { Restaurant, Filters } from '@/types/restaurant';
 import { restaurants } from '@/data/restaurants';
 import { calculateDistance } from '@/utils/distance';
@@ -310,6 +311,40 @@ const Index = () => {
     if (currentRestaurants.length === 0) return [];
     return applyFilters(currentRestaurants);
   }, [currentRestaurants, applyFilters]);
+
+  // Endless recommendations system
+  const {
+    shouldRefresh,
+    isRefreshing,
+    refreshRecommendations,
+    remainingRestaurants,
+    expandedRadius,
+    refreshCount
+  } = useEndlessRecommendations({
+    location,
+    filters,
+    currentIndex,
+    totalRestaurants: filteredRestaurants.length,
+    likedRestaurantIds,
+    recentlyPassedIds,
+    currentRestaurants: filteredRestaurants
+  });
+
+  // Auto-refresh when running low on restaurants
+  useEffect(() => {
+    const autoRefresh = async () => {
+      if (shouldRefresh && filteredRestaurants.length > 0) {
+        console.log(`Auto-refreshing: ${remainingRestaurants} restaurants remaining`);
+        const newRestaurants = await refreshRecommendations();
+        
+        if (newRestaurants.length > 0) {
+          setCurrentRestaurants(prev => [...prev, ...newRestaurants]);
+        }
+      }
+    };
+
+    autoRefresh();
+  }, [shouldRefresh, refreshRecommendations, remainingRestaurants, filteredRestaurants.length]);
 
   // Update display when filters change
   useEffect(() => {
@@ -644,43 +679,60 @@ const Index = () => {
           {/* Cards Stack */}
           <div className="relative h-[660px] flex items-center justify-center">
             {!hasMoreCards ? (
-              // No more cards
+              // Refreshing for more restaurants
               <div className="text-center space-y-6" role="status" aria-live="polite">
-                <div className="text-8xl" aria-hidden="true">🎉</div>
-                <div className="space-y-2">
-                  <h2 className="text-xl font-bold text-card-foreground">
-                    You've seen all restaurants!
-                  </h2>
-                  <p className="text-muted-foreground">
-                    {likedRestaurants.length > 0 
-                      ? `You have ${likedRestaurants.length} matches waiting for you!`
-                      : location 
-                        ? 'No restaurants found within your distance filter. Try increasing the distance or adjusting other filters.'
-                        : 'Try adjusting your filters to see more options'
-                    }
-                  </p>
-                </div>
-                <div className="space-y-3">
-                  <Button 
-                    onClick={resetCards}
-                    className="gradient-primary text-primary-foreground border-0 w-full"
-                    aria-label="Reset and start swiping again"
-                  >
-                    <RotateCcw className="w-4 h-4 mr-2" aria-hidden="true" />
-                    Start Over
-                  </Button>
-                  {likedRestaurants.length > 0 && (
-                    <Button 
-                      onClick={() => setShowLiked(true)}
-                      variant="outline"
-                      className="w-full"
-                      aria-label={`View your ${likedRestaurants.length} matched restaurants`}
-                    >
-                      <Heart className="w-4 h-4 mr-2 text-accent fill-current" aria-hidden="true" />
-                      View Matches ({likedRestaurants.length})
-                    </Button>
-                  )}
-                </div>
+                {isRefreshing ? (
+                  <>
+                    <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" aria-hidden="true" />
+                    <div className="space-y-2">
+                      <h2 className="text-xl font-bold text-card-foreground">
+                        Finding more restaurants...
+                      </h2>
+                      <p className="text-muted-foreground">
+                        {expandedRadius 
+                          ? `Searching up to ${expandedRadius.toFixed(1)} miles away`
+                          : 'Expanding your search'
+                        }
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-8xl" aria-hidden="true">🎉</div>
+                    <div className="space-y-2">
+                      <h2 className="text-xl font-bold text-card-foreground">
+                        You've seen all restaurants!
+                      </h2>
+                      <p className="text-muted-foreground">
+                        {likedRestaurants.length > 0 
+                          ? `You have ${likedRestaurants.length} matches waiting for you!`
+                          : 'Loading more options for you...'
+                        }
+                      </p>
+                    </div>
+                    <div className="space-y-3">
+                      <Button 
+                        onClick={resetCards}
+                        className="gradient-primary text-primary-foreground border-0 w-full"
+                        aria-label="Reset and start swiping again"
+                      >
+                        <RotateCcw className="w-4 h-4 mr-2" aria-hidden="true" />
+                        Start Over
+                      </Button>
+                      {likedRestaurants.length > 0 && (
+                        <Button 
+                          onClick={() => setShowLiked(true)}
+                          variant="outline"
+                          className="w-full"
+                          aria-label={`View your ${likedRestaurants.length} matched restaurants`}
+                        >
+                          <Heart className="w-4 h-4 mr-2 text-accent fill-current" aria-hidden="true" />
+                          View Matches ({likedRestaurants.length})
+                        </Button>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             ) : (
               // Show current card with next card behind it
@@ -747,6 +799,15 @@ const Index = () => {
                 <Heart className="w-4 h-4 text-accent fill-current" />
                 <span>Matches</span>
               </Button>
+            </div>
+          )}
+          
+          {/* Endless Recommendations Indicator */}
+          {remainingRestaurants <= 5 && remainingRestaurants > 0 && !isRefreshing && (
+            <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-xl text-center">
+              <p className="text-sm text-primary font-medium">
+                🔄 {remainingRestaurants} left - Finding more restaurants nearby!
+              </p>
             </div>
           )}
         </div>
