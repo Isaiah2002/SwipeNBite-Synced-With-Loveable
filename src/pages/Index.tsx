@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useInferredPreferences } from '@/hooks/useInferredPreferences';
+import { useFavoritesCache } from '@/hooks/useFavoritesCache';
 import { Restaurant, Filters } from '@/types/restaurant';
 import { restaurants } from '@/data/restaurants';
 import { calculateDistance } from '@/utils/distance';
@@ -151,6 +152,9 @@ const Index = () => {
     .filter(c => c.confidence > 30)
     .map(c => c.cuisine);
   
+  // Load cached favorites for instant feed personalization
+  const { cuisines: favoriteCuisines } = useFavoritesCache();
+  
   // Load saved filters from localStorage or use defaults
   const [filters, setFilters] = useState<Filters>(() => {
     const savedFilters = localStorage.getItem('swipenbite-filters');
@@ -260,8 +264,13 @@ const Index = () => {
         filters.dietary.some(diet => restaurant.dietary.includes(diet));
       
       // Filter by cuisine preferences if user has set any
-      // Combine explicit preferences with inferred cuisines for better personalization
-      const allCuisinePreferences = [...userCuisinePreferences, ...inferredCuisines];
+      // Prioritize favorite cuisines, then user preferences, then inferred cuisines
+      const favoriteCuisineNames = favoriteCuisines.map(fc => fc.cuisine);
+      const allCuisinePreferences = [
+        ...favoriteCuisineNames, 
+        ...userCuisinePreferences, 
+        ...inferredCuisines
+      ];
       const matchesCuisine = allCuisinePreferences.length === 0 || 
         allCuisinePreferences.some(pref => 
           restaurant.cuisine.toLowerCase().includes(pref.toLowerCase())

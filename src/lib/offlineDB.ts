@@ -168,6 +168,24 @@ export const cacheLikedRestaurant = async (restaurant: any) => {
   });
 };
 
+// Cache multiple liked restaurants at once for better performance
+export const cacheLikedRestaurantsBatch = async (restaurants: any[]) => {
+  const db = await getDB();
+  const tx = db.transaction('likedRestaurants', 'readwrite');
+  const timestamp = Date.now();
+  
+  await Promise.all([
+    ...restaurants.map(restaurant => 
+      tx.store.put({
+        id: restaurant.restaurant_id || restaurant.id,
+        data: restaurant,
+        lastUpdated: timestamp
+      })
+    ),
+    tx.done
+  ]);
+};
+
 export const getCachedLikedRestaurants = async () => {
   const db = await getDB();
   const items = await db.getAll('likedRestaurants');
