@@ -90,54 +90,48 @@ const RestaurantOrder = () => {
       
       if (hasMenu) return;
       
-      // No menu found - fetch restaurant data to get URL, then trigger Veryfi extraction
+      // No menu found - use enriched data or fall back gracefully
       try {
         setMenuExtracting(true);
-        console.log('[Menu] Fetching restaurant data for:', restaurant.name);
+        console.log('[Menu] Checking for menu URL...');
         
-        // Query restaurants table to get maps_url
-        const { data: restaurantData, error: fetchError } = await supabase
-          .from('restaurants')
-          .select('maps_url')
-          .eq('id', restaurant.id)
-          .single();
+        // Use enriched mapsUrl if available, otherwise query database
+        let mapsUrl = enrichedRestaurant.mapsUrl;
+        
+        if (!mapsUrl) {
+          const { data: restaurantData } = await supabase
+            .from('restaurants')
+            .select('maps_url')
+            .eq('id', restaurant.id)
+            .single();
+          
+          mapsUrl = restaurantData?.maps_url;
+        }
 
-        if (fetchError || !restaurantData?.maps_url) {
-          console.error('[Menu] No maps URL available for extraction');
-          toast({
-            title: "Menu unavailable",
-            description: "Restaurant doesn't have a website or menu available.",
-            variant: "destructive"
-          });
+        if (!mapsUrl) {
+          console.log('[Menu] No URL available - skipping extraction');
           setMenuExtracting(false);
           return;
         }
 
-        console.log('[Menu] Extracting menu from:', restaurantData.maps_url);
+        console.log('[Menu] Extracting menu from:', mapsUrl);
         
         const { data, error } = await supabase.functions.invoke('veryfi-menu-extract', {
           body: {
             restaurant_id: restaurant.id,
             restaurant_name: restaurant.name,
-            maps_url: restaurantData.maps_url,
+            maps_url: mapsUrl,
           }
         });
 
         if (error) {
           console.error('[Menu] Extraction failed:', error);
-          toast({
-            title: "Menu unavailable",
-            description: "Unable to load menu at this time.",
-            variant: "destructive"
-          });
         } else {
           console.log('[Menu] Extraction complete');
           toast({
             title: "Menu loaded",
             description: "Restaurant menu has been extracted."
           });
-          
-          // Refresh restaurant data to get the new menu
           window.location.reload();
         }
       } catch (error) {
