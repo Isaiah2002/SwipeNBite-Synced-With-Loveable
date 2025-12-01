@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Shield, Download, Trash2, Database, MapPin, Heart, ShoppingCart, AlertCircle } from "lucide-react";
+import { Shield, Download, Trash2, Database, MapPin, Heart, ShoppingCart, AlertCircle, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface DataCounts {
   orders: number;
@@ -20,6 +22,7 @@ export const PrivacyDashboard = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [personalizationEnabled, setPersonalizationEnabled] = useState(true);
   const [dataCounts, setDataCounts] = useState<DataCounts>({
     orders: 0,
     locationHistory: 0,
@@ -30,7 +33,54 @@ export const PrivacyDashboard = () => {
 
   useEffect(() => {
     fetchDataCounts();
+    fetchPersonalizationSetting();
   }, [user]);
+
+  const fetchPersonalizationSetting = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('personalization_enabled')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setPersonalizationEnabled(data.personalization_enabled !== false);
+      }
+    } catch (error: any) {
+      console.error('Error fetching personalization setting:', error);
+    }
+  };
+
+  const updatePersonalization = async (enabled: boolean) => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ personalization_enabled: enabled })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setPersonalizationEnabled(enabled);
+      toast.success(`AI personalization ${enabled ? 'enabled' : 'disabled'}`);
+      
+      if (!enabled) {
+        toast.info('Feed will no longer use behavioral data for personalization');
+      }
+    } catch (error: any) {
+      console.error('Error updating personalization:', error);
+      toast.error('Failed to update personalization setting');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchDataCounts = async () => {
     if (!user) return;
@@ -171,6 +221,40 @@ export const PrivacyDashboard = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* AI Personalization Toggle */}
+          <Card className="border-2">
+            <CardContent className="pt-4 pb-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3 flex-1">
+                  <Sparkles className="w-5 h-5 mt-1 text-purple-500" />
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="personalization" className="text-base font-semibold cursor-pointer">
+                        AI-Based Personalization
+                      </Label>
+                      <Switch
+                        id="personalization"
+                        checked={personalizationEnabled}
+                        onCheckedChange={updatePersonalization}
+                        disabled={loading}
+                      />
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Use your location history, favorites, and browsing behavior to automatically identify preferred cuisines and personalize your restaurant feed
+                    </p>
+                    {!personalizationEnabled && (
+                      <Alert className="mt-2 border-amber-500/50 bg-amber-500/10">
+                        <AlertDescription className="text-xs text-amber-700 dark:text-amber-400">
+                          Your feed will only use explicit preferences from your filter settings. Behavioral insights and automatic cuisine detection will be disabled.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Data Export */}
           <div className="space-y-3">
             <h3 className="font-semibold text-sm">Export Your Data</h3>

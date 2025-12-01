@@ -450,6 +450,7 @@ export type Database = {
           max_distance_preference: number | null
           monthly_budget: number | null
           notifications_consent: boolean | null
+          personalization_enabled: boolean | null
           phone_number: string | null
           price_preference: string | null
           state: string | null
@@ -477,6 +478,7 @@ export type Database = {
           max_distance_preference?: number | null
           monthly_budget?: number | null
           notifications_consent?: boolean | null
+          personalization_enabled?: boolean | null
           phone_number?: string | null
           price_preference?: string | null
           state?: string | null
@@ -504,6 +506,7 @@ export type Database = {
           max_distance_preference?: number | null
           monthly_budget?: number | null
           notifications_consent?: boolean | null
+          personalization_enabled?: boolean | null
           phone_number?: string | null
           price_preference?: string | null
           state?: string | null

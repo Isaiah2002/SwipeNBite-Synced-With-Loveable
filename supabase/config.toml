@@ -62,3 +62,6 @@ verify_jwt = false
 
 [functions.google-geocode]
 verify_jwt = true
+
+[functions.infer-user-preferences]
+verify_jwt = true
