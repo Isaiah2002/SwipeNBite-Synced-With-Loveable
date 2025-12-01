@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useAchievements } from '@/hooks/useAchievements';
 import BottomNav from '@/components/BottomNav';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
@@ -18,6 +19,7 @@ import { BudgetSettings } from '@/components/BudgetSettings';
 import { BudgetAnalytics } from '@/components/BudgetAnalytics';
 import { PrivacyDashboard } from '@/components/PrivacyDashboard';
 import { ConsentManagement } from '@/components/ConsentManagement';
+import { AchievementsBadge } from '@/components/AchievementsBadge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
 
@@ -33,6 +35,7 @@ const emailSchema = z.string().trim().email("Invalid email address").max(255, "E
 const Profile = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { checkForNewAchievements } = useAchievements();
   const [isEditing, setIsEditing] = useState(false);
   const [displayName, setDisplayName] = useState('Food Lover');
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -279,6 +282,9 @@ const Profile = () => {
       if (error) throw error;
 
       toast.success('Friend request accepted!');
+      
+      // Check for friend-based achievements
+      checkForNewAchievements();
       
       // Refresh friendships
       setFriendRequests(prev => prev.filter(f => f.id !== friendshipId));
@@ -730,7 +736,12 @@ const Profile = () => {
 
           {/* Budget & Analytics Dashboard */}
           <div className="mt-6 space-y-6">
-            <h2 className="text-xl font-bold text-card-foreground">Budget & Spending</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-card-foreground">Your Achievements</h2>
+              <AchievementsBadge />
+            </div>
+            
+            <h2 className="text-xl font-bold text-card-foreground mt-8">Budget & Spending</h2>
             <Tabs defaultValue="tracker" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="tracker">Current</TabsTrigger>
