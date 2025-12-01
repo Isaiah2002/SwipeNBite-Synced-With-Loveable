@@ -17,6 +17,7 @@ import { InstallPrompt } from '@/components/InstallPrompt';
 import { OfflineIndicator } from '@/components/OfflineIndicator';
 import { BudgetAlert } from '@/components/BudgetAlert';
 import { ConsentBanner } from '@/components/ConsentBanner';
+import { RestaurantCardSkeleton } from '@/components/RestaurantCardSkeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Heart, RotateCcw, LogOut, User, Search, MapPin } from 'lucide-react';
@@ -519,15 +520,25 @@ const Index = () => {
   }, [currentRestaurant, hasMoreCards, showOnboarding, showLiked]);
 
   // Show loading state while checking auth or fetching restaurants
-  if (loading || fetchingRestaurants) {
+  if (loading || fetchingRestaurants || locationLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
-          <p className="text-muted-foreground">
-            {fetchingRestaurants ? 'Finding restaurants near you...' : 'Loading SwipeN\'Bite...'}
-          </p>
-        </div>
+      <div className="min-h-screen bg-background pb-24">
+        <header className="p-4 pb-2 pt-2">
+          <div className="max-w-md mx-auto space-y-3">
+            <FilterBar filters={filters} onFiltersChange={setFilters} />
+          </div>
+        </header>
+        <main className="flex-1 p-4 pt-2">
+          <div className="max-w-md mx-auto space-y-4">
+            <RestaurantCardSkeleton />
+            {fetchingRestaurants && (
+              <p className="text-center text-muted-foreground text-sm">
+                Finding restaurants near you...
+              </p>
+            )}
+          </div>
+        </main>
+        <BottomNav />
       </div>
     );
   }
