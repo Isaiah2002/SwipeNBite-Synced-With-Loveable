@@ -7,17 +7,6 @@ export interface MenuItem {
   image?: string;
 }
 
-export interface DocumenuMenuItem {
-  name: string;
-  description?: string;
-  price?: string;
-}
-
-export interface DocumenuMenuSection {
-  section_name: string;
-  menu_items: DocumenuMenuItem[];
-}
-
 export interface Restaurant {
   id: string;
   name: string;
@@ -49,11 +38,6 @@ export interface Restaurant {
   // OpenTable data
   reservationUrl?: string;
   openTableAvailable?: boolean;
-  // Documenu data
-  menuAvailable?: boolean;
-  menuItems?: DocumenuMenuSection[];
-  restaurantPhone?: string;
-  restaurantWebsite?: string;
 }
 
 export interface YelpReview {
