@@ -279,27 +279,11 @@ const RestaurantOrder = () => {
           {menuLoading ? (
             <div className="text-center py-12">
               <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-muted-foreground">Fetching menu data...</p>
+              <p className="text-muted-foreground">Loading menu from SerpAPI...</p>
             </div>
           ) : menuItems.length === 0 ? (
-            <div className="text-center py-12 space-y-4">
-              <div className="text-4xl">📋</div>
-              <div>
-                <p className="font-semibold text-card-foreground mb-2">Menu Not Available</p>
-                <p className="text-sm text-muted-foreground">
-                  This restaurant's menu isn't available through our menu providers (MealMe or SerpAPI).
-                </p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  You can still call them at {enrichedRestaurant.restaurantPhone || 'their phone number'} to place an order!
-                </p>
-              </div>
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/favorites')}
-                className="mt-4"
-              >
-                Back to Favorites
-              </Button>
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No menu available for this restaurant</p>
             </div>
           ) : (
             <div className="space-y-4">
