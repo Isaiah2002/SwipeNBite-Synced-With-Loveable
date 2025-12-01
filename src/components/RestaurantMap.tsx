@@ -1,15 +1,4 @@
 import { useEffect, useRef, memo } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-
-// Configure default Leaflet marker icons
-// (Leaflet's defaults rely on asset paths that don't work well with bundlers)
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-});
 
 interface RestaurantMapProps {
   latitude: number;
@@ -20,39 +9,80 @@ interface RestaurantMapProps {
 
 export const RestaurantMap = memo(({ latitude, longitude, name, address }: RestaurantMapProps) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapInstanceRef = useRef<L.Map | null>(null);
+  const mapInstanceRef = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.Marker | null>(null);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
-    // Initialize map only once
-    if (!mapInstanceRef.current) {
-      const map = L.map(mapContainerRef.current).setView([latitude, longitude], 15);
+    const initMap = () => {
+      if (!window.google) {
+        console.error('Google Maps API not loaded');
+        return;
+      }
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap contributors',
-      }).addTo(map);
+      const position = { lat: latitude, lng: longitude };
 
-      const marker = L.marker([latitude, longitude]).addTo(map);
-      const popupContent = `
-        <div style="font-size: 0.875rem;">
-          <div style="font-weight: 600;">${name}</div>
-          ${address ? `<div style="margin-top: 0.25rem; color: #6b7280; font-size: 0.75rem;">${address}</div>` : ''}
-        </div>
-      `;
-      marker.bindPopup(popupContent);
+      // Initialize map only once
+      if (!mapInstanceRef.current) {
+        mapInstanceRef.current = new google.maps.Map(mapContainerRef.current!, {
+          center: position,
+          zoom: 15,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: true,
+        });
 
-      mapInstanceRef.current = map;
+        // Create marker
+        markerRef.current = new google.maps.Marker({
+          position: position,
+          map: mapInstanceRef.current,
+          title: name,
+        });
+
+        // Create info window
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+            <div style="font-size: 0.875rem; padding: 0.25rem;">
+              <div style="font-weight: 600; margin-bottom: 0.25rem;">${name}</div>
+              ${address ? `<div style="color: #6b7280; font-size: 0.75rem;">${address}</div>` : ''}
+            </div>
+          `,
+        });
+
+        markerRef.current.addListener('click', () => {
+          infoWindow.open(mapInstanceRef.current!, markerRef.current!);
+        });
+      } else {
+        // Update position if props change
+        mapInstanceRef.current.setCenter(position);
+        if (markerRef.current) {
+          markerRef.current.setPosition(position);
+        }
+      }
+    };
+
+    // Load Google Maps script if not already loaded
+    if (!window.google) {
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      if (!apiKey || apiKey === 'your_google_maps_api_key_here') {
+        console.error('Google Maps API key not configured');
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.onload = initMap;
+      document.head.appendChild(script);
     } else {
-      // If props change, update view/marker position
-      mapInstanceRef.current.setView([latitude, longitude], 15);
+      initMap();
     }
 
     return () => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
+      if (markerRef.current) {
+        markerRef.current.setMap(null);
       }
     };
   }, [latitude, longitude, name, address]);
@@ -70,4 +100,3 @@ export const RestaurantMap = memo(({ latitude, longitude, name, address }: Resta
     prevProps.name === nextProps.name
   );
 });
-
