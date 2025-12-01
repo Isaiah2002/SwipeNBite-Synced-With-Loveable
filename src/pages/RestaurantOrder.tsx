@@ -113,7 +113,8 @@ const RestaurantOrder = () => {
           name: item.name,
           description: item.description || '',
           price: priceNum,
-          category: section.section_name
+          category: section.section_name,
+          image: item.image || undefined
         });
       });
     });
