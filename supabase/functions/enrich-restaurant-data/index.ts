@@ -176,46 +176,7 @@ serve(async (req) => {
     console.log(`Processing time: ${processingTime}ms`);
     console.log(`Data sources used: ${Object.keys(sources).filter(k => sources[k as keyof typeof sources]?.success).join(', ')}`);
 
-    // 5. CHECK FOR MENU DATA AND TRIGGER VERYFI IF MISSING
-    EdgeRuntime.waitUntil((async () => {
-      try {
-        // Check if restaurant has menu data
-        const { data: restaurantData } = await supabase
-          .from('restaurants')
-          .select('menu')
-          .eq('id', restaurantId)
-          .single();
-
-        const hasMenu = restaurantData?.menu && 
-                       Array.isArray(restaurantData.menu) && 
-                       restaurantData.menu.length > 0;
-
-        if (!hasMenu && (merged.mapsUrl || merged.website)) {
-          console.log('[Veryfi] No menu found, triggering extraction...');
-          
-          const { data: veryfiData, error: veryfiError } = await supabase.functions.invoke('veryfi-menu-extract', {
-            body: {
-              restaurant_id: restaurantId,
-              restaurant_name: restaurantName,
-              website_url: merged.website,
-              maps_url: merged.mapsUrl,
-            }
-          });
-
-          if (veryfiError) {
-            console.error('[Veryfi] Extraction failed:', veryfiError.message);
-          } else {
-            console.log('[Veryfi] ✓ Extraction triggered successfully');
-          }
-        } else {
-          console.log('[Veryfi] Menu already exists or no URL available');
-        }
-      } catch (error) {
-        console.error('[Veryfi] Error:', error.message);
-      }
-    })());
-
-    // 6. UPDATE RESTAURANT IN DATABASE (background task)
+    // 5. UPDATE RESTAURANT IN DATABASE (background task)
     EdgeRuntime.waitUntil((async () => {
       try {
         const { error: updateError } = await supabase
