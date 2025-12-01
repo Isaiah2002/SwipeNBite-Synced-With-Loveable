@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { universityCampuses } from '@/data/universityCampuses';
+import { calculateDistance } from '@/utils/distance';
 
 export const useMealPlanCheck = (restaurantId: string) => {
   const { user } = useAuth();
@@ -29,16 +31,36 @@ export const useMealPlanCheck = (restaurantId: string) => {
           return;
         }
 
-        // Check if restaurant is on the meal plan for this university
-        const { data: mealPlanData } = await supabase
-          .from('university_meal_plan_restaurants')
-          .select('*')
-          .eq('restaurant_id', restaurantId)
-          .eq('university', profile.university)
-          .eq('verified', true)
-          .maybeSingle();
+        // Get campus data for user's university
+        const campusData = universityCampuses[profile.university];
+        if (!campusData) {
+          setIsOnMealPlan(false);
+          setLoading(false);
+          return;
+        }
 
-        setIsOnMealPlan(!!mealPlanData);
+        // Get restaurant location
+        const { data: restaurant } = await supabase
+          .from('restaurants')
+          .select('latitude, longitude')
+          .eq('id', restaurantId)
+          .single();
+
+        if (!restaurant?.latitude || !restaurant?.longitude) {
+          setIsOnMealPlan(false);
+          setLoading(false);
+          return;
+        }
+
+        // Calculate distance from restaurant to campus center
+        const distance = calculateDistance(
+          { latitude: campusData.latitude, longitude: campusData.longitude },
+          { latitude: restaurant.latitude, longitude: restaurant.longitude }
+        );
+
+        // Check if restaurant is within campus radius (diameter / 2)
+        const campusRadius = campusData.diameterMiles / 2;
+        setIsOnMealPlan(distance <= campusRadius);
       } catch (error) {
         console.error('Error checking meal plan:', error);
         setIsOnMealPlan(false);
