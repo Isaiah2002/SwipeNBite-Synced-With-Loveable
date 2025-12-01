@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, LogOut, Edit3, Settings, Trash2, UserPlus, Users, Check, X } from 'lucide-react';
+import { ArrowLeft, User, Mail, LogOut, Edit3, Settings, Trash2, UserPlus, Users, Check, X, ChevronsUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,7 +22,9 @@ import { ConsentManagement } from '@/components/ConsentManagement';
 import { AchievementsBadge } from '@/components/AchievementsBadge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { cn } from '@/lib/utils';
 
 const addressSchema = z.object({
   address: z.string().trim().min(1, "Street address is required").max(200, "Address is too long"),
@@ -55,6 +57,7 @@ const Profile = () => {
   const [friendRequests, setFriendRequests] = useState<any[]>([]);
   const [friends, setFriends] = useState<any[]>([]);
   const [university, setUniversity] = useState('');
+  const [universityOpen, setUniversityOpen] = useState(false);
 
   const universities = [
     'Harvard University', 'Stanford University', 'MIT', 'Yale University', 
@@ -601,19 +604,49 @@ const Profile = () => {
                       <div className="space-y-4 pt-4">
                         {/* University Selection */}
                         <div className="space-y-2">
-                          <Label htmlFor="university">Primary University</Label>
-                          <Select value={university} onValueChange={setUniversity}>
-                            <SelectTrigger id="university" className="w-full">
-                              <SelectValue placeholder="Select your university" />
-                            </SelectTrigger>
-                            <SelectContent className="max-h-[300px]">
-                              {universities.map((uni) => (
-                                <SelectItem key={uni} value={uni}>
-                                  {uni}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <Label>Primary University</Label>
+                          <Popover open={universityOpen} onOpenChange={setUniversityOpen}>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={universityOpen}
+                                className="w-full justify-between"
+                              >
+                                {university || "Search and select your university..."}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0 bg-white" align="start">
+                              <Command className="bg-white">
+                                <CommandInput placeholder="Search universities..." className="h-9" />
+                                <CommandList>
+                                  <CommandEmpty>No university found.</CommandEmpty>
+                                  <CommandGroup className="max-h-[300px] overflow-auto">
+                                    {universities.map((uni) => (
+                                      <CommandItem
+                                        key={uni}
+                                        value={uni}
+                                        onSelect={(currentValue) => {
+                                          setUniversity(currentValue === university ? "" : currentValue);
+                                          setUniversityOpen(false);
+                                        }}
+                                        className="bg-white hover:bg-gray-100"
+                                      >
+                                        {uni}
+                                        <Check
+                                          className={cn(
+                                            "ml-auto h-4 w-4",
+                                            university === uni ? "opacity-100" : "opacity-0"
+                                          )}
+                                        />
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                         </div>
 
                         {/* Cuisine Preferences */}
