@@ -56,3 +56,6 @@ verify_jwt = true
 
 [functions.infer-user-preferences]
 verify_jwt = true
+
+[functions.veryfi-menu-extract]
+verify_jwt = false
