@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface EnrichedData {
   yelpData?: any;
   openTableData?: any;
+  documenuData?: any;
 }
 
 export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = false) => {
@@ -61,11 +62,26 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
           })
         );
 
-        const [yelpResponse, openTableResponse] = await Promise.all(promises);
+        // Fetch Documenu data
+        promises.push(
+          supabase.functions.invoke('documenu-menu', {
+            body: {
+              restaurantName: restaurant.name,
+              latitude: restaurant.latitude,
+              longitude: restaurant.longitude,
+            }
+          }).catch(err => {
+            console.error('Documenu error:', err);
+            return { data: null };
+          })
+        );
+
+        const [yelpResponse, openTableResponse, documenuResponse] = await Promise.all(promises);
 
         setEnrichedData({
           yelpData: yelpResponse.data,
           openTableData: openTableResponse.data,
+          documenuData: documenuResponse.data,
         });
 
       } catch (err: any) {
@@ -89,6 +105,10 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
     reviews: enrichedData.yelpData?.reviews,
     reservationUrl: enrichedData.openTableData?.reservationUrl,
     openTableAvailable: enrichedData.openTableData?.available,
+    menuAvailable: enrichedData.documenuData?.available,
+    menuItems: enrichedData.documenuData?.menuItems,
+    restaurantPhone: enrichedData.documenuData?.restaurantPhone,
+    restaurantWebsite: enrichedData.documenuData?.restaurantWebsite,
   };
 
   return { enrichedRestaurant, loading, error };

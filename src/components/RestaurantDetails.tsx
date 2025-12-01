@@ -221,6 +221,54 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
         </CardContent>
       </Card>
 
+      {/* Menu */}
+      {restaurant.menuAvailable && restaurant.menuItems && restaurant.menuItems.length > 0 && (
+        <section className="space-y-4" aria-labelledby="menu-heading">
+          <h3 id="menu-heading" className="text-lg font-semibold text-card-foreground">Menu</h3>
+          
+          {restaurant.menuItems.map((section, sectionIndex) => (
+            <Card key={sectionIndex}>
+              <CardContent className="pt-6 space-y-4">
+                <h4 className="text-base font-semibold text-card-foreground">
+                  {section.section_name}
+                </h4>
+                
+                <div className="space-y-3">
+                  {section.menu_items.map((item, itemIndex) => (
+                    <div key={itemIndex} className="flex justify-between items-start gap-4">
+                      <div className="flex-1">
+                        <div className="font-medium text-sm">{item.name}</div>
+                        {item.description && (
+                          <div className="text-sm text-muted-foreground mt-1">
+                            {item.description}
+                          </div>
+                        )}
+                      </div>
+                      {item.price && (
+                        <div className="font-medium text-sm whitespace-nowrap">
+                          {item.price}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+
+          {restaurant.restaurantWebsite && (
+            <Button 
+              variant="outline" 
+              className="w-full" 
+              onClick={() => window.open(restaurant.restaurantWebsite, '_blank')}
+              aria-label={`View full menu for ${restaurant.name} on their website`}
+            >
+              <ExternalLink className="w-4 h-4 mr-2" aria-hidden="true" />
+              View Full Menu
+            </Button>
+          )}
+        </section>
+      )}
     </div>
   );
 }, (prevProps, nextProps) => {

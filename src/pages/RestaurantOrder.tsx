@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { MenuItem, Restaurant } from '@/types/restaurant';
 import { supabase } from '@/integrations/supabase/client';
+import { useRestaurantData } from '@/hooks/useRestaurantData';
 
 const RestaurantOrder = () => {
   const navigate = useNavigate();
@@ -69,6 +70,11 @@ const RestaurantOrder = () => {
     fetchRestaurant();
   }, [restaurantId]);
 
+  // Fetch enriched data including Documenu menu
+  const { enrichedRestaurant, loading: menuLoading } = useRestaurantData(
+    restaurant || { id: '', name: '', cuisine: '', price: '$', rating: 0, distance: 0, image: '', description: '', dietary: [], estimatedTime: 0 },
+    !!restaurant
+  );
 
   if (loading) {
     return (
@@ -94,8 +100,27 @@ const RestaurantOrder = () => {
     );
   }
 
-  // Use restaurant's static menu data
-  const menuItems: MenuItem[] = restaurant.menu || [];
+  // Convert Documenu menu items to MenuItem format or use restaurant's static menu
+  let menuItems: MenuItem[] = [];
+  
+  if (enrichedRestaurant.menuItems && enrichedRestaurant.menuItems.length > 0) {
+    // Use Documenu data if available
+    enrichedRestaurant.menuItems.forEach((section) => {
+      section.menu_items.forEach((item, index) => {
+        const priceNum = item.price ? parseFloat(item.price.replace(/[^0-9.]/g, '')) : undefined;
+        menuItems.push({
+          id: `${section.section_name}-${index}`,
+          name: item.name,
+          description: item.description || '',
+          price: priceNum,
+          category: section.section_name
+        });
+      });
+    });
+  } else if (restaurant.menu && restaurant.menu.length > 0) {
+    // Use restaurant's static menu data
+    menuItems = restaurant.menu;
+  }
 
   const addToCart = (itemId: string) => {
     setCart(prev => ({
@@ -245,7 +270,12 @@ const RestaurantOrder = () => {
         <div className="max-w-md mx-auto">
           <h2 className="text-xl font-bold text-card-foreground mb-6">Menu</h2>
           
-          {menuItems.length === 0 ? (
+          {menuLoading ? (
+            <div className="text-center py-12">
+              <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-muted-foreground">Loading menu from Documenu...</p>
+            </div>
+          ) : menuItems.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No menu available for this restaurant</p>
             </div>
