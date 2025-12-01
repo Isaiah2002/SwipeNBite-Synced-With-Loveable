@@ -294,14 +294,18 @@ const RestaurantOrder = () => {
                 <div className="p-4">
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-card-foreground">{item.name}</h3>
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="font-semibold text-card-foreground">{item.name}</h3>
+                        {item.price ? (
+                          <span className="text-xl font-bold text-primary">
+                            ${item.price.toFixed(2)}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-muted-foreground italic">Price varies</span>
+                        )}
+                      </div>
                       {item.description && (
                         <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
-                      )}
-                      {item.price && (
-                        <p className="text-lg font-bold text-card-foreground mt-2">
-                          ${item.price.toFixed(2)}
-                        </p>
                       )}
                     </div>
                   </div>
