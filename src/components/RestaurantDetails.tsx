@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { Restaurant } from '@/types/restaurant';
 import { Star, MapPin, Clock, ExternalLink, Phone, Calendar, Share2, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -85,24 +86,32 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
       {/* Map */}
       {restaurant.latitude && restaurant.longitude && (
         <section className="space-y-2" aria-labelledby="location-heading">
-          <h3 id="location-heading" className="text-lg font-semibold text-card-foreground">Location</h3>
+          <div className="flex items-center justify-between">
+            <h3 id="location-heading" className="text-lg font-semibold text-card-foreground">Location</h3>
+            {enrichedRestaurant.placeId && (
+              <Badge variant="outline" className="text-xs">
+                <MapPin className="w-3 h-3 mr-1" />
+                Verified by Google
+              </Badge>
+            )}
+          </div>
           <RestaurantMap
-            latitude={restaurant.latitude}
-            longitude={restaurant.longitude}
+            latitude={enrichedRestaurant.latitude || restaurant.latitude}
+            longitude={enrichedRestaurant.longitude || restaurant.longitude}
             name={restaurant.name}
-            address={restaurant.address}
+            address={enrichedRestaurant.address || restaurant.address}
           />
-          {restaurant.address && (
+          {(enrichedRestaurant.address || restaurant.address) && (
             <div className="flex items-start space-x-2 text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
               <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
-              <address className="not-italic">{restaurant.address}</address>
+              <address className="not-italic">{enrichedRestaurant.address || restaurant.address}</address>
             </div>
           )}
-          {restaurant.phone && (
+          {(enrichedRestaurant.phone || restaurant.phone) && (
             <div className="flex items-start space-x-2 text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
               <Phone className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
-              <a href={`tel:${restaurant.phone}`} className="hover:text-primary" aria-label={`Call ${restaurant.name} at ${restaurant.phone}`}>
-                {restaurant.phone}
+              <a href={`tel:${enrichedRestaurant.phone || restaurant.phone}`} className="hover:text-primary" aria-label={`Call ${restaurant.name} at ${enrichedRestaurant.phone || restaurant.phone}`}>
+                {enrichedRestaurant.phone || restaurant.phone}
               </a>
             </div>
           )}
@@ -248,6 +257,15 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
             </Alert>
           )}
         </>
+      )}
+
+      {/* Location Verification Info */}
+      {!loading && !enrichedRestaurant.placeId && restaurant.latitude && restaurant.longitude && (
+        <Alert>
+          <AlertDescription>
+            Location shown based on provided coordinates. Google verification unavailable.
+          </AlertDescription>
+        </Alert>
       )}
 
       {/* Reserve Table CTA - Prominent when available */}

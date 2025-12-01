@@ -3,6 +3,7 @@ import { Restaurant } from '@/types/restaurant';
 import { supabase } from '@/integrations/supabase/client';
 
 interface EnrichedData {
+  googlePlacesData?: any;
   yelpData?: any;
   openTableData?: any;
   serpapiData?: any;
@@ -58,6 +59,16 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
           setLoading(false);
           return;
         }
+
+        // Verify location with Google Places first
+        const googlePlacesPromise = supabase.functions.invoke('google-places-verify', {
+          body: {
+            restaurantName: restaurant.name,
+            address: restaurant.address,
+            latitude: restaurant.latitude,
+            longitude: restaurant.longitude,
+          }
+        }).catch(() => ({ data: null }));
 
         // Fetch Yelp data with fallback
         const yelpPromise = supabase.functions.invoke('yelp-restaurant', {
@@ -116,12 +127,16 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
           }
         }).catch(() => ({ data: null }));
 
-        const [yelpResult, openTableResult, mealmeResponse, serpapiResponse] = await Promise.all([
+        const [googlePlacesResponse, yelpResult, openTableResult, mealmeResponse, serpapiResponse] = await Promise.all([
+          googlePlacesPromise,
           yelpPromise, 
           openTablePromise, 
           mealmePromise, 
           serpapiPromise
         ]);
+
+        // Use Google Places verified data if available
+        const googleData = googlePlacesResponse.data?.verified ? googlePlacesResponse.data : null;
 
         // Prioritize MealMe for menu data, fallback to SerpAPI
         const menuData = mealmeResponse.data?.available 
@@ -135,6 +150,7 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
         }
 
         const finalData = {
+          googlePlacesData: googleData,
           yelpData: yelpResult.data,
           openTableData: openTableResult.data,
           serpapiData: menuData,
@@ -166,9 +182,18 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
   }, [enabled, restaurant.id, restaurant.latitude, restaurant.longitude, restaurant.name]);
 
   // Merge enriched data with restaurant data
-  // SerpAPI is primary source for menus, Yelp for ratings and business info
+  // Google Places is primary source for location, SerpAPI for menus, Yelp for ratings
   const enrichedRestaurant: Restaurant = {
     ...restaurant,
+    // Google Places verified location data (highest priority)
+    ...(enrichedData.googlePlacesData ? {
+      latitude: enrichedData.googlePlacesData.latitude,
+      longitude: enrichedData.googlePlacesData.longitude,
+      address: enrichedData.googlePlacesData.address,
+      phone: enrichedData.googlePlacesData.phone || restaurant.phone,
+      googleRating: enrichedData.googlePlacesData.googleRating,
+      placeId: enrichedData.googlePlacesData.place_id,
+    } : {}),
     // Yelp data for ratings, reviews, and business info
     yelpId: enrichedData.yelpData?.yelpId,
     yelpUrl: enrichedData.yelpData?.yelpUrl,
@@ -181,11 +206,12 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
     // SerpAPI for menu data (primary source)
     menuAvailable: enrichedData.serpapiData?.available,
     menuItems: enrichedData.serpapiData?.menuItems,
-    restaurantPhone: enrichedData.serpapiData?.restaurantPhone || enrichedData.yelpData?.phone,
-    restaurantWebsite: enrichedData.serpapiData?.restaurantWebsite,
-    // Merge photos from both Yelp and SerpAPI
+    restaurantPhone: enrichedData.googlePlacesData?.phone || enrichedData.serpapiData?.restaurantPhone || enrichedData.yelpData?.phone,
+    restaurantWebsite: enrichedData.serpapiData?.restaurantWebsite || enrichedData.googlePlacesData?.website,
+    // Merge photos from Google Places, Yelp and SerpAPI
     photos: [
       ...(restaurant.photos || []),
+      ...(enrichedData.googlePlacesData?.photos || []),
       ...(enrichedData.serpapiData?.photos || []),
     ].filter((photo, index, self) => self.indexOf(photo) === index).slice(0, 10),
   };
