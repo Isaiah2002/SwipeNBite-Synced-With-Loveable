@@ -9,7 +9,6 @@ import { SwipeCard } from '@/components/SwipeCard';
 import { FilterBar } from '@/components/FilterBar';
 import { LikedRestaurants } from '@/components/LikedRestaurants';
 import { LocationPrompt } from '@/components/LocationPrompt';
-import { ShareDialog } from '@/components/ShareDialog';
 import { AddressInput } from '@/components/AddressInput';
 import { Onboarding } from '@/components/Onboarding';
 import { InstallPrompt } from '@/components/InstallPrompt';
@@ -92,8 +91,6 @@ const Index = () => {
   const [showLiked, setShowLiked] = useState(false);
   const [swipeAnimation, setSwipeAnimation] = useState<'left' | 'right' | null>(null);
   const [showLocationPrompt, setShowLocationPrompt] = useState(false);
-  const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [restaurantToShare, setRestaurantToShare] = useState<Restaurant | null>(null);
   const [fetchingRestaurants, setFetchingRestaurants] = useState(false);
   const [userCuisinePreferences, setUserCuisinePreferences] = useState<string[]>([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -235,6 +232,22 @@ const Index = () => {
     }
   }, [user, showOnboarding]);
 
+  // Handle deep link to specific restaurant
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const restaurantId = params.get('restaurant');
+    
+    if (restaurantId && currentRestaurants.length > 0) {
+      const restaurantIndex = currentRestaurants.findIndex(r => r.id === restaurantId);
+      if (restaurantIndex !== -1) {
+        setCurrentIndex(restaurantIndex);
+        toast.success('Showing shared restaurant!');
+        // Clear the URL parameter
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+  }, [currentRestaurants]);
+
   const handleSwipe = async (direction: 'left' | 'right') => {
     const currentRestaurant = currentRestaurants[currentIndex];
     if (!currentRestaurant) return;
@@ -318,9 +331,36 @@ const Index = () => {
     toast.success('Cards reset! Start swiping again 🔄');
   };
 
-  const handleShare = (restaurant: Restaurant) => {
-    setRestaurantToShare(restaurant);
-    setShareDialogOpen(true);
+  const handleShare = async (restaurant: Restaurant) => {
+    const shareUrl = `${window.location.origin}/?restaurant=${encodeURIComponent(restaurant.id)}`;
+    const shareData = {
+      title: `Check out ${restaurant.name}!`,
+      text: `${restaurant.name} - ${restaurant.cuisine} • ${restaurant.price}\n${restaurant.description}`,
+      url: shareUrl
+    };
+
+    try {
+      // Check if Web Share API is supported (works on mobile and some desktop browsers)
+      if (navigator.share) {
+        await navigator.share(shareData);
+        toast.success('Shared successfully!');
+      } else {
+        // Fallback: Copy to clipboard
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('Link copied to clipboard!');
+      }
+    } catch (error: any) {
+      // User cancelled or error occurred
+      if (error.name !== 'AbortError') {
+        // Fallback to clipboard if share fails
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          toast.success('Link copied to clipboard!');
+        } catch (clipboardError) {
+          toast.error('Failed to share restaurant');
+        }
+      }
+    }
   };
 
   const handleAddressUpdate = async () => {
@@ -585,15 +625,6 @@ const Index = () => {
         </div>
       </main>
       <BottomNav />
-      
-      {/* Share Dialog */}
-      {restaurantToShare && (
-        <ShareDialog 
-          open={shareDialogOpen}
-          onOpenChange={setShareDialogOpen}
-          restaurant={restaurantToShare}
-        />
-      )}
     </div>
     
     {/* Install Prompt */}
