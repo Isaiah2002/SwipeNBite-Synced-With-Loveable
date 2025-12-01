@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 
 const BottomNav = () => {
   const navItems = [
-    { to: '/favorites', icon: Heart, label: 'Likes' },
+    { to: '/likes', icon: Heart, label: 'Likes' },
     { to: '/orders', icon: ShoppingBag, label: 'Orders' },
     { to: '/profile', icon: User, label: 'Profile' },
   ];

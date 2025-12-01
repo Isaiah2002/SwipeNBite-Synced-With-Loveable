@@ -94,8 +94,8 @@ const RestaurantOrder = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <h2 className="text-xl font-bold text-card-foreground">Restaurant not found</h2>
-          <Button onClick={() => navigate('/favorites')}>
-            Back to Favorites
+          <Button onClick={() => navigate('/likes')}>
+            Back to Likes
           </Button>
         </div>
       </div>
@@ -238,7 +238,7 @@ const RestaurantOrder = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate('/favorites')}
+          onClick={() => navigate('/likes')}
           className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm"
         >
           <ArrowLeft className="w-5 h-5" />
