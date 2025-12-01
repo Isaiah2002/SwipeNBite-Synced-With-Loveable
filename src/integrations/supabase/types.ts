@@ -153,6 +153,39 @@ export type Database = {
         }
         Relationships: []
       }
+      achievements: {
+        Row: {
+          badge_color: string
+          badge_icon: string
+          created_at: string
+          criteria_threshold: number
+          criteria_type: string
+          description: string
+          id: string
+          name: string
+        }
+        Insert: {
+          badge_color: string
+          badge_icon: string
+          created_at?: string
+          criteria_threshold: number
+          criteria_type: string
+          description: string
+          id?: string
+          name: string
+        }
+        Update: {
+          badge_color?: string
+          badge_icon?: string
+          created_at?: string
+          criteria_threshold?: number
+          criteria_type?: string
+          description?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       friendships: {
         Row: {
           created_at: string
@@ -745,6 +778,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          id?: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

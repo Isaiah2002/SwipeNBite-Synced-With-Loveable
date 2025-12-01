@@ -7,11 +7,13 @@ import { useToast } from '@/hooks/use-toast';
 import { MenuItem, Restaurant } from '@/types/restaurant';
 import { supabase } from '@/integrations/supabase/client';
 import { useRestaurantData } from '@/hooks/useRestaurantData';
+import { useAchievements } from '@/hooks/useAchievements';
 
 const RestaurantOrder = () => {
   const navigate = useNavigate();
   const { restaurantId } = useParams();
   const { toast } = useToast();
+  const { checkForNewAchievements } = useAchievements();
   const [cart, setCart] = useState<Record<string, number>>({});
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
@@ -207,6 +209,9 @@ const RestaurantOrder = () => {
         title: "Order placed!",
         description: `Your order from ${restaurant.name} has been placed successfully.`,
       });
+      
+      // Check for order-based achievements
+      checkForNewAchievements();
       
       navigate('/orders');
     } catch (error: any) {

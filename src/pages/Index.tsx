@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
+import { useAchievements } from '@/hooks/useAchievements';
 import { Restaurant, Filters } from '@/types/restaurant';
 import { restaurants } from '@/data/restaurants';
 import { calculateDistance } from '@/utils/distance';
@@ -26,6 +27,7 @@ import { supabase } from '@/integrations/supabase/client';
 const Index = () => {
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
+  const { checkForNewAchievements } = useAchievements();
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
 
@@ -268,6 +270,11 @@ const Index = () => {
           rating: currentRestaurant.rating,
           distance: currentRestaurant.distance
         });
+        
+        // Check for achievement progress after every 5 swipes
+        if ((currentIndex + 1) % 5 === 0) {
+          checkForNewAchievements();
+        }
       }
     } catch (error: any) {
       console.error('Error logging swipe event:', error);
@@ -296,6 +303,9 @@ const Index = () => {
             longitude: currentRestaurant.longitude,
             deals: currentRestaurant.deals
           });
+          
+          // Check for like-based achievements
+          checkForNewAchievements();
         }
       } catch (error: any) {
         console.error('Error saving liked restaurant:', error);
