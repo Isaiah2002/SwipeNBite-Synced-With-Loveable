@@ -47,3 +47,6 @@ verify_jwt = true
 
 [functions.track-recommendation-interaction]
 verify_jwt = true
+
+[functions.add-friend-by-email]
+verify_jwt = true

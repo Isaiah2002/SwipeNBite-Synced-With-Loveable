@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, LogOut, Edit3, Settings, Trash2 } from 'lucide-react';
+import { ArrowLeft, User, Mail, LogOut, Edit3, Settings, Trash2, UserPlus, Users, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import BottomNav from '@/components/BottomNav';
 import { toast } from 'sonner';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
@@ -19,6 +19,7 @@ import { BudgetAnalytics } from '@/components/BudgetAnalytics';
 import { PrivacyDashboard } from '@/components/PrivacyDashboard';
 import { ConsentManagement } from '@/components/ConsentManagement';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card } from '@/components/ui/card';
 
 const addressSchema = z.object({
   address: z.string().trim().min(1, "Street address is required").max(200, "Address is too long"),
@@ -26,6 +27,8 @@ const addressSchema = z.object({
   state: z.string().trim().min(2, "State is required").max(2, "State must be 2 characters").toUpperCase(),
   zipCode: z.string().trim().regex(/^\d{5}(-\d{4})?$/, "Invalid ZIP code format (e.g., 12345 or 12345-6789)")
 });
+
+const emailSchema = z.string().trim().email("Invalid email address").max(255, "Email is too long");
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -43,6 +46,10 @@ const Profile = () => {
   const [addressErrors, setAddressErrors] = useState<{ [key: string]: string }>({});
   const [orders, setOrders] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
+  const [friendsDialogOpen, setFriendsDialogOpen] = useState(false);
+  const [addFriendEmail, setAddFriendEmail] = useState('');
+  const [friendRequests, setFriendRequests] = useState<any[]>([]);
+  const [friends, setFriends] = useState<any[]>([]);
 
   const cuisineOptions = [
     'Italian', 'Mexican', 'Chinese', 'Japanese', 'Thai', 'Indian', 
@@ -94,8 +101,44 @@ const Profile = () => {
       }
     };
 
+    const fetchFriendships = async () => {
+      if (!user) return;
+      
+      try {
+        // Fetch pending friend requests (where user is recipient)
+        const { data: requests, error: reqError } = await supabase
+          .from('friendships')
+          .select('*, profiles!friendships_user_id_fkey(full_name)')
+          .eq('friend_id', user.id)
+          .eq('status', 'pending');
+
+        if (reqError) throw reqError;
+        setFriendRequests(requests || []);
+
+        // Fetch accepted friends
+        const { data: acceptedFriends, error: friendsError } = await supabase
+          .from('friendships')
+          .select('*, profiles!friendships_friend_id_fkey(full_name)')
+          .eq('user_id', user.id)
+          .eq('status', 'accepted');
+
+        const { data: acceptedFriendsReverse, error: friendsReverseError } = await supabase
+          .from('friendships')
+          .select('*, profiles!friendships_user_id_fkey(full_name)')
+          .eq('friend_id', user.id)
+          .eq('status', 'accepted');
+
+        if (friendsError || friendsReverseError) throw friendsError || friendsReverseError;
+        
+        setFriends([...(acceptedFriends || []), ...(acceptedFriendsReverse || [])]);
+      } catch (error: any) {
+        console.error('Error fetching friendships:', error);
+      }
+    };
+
     fetchProfile();
     fetchOrders();
+    fetchFriendships();
   }, [user]);
 
   const handleSave = () => {
@@ -180,6 +223,92 @@ const Profile = () => {
         ? prev.filter(c => c !== cuisine)
         : [...prev, cuisine]
     );
+  };
+
+  const handleAddFriend = async () => {
+    if (!user) return;
+    
+    // Validate email
+    try {
+      emailSchema.parse(addFriendEmail);
+    } catch (error) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    if (addFriendEmail === user.email) {
+      toast.error("You can't add yourself as a friend");
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('add-friend-by-email', {
+        body: { friendEmail: addFriendEmail }
+      });
+
+      if (error) throw error;
+
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      toast.success('Friend request sent!');
+      setAddFriendEmail('');
+      setFriendsDialogOpen(false);
+      
+      // Refresh page to update friend lists
+      window.location.reload();
+    } catch (error: any) {
+      console.error('Error adding friend:', error);
+      toast.error('Failed to send friend request');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAcceptFriend = async (friendshipId: string) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('friendships')
+        .update({ status: 'accepted' })
+        .eq('id', friendshipId);
+
+      if (error) throw error;
+
+      toast.success('Friend request accepted!');
+      
+      // Refresh friendships
+      setFriendRequests(prev => prev.filter(f => f.id !== friendshipId));
+      window.location.reload();
+    } catch (error: any) {
+      console.error('Error accepting friend:', error);
+      toast.error('Failed to accept friend request');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRejectFriend = async (friendshipId: string) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('friendships')
+        .delete()
+        .eq('id', friendshipId);
+
+      if (error) throw error;
+
+      toast.success('Friend request rejected');
+      setFriendRequests(prev => prev.filter(f => f.id !== friendshipId));
+    } catch (error: any) {
+      console.error('Error rejecting friend:', error);
+      toast.error('Failed to reject friend request');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -457,6 +586,131 @@ const Profile = () => {
                         >
                           {loading ? 'Saving...' : 'Save Preferences'}
                         </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog open={friendsDialogOpen} onOpenChange={setFriendsDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full flex items-center space-x-2"
+                      >
+                        <Users className="w-4 h-4" />
+                        <span>Friends ({friends.length})</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Friends</DialogTitle>
+                        <DialogDescription>
+                          Manage your friends and send friend requests
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-6 pt-4">
+                        {/* Add Friend Section */}
+                        <div className="space-y-3">
+                          <Label htmlFor="friendEmail">Add Friend by Email</Label>
+                          <div className="flex space-x-2">
+                            <Input
+                              id="friendEmail"
+                              type="email"
+                              placeholder="friend@example.com"
+                              value={addFriendEmail}
+                              onChange={(e) => setAddFriendEmail(e.target.value)}
+                              onKeyDown={(e) => e.key === 'Enter' && handleAddFriend()}
+                            />
+                            <Button
+                              onClick={handleAddFriend}
+                              disabled={loading}
+                              size="icon"
+                            >
+                              <UserPlus className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Pending Requests */}
+                        {friendRequests.length > 0 && (
+                          <div className="space-y-3">
+                            <h3 className="text-sm font-semibold text-card-foreground">
+                              Pending Requests ({friendRequests.length})
+                            </h3>
+                            <div className="space-y-2">
+                              {friendRequests.map((request) => (
+                                <Card key={request.id} className="p-3">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-3">
+                                      <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
+                                        <User className="w-5 h-5 text-muted-foreground" />
+                                      </div>
+                                      <div>
+                                        <p className="font-medium text-sm text-card-foreground">
+                                          {request.profiles?.full_name || 'Friend'}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                          wants to be friends
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="flex space-x-1">
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                        onClick={() => handleAcceptFriend(request.id)}
+                                        disabled={loading}
+                                      >
+                                        <Check className="w-4 h-4" />
+                                      </Button>
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                        onClick={() => handleRejectFriend(request.id)}
+                                        disabled={loading}
+                                      >
+                                        <X className="w-4 h-4" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </Card>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Friends List */}
+                        <div className="space-y-3">
+                          <h3 className="text-sm font-semibold text-card-foreground">
+                            Your Friends ({friends.length})
+                          </h3>
+                          {friends.length === 0 ? (
+                            <p className="text-sm text-muted-foreground text-center py-4">
+                              No friends yet. Add friends by email to get started!
+                            </p>
+                          ) : (
+                            <div className="space-y-2">
+                              {friends.map((friend) => (
+                                <Card key={friend.id} className="p-3">
+                                  <div className="flex items-center space-x-3">
+                                    <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center">
+                                      <User className="w-5 h-5 text-primary-foreground" />
+                                    </div>
+                                    <div>
+                                      <p className="font-medium text-sm text-card-foreground">
+                                        {friend.profiles?.full_name || 'Friend'}
+                                      </p>
+                                      <p className="text-xs text-muted-foreground">
+                                        Friends since {new Date(friend.created_at).toLocaleDateString()}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </Card>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </DialogContent>
                   </Dialog>
