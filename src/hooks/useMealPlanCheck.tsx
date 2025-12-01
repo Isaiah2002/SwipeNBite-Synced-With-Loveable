@@ -58,8 +58,8 @@ export const useMealPlanCheck = (restaurantId: string) => {
           { latitude: restaurant.latitude, longitude: restaurant.longitude }
         );
 
-        // Check if restaurant is within campus radius (diameter / 2)
-        const campusRadius = campusData.diameterMiles / 2;
+        // Check if restaurant is within campus radius (diameter / 2) plus 0.5 mile buffer
+        const campusRadius = (campusData.diameterMiles / 2) + 0.5;
         setIsOnMealPlan(distance <= campusRadius);
       } catch (error) {
         console.error('Error checking meal plan:', error);
