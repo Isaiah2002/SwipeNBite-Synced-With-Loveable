@@ -104,10 +104,10 @@ serve(async (req) => {
 
     if (swipesError) throw swipesError;
 
-    // Fetch user's liked restaurants
+    // Fetch user's liked restaurants (favorites)
     const { data: liked, error: likedError } = await supabase
       .from("liked_restaurants")
-      .select("cuisine, restaurant_name, rating, price")
+      .select("cuisine, restaurant_name, rating, price, dietary")
       .eq("user_id", userId);
 
     if (likedError) throw likedError;
@@ -116,39 +116,77 @@ serve(async (req) => {
     const likedSwipes = swipes?.filter(s => s.swipe_direction === "right") || [];
     const passedSwipes = swipes?.filter(s => s.swipe_direction === "left") || [];
 
-    const likedCuisines = likedSwipes.map(s => s.cuisine).filter(Boolean);
-    const likedPrices = likedSwipes.map(s => s.price).filter(Boolean);
-    const likedRatings = likedSwipes.map(s => s.rating).filter(Boolean);
+    // Prioritize favorited restaurants for analysis
+    const favoritedCuisines = liked?.map(l => l.cuisine).filter(Boolean) || [];
+    const favoritedPrices = liked?.map(l => l.price).filter(Boolean) || [];
+    const favoritedRatings = liked?.map(l => l.rating).filter(Boolean) || [];
+    const favoritedDietary = liked?.flatMap(l => l.dietary || []).filter(Boolean) || [];
+    
+    // Combine with swipe data (favorites have higher weight)
+    const allLikedCuisines = [...favoritedCuisines, ...favoritedCuisines, ...likedSwipes.map(s => s.cuisine).filter(Boolean)];
+    const allLikedPrices = [...favoritedPrices, ...favoritedPrices, ...likedSwipes.map(s => s.price).filter(Boolean)];
+    const allLikedRatings = [...favoritedRatings, ...favoritedRatings, ...likedSwipes.map(s => s.rating).filter(Boolean)];
+
+    // Calculate frequency for top preferences
+    const cuisineFrequency = allLikedCuisines.reduce((acc, c) => {
+      acc[c] = (acc[c] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const priceFrequency = allLikedPrices.reduce((acc, p) => {
+      acc[p] = (acc[p] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const topCuisines = Object.entries(cuisineFrequency)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([cuisine]) => cuisine);
+    
+    const topPrices = Object.entries(priceFrequency)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([price]) => price);
 
     // Calculate metrics for tracking
     const totalSwipes = swipes?.length || 0;
     const likeRatio = totalSwipes > 0 ? (likedSwipes.length / totalSwipes) * 100 : 0;
     const sessionId = crypto.randomUUID();
 
-    // Create analysis prompt
-    const analysisPrompt = `Based on this user's restaurant swipe behavior, provide 3-5 personalized restaurant recommendations.
+    // Create analysis prompt with strong emphasis on favorited restaurants
+    const analysisPrompt = `Based on this user's restaurant preferences, provide 3-5 personalized restaurant recommendations that PRIORITIZE their favorited restaurants' patterns.
 
-User's Swipe History:
+FAVORITED RESTAURANTS (HIGHEST PRIORITY):
+- Count: ${liked?.length || 0}
+- Top Cuisines: ${topCuisines.join(", ") || "None yet"}
+- Preferred Price Points: ${topPrices.join(", ") || "None yet"}
+- Average Rating: ${favoritedRatings.length > 0 ? (favoritedRatings.reduce((a, b) => a + b, 0) / favoritedRatings.length).toFixed(1) : "N/A"}
+- Dietary Preferences: ${[...new Set(favoritedDietary)].join(", ") || "None"}
+- Favorite Restaurants: ${liked?.map(l => l.restaurant_name).slice(0, 5).join(", ") || "None yet"}
+
+Swipe History (Secondary Context):
 - Total swipes: ${swipes?.length || 0}
 - Liked: ${likedSwipes.length}
 - Passed: ${passedSwipes.length}
 - Like ratio: ${((likedSwipes.length / (swipes?.length || 1)) * 100).toFixed(1)}%
 
-Preferred Cuisines (from likes): ${likedCuisines.slice(0, 10).join(", ") || "None yet"}
-Preferred Price Range: ${likedPrices.slice(0, 10).join(", ") || "None yet"}
-Average Rating Preference: ${likedRatings.length > 0 ? (likedRatings.reduce((a, b) => a + b, 0) / likedRatings.length).toFixed(1) : "N/A"}
+Recently Passed: ${passedSwipes.slice(0, 3).map(s => s.restaurant_name).join(", ") || "None"}
 
-Recently Liked Restaurants: ${likedSwipes.slice(0, 5).map(s => s.restaurant_name).join(", ") || "None yet"}
-Recently Passed Restaurants: ${passedSwipes.slice(0, 5).map(s => s.restaurant_name).join(", ") || "None yet"}
+INSTRUCTIONS:
+1. Recommendations MUST match the top cuisines from favorited restaurants
+2. Recommendations MUST match the preferred price points from favorites
+3. Consider dietary preferences from favorites
+4. Suggest similar restaurants or complementary cuisines
+5. Explain how each recommendation relates to their favorites
 
 Provide recommendations in a JSON array format with the following structure:
 {
   "recommendations": [
     {
       "title": "Restaurant or Cuisine Type",
-      "reason": "Brief explanation why this matches their preferences",
-      "cuisine": "Cuisine type",
-      "insight": "Specific insight about their behavior"
+      "reason": "How this matches their favorited restaurants",
+      "cuisine": "Cuisine type (should match top cuisines)",
+      "insight": "Specific connection to their favorites"
     }
   ]
 }`;
