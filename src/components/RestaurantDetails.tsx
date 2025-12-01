@@ -211,6 +211,32 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
         </section>
       )}
 
+      {/* Reserve Table CTA - Prominent when available */}
+      {restaurant.openTableAvailable && restaurant.reservationUrl && (
+        <Card className="bg-primary/10 border-primary/20">
+          <CardContent className="pt-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary text-primary-foreground rounded-full">
+                  <Calendar className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="font-semibold text-card-foreground">Reserve a Table</div>
+                  <div className="text-sm text-muted-foreground">Book through OpenTable</div>
+                </div>
+              </div>
+              <Button 
+                className="gradient-primary text-primary-foreground border-0"
+                onClick={handleReservationClick}
+                aria-label={`Reserve a table at ${restaurant.name} via OpenTable`}
+              >
+                Reserve Table
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Quick Actions */}
       <section className="space-y-3" aria-labelledby="actions-heading">
         <h3 id="actions-heading" className="text-lg font-semibold text-card-foreground">Quick Actions</h3>
@@ -225,18 +251,6 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
             <Share2 className="w-4 h-4 mr-2" aria-hidden="true" />
             Share
           </Button>
-
-          {restaurant.reservationUrl && (
-            <Button 
-              variant="outline" 
-              className="w-full" 
-              onClick={handleReservationClick}
-              aria-label={`Make a reservation at ${restaurant.name}`}
-            >
-              <Calendar className="w-4 h-4 mr-2" aria-hidden="true" />
-              Reserve
-            </Button>
-          )}
 
           {restaurant.yelpUrl && (
             <Button 
