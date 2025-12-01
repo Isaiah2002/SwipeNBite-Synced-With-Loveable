@@ -13,35 +13,35 @@ serve(async (req) => {
   try {
     const { address, city, state, zip_code } = await req.json();
     
-    console.log('Geocoding address:', { address, city, state, zip_code });
+    console.log('Geocoding address with Google Maps:', { address, city, state, zip_code });
+
+    const apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY');
+    
+    if (!apiKey) {
+      throw new Error('Google Maps API key not configured');
+    }
 
     // Build the search query
     const searchQuery = `${address}, ${city}, ${state} ${zip_code}, USA`;
     
-    // Use Nominatim API (OpenStreetMap's geocoding service)
-    const nominatimUrl = `https://nominatim.openstreetmap.org/search?` +
-      `q=${encodeURIComponent(searchQuery)}` +
-      `&format=json` +
-      `&limit=1` +
-      `&addressdetails=1`;
+    // Use Google Maps Geocoding API
+    const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?` +
+      `address=${encodeURIComponent(searchQuery)}` +
+      `&key=${apiKey}`;
 
-    console.log('Nominatim request URL:', nominatimUrl);
+    console.log('Google Maps Geocoding request');
 
-    const response = await fetch(nominatimUrl, {
-      headers: {
-        'User-Agent': 'SwipeNBite/1.0 (Restaurant Discovery App)', // Required by Nominatim
-      },
-    });
+    const response = await fetch(geocodeUrl);
 
     if (!response.ok) {
-      console.error('Nominatim API error:', response.status, response.statusText);
-      throw new Error(`Nominatim API returned ${response.status}`);
+      console.error('Google Maps API error:', response.status, response.statusText);
+      throw new Error(`Google Maps API returned ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('Nominatim response:', data);
+    console.log('Google Maps response status:', data.status);
 
-    if (!data || data.length === 0) {
+    if (data.status !== 'OK' || !data.results || data.results.length === 0) {
       console.log('No results found for address');
       return new Response(
         JSON.stringify({ error: 'Unable to geocode address' }),
@@ -52,11 +52,11 @@ serve(async (req) => {
       );
     }
 
-    const result = data[0];
+    const result = data.results[0];
     const geocodedData = {
-      latitude: parseFloat(result.lat),
-      longitude: parseFloat(result.lon),
-      formatted_address: result.display_name,
+      latitude: result.geometry.location.lat,
+      longitude: result.geometry.location.lng,
+      formatted_address: result.formatted_address,
     };
 
     console.log('Successfully geocoded:', geocodedData);
@@ -70,7 +70,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error in nominatim-geocode function:', error);
+    console.error('Error in google-geocode function:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
