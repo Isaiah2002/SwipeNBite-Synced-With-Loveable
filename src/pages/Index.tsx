@@ -86,6 +86,47 @@ const Index = () => {
 
     fetchAndGeocodeAddress();
   }, [user]);
+
+  // Fetch liked restaurants and recently passed restaurants
+  useEffect(() => {
+    const fetchExcludedRestaurants = async () => {
+      if (!user) return;
+
+      try {
+        // Fetch liked restaurant IDs
+        const { data: likedData, error: likedError } = await supabase
+          .from('liked_restaurants')
+          .select('restaurant_id')
+          .eq('user_id', user.id);
+
+        if (likedError) throw likedError;
+        
+        const likedIds = new Set(likedData?.map(r => r.restaurant_id) || []);
+        setLikedRestaurantIds(likedIds);
+
+        // Fetch recently passed restaurants (within last 3 days)
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+        
+        const { data: passedData, error: passedError } = await supabase
+          .from('swipe_events')
+          .select('restaurant_id')
+          .eq('user_id', user.id)
+          .eq('swipe_direction', 'left')
+          .gte('created_at', threeDaysAgo.toISOString());
+
+        if (passedError) throw passedError;
+        
+        const passedIds = new Set(passedData?.map(r => r.restaurant_id) || []);
+        setRecentlyPassedIds(passedIds);
+
+      } catch (error: any) {
+        console.error('Error fetching excluded restaurants:', error);
+      }
+    };
+
+    fetchExcludedRestaurants();
+  }, [user]);
   const [currentRestaurants, setCurrentRestaurants] = useState<Restaurant[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likedRestaurants, setLikedRestaurants] = useState<Restaurant[]>([]);
@@ -97,6 +138,8 @@ const Index = () => {
   const [userCuisinePreferences, setUserCuisinePreferences] = useState<string[]>([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [likedRestaurantIds, setLikedRestaurantIds] = useState<Set<string>>(new Set());
+  const [recentlyPassedIds, setRecentlyPassedIds] = useState<Set<string>>(new Set());
   
   // Load saved filters from localStorage or use defaults
   const [filters, setFilters] = useState<Filters>(() => {
@@ -212,14 +255,18 @@ const Index = () => {
           restaurant.cuisine.toLowerCase().includes(pref.toLowerCase())
         );
       
-      return matchesPrice && matchesRating && matchesDietary && matchesCuisine;
+      // Exclude liked restaurants and recently passed restaurants
+      const notLiked = !likedRestaurantIds.has(restaurant.id);
+      const notRecentlyPassed = !recentlyPassedIds.has(restaurant.id);
+      
+      return matchesPrice && matchesRating && matchesDietary && matchesCuisine && notLiked && notRecentlyPassed;
     });
 
     console.log(`Filtered restaurants count: ${filtered.length}`);
 
     setCurrentRestaurants(filtered);
     setCurrentIndex(0);
-  }, [filters.maxPrice, filters.minRating, filters.dietary, userCuisinePreferences]);
+  }, [filters.maxPrice, filters.minRating, filters.dietary, userCuisinePreferences, likedRestaurantIds, recentlyPassedIds]);
 
   // Show keyboard shortcuts hint on first visit
   useEffect(() => {
@@ -283,6 +330,9 @@ const Index = () => {
     if (direction === 'right') {
       setLikedRestaurants(prev => [...prev, currentRestaurant]);
       
+      // Add to liked restaurant IDs immediately
+      setLikedRestaurantIds(prev => new Set([...prev, currentRestaurant.id]));
+      
       // Save to liked_restaurants
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -313,6 +363,8 @@ const Index = () => {
       
       toast.success(`Added ${currentRestaurant.name} to your matches! 💚`);
     } else {
+      // Add to recently passed restaurant IDs immediately
+      setRecentlyPassedIds(prev => new Set([...prev, currentRestaurant.id]));
       toast(`Passed on ${currentRestaurant.name} 👋`);
     }
 
