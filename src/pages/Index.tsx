@@ -283,7 +283,10 @@ const Index = () => {
       const notLiked = !likedRestaurantIds.has(restaurant.id);
       const notRecentlyPassed = !recentlyPassedIds.has(restaurant.id);
       
-      return matchesPrice && matchesRating && matchesDietary && matchesCuisine && notLiked && notRecentlyPassed;
+      // Only show restaurants with addresses
+      const hasAddress = Boolean(restaurant.address);
+      
+      return matchesPrice && matchesRating && matchesDietary && matchesCuisine && notLiked && notRecentlyPassed && hasAddress;
     });
 
     const endTime = performance.now();

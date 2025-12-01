@@ -87,7 +87,10 @@ export const useEndlessRecommendations = ({
       // Only exclude restaurants passed in the last 24 hours (more aggressive reuse)
       const notRecentlyPassed = !recentlyPassedIds.has(restaurant.id);
       
-      return matchesPrice && matchesRating && matchesDietary && notLiked && notRecentlyPassed;
+      // Only show restaurants with addresses
+      const hasAddress = Boolean(restaurant.address);
+      
+      return matchesPrice && matchesRating && matchesDietary && notLiked && notRecentlyPassed && hasAddress;
     });
 
     return filtered;
@@ -146,7 +149,7 @@ export const useEndlessRecommendations = ({
       if (newRestaurants.length < 10) {
         console.log('Including backup restaurant data');
         const backupRestaurants = staticRestaurants.filter(
-          r => !likedRestaurantIds.has(r.id) && !shownRestaurantIds.has(r.id)
+          r => !likedRestaurantIds.has(r.id) && !shownRestaurantIds.has(r.id) && Boolean(r.address)
         );
         newRestaurants = [...newRestaurants, ...backupRestaurants.slice(0, 20)];
       }
