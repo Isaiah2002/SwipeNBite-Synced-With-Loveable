@@ -1,11 +1,12 @@
 import { memo } from 'react';
 import { Restaurant } from '@/types/restaurant';
-import { Star, MapPin, Clock, ExternalLink, Phone, Calendar, Share2 } from 'lucide-react';
+import { Star, MapPin, Clock, ExternalLink, Phone, Calendar, Share2, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { RestaurantMap } from '@/components/RestaurantMap';
+import { useMealPlanCheck } from '@/hooks/useMealPlanCheck';
 import { toast } from 'sonner';
 
 interface RestaurantDetailsProps {
@@ -13,6 +14,8 @@ interface RestaurantDetailsProps {
 }
 
 export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) => {
+  const { isOnMealPlan } = useMealPlanCheck(restaurant.id);
+
   const handleReservationClick = () => {
     if (restaurant.reservationUrl) {
       window.open(restaurant.reservationUrl, '_blank');
@@ -59,6 +62,23 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
 
   return (
     <div className="space-y-6" role="document" aria-label={`Details for ${restaurant.name}`}>
+      {/* Meal Plan Badge */}
+      {isOnMealPlan && (
+        <Card className="bg-primary/10 border-primary/20">
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary text-primary-foreground rounded-full">
+                <GraduationCap className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="font-semibold text-card-foreground">Student Meal Plan</div>
+                <div className="text-sm text-muted-foreground">This restaurant accepts your university meal plan</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Map */}
       {restaurant.latitude && restaurant.longitude && (
         <section className="space-y-2" aria-labelledby="location-heading">

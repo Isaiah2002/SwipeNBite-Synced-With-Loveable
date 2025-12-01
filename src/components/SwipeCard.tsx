@@ -1,9 +1,10 @@
 import { useState, useEffect, memo } from 'react';
 import { Restaurant } from '@/types/restaurant';
-import { Heart, X, Clock, MapPin, Star, Share2, Info } from 'lucide-react';
+import { Heart, X, Clock, MapPin, Star, Share2, Info, GraduationCap } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { RestaurantDetails } from '@/components/RestaurantDetails';
 import { useRestaurantData } from '@/hooks/useRestaurantData';
+import { useMealPlanCheck } from '@/hooks/useMealPlanCheck';
 import { Button } from '@/components/ui/button';
 import { LazyImage } from '@/components/LazyImage';
 
@@ -35,6 +36,7 @@ export const SwipeCard = memo(({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isImageSwiping, setIsImageSwiping] = useState(false);
   const { enrichedRestaurant, loading: dataLoading } = useRestaurantData(restaurant, detailsOpen);
+  const { isOnMealPlan } = useMealPlanCheck(restaurant.id);
 
   // Haptic feedback helper
   const triggerHaptic = (intensity: 'light' | 'medium' | 'heavy' = 'medium') => {
@@ -280,7 +282,15 @@ export const SwipeCard = memo(({
         {/* Restaurant Info */}
         <div className="p-6 space-y-4">
           <div>
-            <h3 className="text-xl font-bold text-card-foreground">{restaurant.name}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-xl font-bold text-card-foreground">{restaurant.name}</h3>
+              {isOnMealPlan && (
+                <div className="flex items-center gap-1 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-bold">
+                  <GraduationCap className="w-3 h-3" />
+                  <span>Meal Plan</span>
+                </div>
+              )}
+            </div>
             <p className="text-muted-foreground font-medium">{restaurant.cuisine}</p>
           </div>
           
