@@ -10,6 +10,7 @@ import {
   cacheOrder,
   getCachedOrders,
   cacheLikedRestaurant,
+  cacheLikedRestaurantsBatch,
   getCachedLikedRestaurants
 } from '@/lib/offlineDB';
 
@@ -131,9 +132,11 @@ export const useOfflineSync = () => {
         .eq('user_id', user.id);
 
       if (!error && data) {
-        for (const restaurant of data) {
-          await cacheLikedRestaurant(restaurant);
-        }
+        // Batch cache for better performance
+        await cacheLikedRestaurantsBatch(data);
+        
+        // Also cache in localStorage for quick access
+        localStorage.setItem('cached_favorites', JSON.stringify(data));
       }
     } catch (error) {
       console.error('Error syncing liked restaurants:', error);
@@ -196,6 +199,18 @@ export const useOfflineSync = () => {
   };
 
   const getLikedRestaurants = async () => {
+    // Try localStorage cache first for instant load
+    const cachedFavorites = localStorage.getItem('cached_favorites');
+    if (cachedFavorites) {
+      try {
+        const parsed = JSON.parse(cachedFavorites);
+        // Return cached data immediately while fetching fresh data in background
+        if (!isOnline) return parsed;
+      } catch (e) {
+        console.error('Error parsing cached favorites:', e);
+      }
+    }
+    
     if (isOnline && user) {
       const { data, error } = await supabase
         .from('liked_restaurants')
@@ -203,9 +218,8 @@ export const useOfflineSync = () => {
         .eq('user_id', user.id);
 
       if (!error && data) {
-        for (const restaurant of data) {
-          await cacheLikedRestaurant(restaurant);
-        }
+        await cacheLikedRestaurantsBatch(data);
+        localStorage.setItem('cached_favorites', JSON.stringify(data));
         return data;
       }
     }
