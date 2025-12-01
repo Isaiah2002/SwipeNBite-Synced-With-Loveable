@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { RestaurantMap } from '@/components/RestaurantMap';
 import { useMealPlanCheck } from '@/hooks/useMealPlanCheck';
+import { useRestaurantData } from '@/hooks/useRestaurantData';
 import { toast } from 'sonner';
 
 interface RestaurantDetailsProps {
@@ -15,16 +17,17 @@ interface RestaurantDetailsProps {
 
 export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) => {
   const { isOnMealPlan } = useMealPlanCheck(restaurant.id);
+  const { enrichedRestaurant, loading, apiStatus } = useRestaurantData(restaurant, true);
 
   const handleReservationClick = () => {
-    if (restaurant.reservationUrl) {
-      window.open(restaurant.reservationUrl, '_blank');
+    if (enrichedRestaurant.reservationUrl) {
+      window.open(enrichedRestaurant.reservationUrl, '_blank');
     }
   };
 
   const handleYelpClick = () => {
-    if (restaurant.yelpUrl) {
-      window.open(restaurant.yelpUrl, '_blank');
+    if (enrichedRestaurant.yelpUrl) {
+      window.open(enrichedRestaurant.yelpUrl, '_blank');
     }
   };
 
@@ -151,7 +154,7 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
             </>
           )}
 
-          {restaurant.yelpRating && (
+          {enrichedRestaurant.yelpRating && (
             <>
               <Separator />
               <div className="flex items-center justify-between">
@@ -160,11 +163,20 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
                   <span className="font-medium">Yelp</span>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-lg">{restaurant.yelpRating}</div>
-                  {restaurant.reviewCount && (
-                    <div className="text-xs text-muted-foreground">{restaurant.reviewCount} reviews</div>
+                  <div className="font-bold text-lg">{enrichedRestaurant.yelpRating}</div>
+                  {enrichedRestaurant.reviewCount && (
+                    <div className="text-xs text-muted-foreground">{enrichedRestaurant.reviewCount} reviews</div>
                   )}
                 </div>
+              </div>
+            </>
+          )}
+
+          {!loading && apiStatus?.yelp === 'failed' && !enrichedRestaurant.yelpRating && (
+            <>
+              <Separator />
+              <div className="text-sm text-muted-foreground text-center py-2">
+                Yelp rating currently unavailable
               </div>
             </>
           )}
@@ -173,11 +185,11 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
       </section>
 
       {/* Reviews */}
-      {restaurant.reviews && restaurant.reviews.length > 0 && (
+      {enrichedRestaurant.reviews && enrichedRestaurant.reviews.length > 0 && (
         <section className="space-y-3" aria-labelledby="reviews-heading">
           <div className="flex items-center justify-between">
             <h3 id="reviews-heading" className="text-lg font-semibold text-card-foreground">Recent Reviews</h3>
-            {restaurant.yelpUrl && (
+            {enrichedRestaurant.yelpUrl && (
               <Button variant="ghost" size="sm" onClick={handleYelpClick} aria-label="View all reviews on Yelp">
                 View all <ExternalLink className="w-3 h-3 ml-1" aria-hidden="true" />
               </Button>
@@ -185,7 +197,7 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
           </div>
           
           <div role="list" aria-label="Customer reviews">
-          {restaurant.reviews.map((review) => (
+          {enrichedRestaurant.reviews.map((review) => (
             <Card key={review.id} role="listitem">
               <CardContent className="pt-4 space-y-2">
                 <div className="flex items-center justify-between">
@@ -211,8 +223,35 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
         </section>
       )}
 
+      {/* API Status Alerts */}
+      {!loading && apiStatus && (
+        <>
+          {apiStatus.openTable === 'rate_limited' && (
+            <Alert>
+              <AlertDescription>
+                Reservation data temporarily unavailable due to high demand. Please try again later.
+              </AlertDescription>
+            </Alert>
+          )}
+          {apiStatus.menu === 'rate_limited' && (
+            <Alert>
+              <AlertDescription>
+                Menu data temporarily unavailable. Check back in a few minutes.
+              </AlertDescription>
+            </Alert>
+          )}
+          {apiStatus.yelp === 'rate_limited' && (
+            <Alert>
+              <AlertDescription>
+                Reviews temporarily unavailable due to service limits.
+              </AlertDescription>
+            </Alert>
+          )}
+        </>
+      )}
+
       {/* Reserve Table CTA - Prominent when available */}
-      {restaurant.openTableAvailable && restaurant.reservationUrl && (
+      {enrichedRestaurant.openTableAvailable && enrichedRestaurant.reservationUrl && (
         <Card className="bg-primary/10 border-primary/20">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between gap-4">
@@ -236,6 +275,14 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
           </CardContent>
         </Card>
       )}
+      
+      {!loading && apiStatus?.openTable === 'failed' && !enrichedRestaurant.reservationUrl && (
+        <Alert>
+          <AlertDescription>
+            Reservation information currently unavailable for this restaurant.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Quick Actions */}
       <section className="space-y-3" aria-labelledby="actions-heading">
@@ -252,7 +299,7 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
             Share
           </Button>
 
-          {restaurant.yelpUrl && (
+          {enrichedRestaurant.yelpUrl && (
             <Button 
               variant="outline" 
               className="w-full" 
@@ -299,11 +346,11 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
       </Card>
 
       {/* Menu */}
-      {restaurant.menuAvailable && restaurant.menuItems && restaurant.menuItems.length > 0 && (
+      {enrichedRestaurant.menuAvailable && enrichedRestaurant.menuItems && enrichedRestaurant.menuItems.length > 0 && (
         <section className="space-y-4" aria-labelledby="menu-heading">
           <h3 id="menu-heading" className="text-lg font-semibold text-card-foreground">Menu</h3>
           
-          {restaurant.menuItems.map((section, sectionIndex) => (
+          {enrichedRestaurant.menuItems.map((section, sectionIndex) => (
             <Card key={sectionIndex}>
               <CardContent className="pt-6 space-y-4">
                 <h4 className="text-base font-semibold text-card-foreground">
@@ -333,11 +380,11 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
             </Card>
           ))}
 
-          {restaurant.restaurantWebsite && (
+          {enrichedRestaurant.restaurantWebsite && (
             <Button 
               variant="outline" 
               className="w-full" 
-              onClick={() => window.open(restaurant.restaurantWebsite, '_blank')}
+              onClick={() => window.open(enrichedRestaurant.restaurantWebsite, '_blank')}
               aria-label={`View full menu for ${restaurant.name} on their website`}
             >
               <ExternalLink className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -345,6 +392,14 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
             </Button>
           )}
         </section>
+      )}
+
+      {!loading && apiStatus?.menu === 'failed' && !enrichedRestaurant.menuAvailable && (
+        <Alert>
+          <AlertDescription>
+            Menu data currently unavailable for this restaurant.
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   );
