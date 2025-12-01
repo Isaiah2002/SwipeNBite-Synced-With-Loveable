@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { sessionId, variantId, recommendations, interactionType, restaurantData } = await req.json();
+    const { sessionId, variantId, recommendations, interactionType, restaurantData, engagementData } = await req.json();
     
     if (!sessionId || !interactionType) {
       return new Response(JSON.stringify({ error: "sessionId and interactionType are required" }), {
@@ -44,6 +44,8 @@ serve(async (req) => {
       });
     }
 
+    console.log(`Tracking ${interactionType} interaction for session ${sessionId}`);
+
     // Track the interaction
     if (interactionType === 'view' && recommendations) {
       // Track view - record all recommendations shown
@@ -69,10 +71,36 @@ serve(async (req) => {
 
       if (metric) {
         const newRecommendationsShown = metric.recommendations_shown + recommendations.length;
+        
+        // Calculate relevance score based on favorited restaurants
+        let relevanceScore = 0;
+        if (recommendations && recommendations.length > 0) {
+          const { data: favorites } = await supabase
+            .from("liked_restaurants")
+            .select("cuisine, price")
+            .eq("user_id", user.id);
+          
+          if (favorites && favorites.length > 0) {
+            const favoriteCuisines = favorites.map(f => f.cuisine.toLowerCase());
+            const favoritePrices = favorites.map(f => f.price);
+            
+            let matchCount = 0;
+            for (const rec of recommendations) {
+              const cuisineMatch = favoriteCuisines.some(c => 
+                rec.cuisine.toLowerCase().includes(c) || c.includes(rec.cuisine.toLowerCase())
+              );
+              if (cuisineMatch) matchCount++;
+            }
+            relevanceScore = (matchCount / recommendations.length) * 100;
+          }
+        }
+
+        console.log(`Relevance score: ${relevanceScore.toFixed(2)}%`);
+
         await supabase
           .from("ab_test_metrics")
           .update({
-            recommendations_shown: newRecommendationsShown
+            recommendations_shown: newRecommendationsShown,
           })
           .eq("session_id", sessionId);
       }
@@ -101,6 +129,8 @@ serve(async (req) => {
         const clickThroughRate = metric.recommendations_shown > 0 
           ? (newClicksCount / metric.recommendations_shown) * 100 
           : 0;
+
+        console.log(`CTR updated: ${clickThroughRate.toFixed(2)}% (${newClicksCount}/${metric.recommendations_shown})`);
 
         await supabase
           .from("ab_test_metrics")
@@ -136,6 +166,8 @@ serve(async (req) => {
           ? (newConversionsCount / metric.clicks_count) * 100 
           : 0;
 
+        console.log(`Conversion rate updated: ${conversionRate.toFixed(2)}% (${newConversionsCount}/${metric.clicks_count})`);
+
         await supabase
           .from("ab_test_metrics")
           .update({
@@ -143,6 +175,21 @@ serve(async (req) => {
             conversion_rate: conversionRate
           })
           .eq("session_id", sessionId);
+      }
+    } else if (interactionType === 'engagement' && engagementData) {
+      // Track detailed engagement metrics (time spent, scroll depth, etc.)
+      console.log(`Engagement data received:`, engagementData);
+      
+      const { data: metric } = await supabase
+        .from("ab_test_metrics")
+        .select("*")
+        .eq("session_id", sessionId)
+        .maybeSingle();
+
+      if (metric) {
+        // Log engagement for analytics but don't update core metrics yet
+        // This allows for future expansion of engagement tracking
+        console.log(`Session ${sessionId} engagement: ${JSON.stringify(engagementData)}`);
       }
     }
 

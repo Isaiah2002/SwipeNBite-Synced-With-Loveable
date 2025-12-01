@@ -48,6 +48,9 @@ verify_jwt = true
 [functions.track-recommendation-interaction]
 verify_jwt = true
 
+[functions.ab-test-analytics]
+verify_jwt = true
+
 [functions.add-friend-by-email]
 verify_jwt = true
 
@@ -56,3 +59,6 @@ verify_jwt = true
 
 [functions.mealme-menu]
 verify_jwt = false
+
+[functions.google-geocode]
+verify_jwt = true
