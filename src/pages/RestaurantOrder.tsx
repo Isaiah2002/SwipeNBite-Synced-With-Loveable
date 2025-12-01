@@ -90,17 +90,36 @@ const RestaurantOrder = () => {
       
       if (hasMenu) return;
       
-      // No menu found - trigger Veryfi extraction
+      // No menu found - fetch restaurant data to get URL, then trigger Veryfi extraction
       try {
         setMenuExtracting(true);
-        console.log('[Menu] Extracting menu for:', restaurant.name);
+        console.log('[Menu] Fetching restaurant data for:', restaurant.name);
+        
+        // Query restaurants table to get maps_url
+        const { data: restaurantData, error: fetchError } = await supabase
+          .from('restaurants')
+          .select('maps_url')
+          .eq('id', restaurant.id)
+          .single();
+
+        if (fetchError || !restaurantData?.maps_url) {
+          console.error('[Menu] No maps URL available for extraction');
+          toast({
+            title: "Menu unavailable",
+            description: "Restaurant doesn't have a website or menu available.",
+            variant: "destructive"
+          });
+          setMenuExtracting(false);
+          return;
+        }
+
+        console.log('[Menu] Extracting menu from:', restaurantData.maps_url);
         
         const { data, error } = await supabase.functions.invoke('veryfi-menu-extract', {
           body: {
             restaurant_id: restaurant.id,
             restaurant_name: restaurant.name,
-            website_url: enrichedRestaurant.restaurantWebsite,
-            maps_url: enrichedRestaurant.mapsUrl,
+            maps_url: restaurantData.maps_url,
           }
         });
 
