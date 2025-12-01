@@ -41,10 +41,6 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
         setLoading(true);
         setApiStatus({ yelp: 'loading', openTable: 'loading', menu: 'loading' });
         
-        // Add a random delay to stagger requests and avoid rate limiting
-        const randomDelay = Math.random() * 1000;
-        await new Promise(resolve => setTimeout(resolve, randomDelay));
-
         // Try to fetch from cache first
         const cacheKey = `restaurant_${restaurant.id}`;
         const cachedData = localStorage.getItem(cacheKey);
@@ -60,107 +56,84 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
           return;
         }
 
-        // Verify location with Google Places first
-        const googlePlacesPromise = supabase.functions.invoke('google-places-verify', {
+        // Call unified middleware endpoint
+        console.log('Calling unified enrichment middleware for:', restaurant.name);
+        const { data: middlewareData, error: middlewareError } = await supabase.functions.invoke('enrich-restaurant-data', {
           body: {
+            restaurantId: restaurant.id,
             restaurantName: restaurant.name,
             address: restaurant.address,
             latitude: restaurant.latitude,
             longitude: restaurant.longitude,
           }
-        }).catch(() => ({ data: null }));
-
-        // Fetch Yelp data with fallback
-        const yelpPromise = supabase.functions.invoke('yelp-restaurant', {
-          body: {
-            name: restaurant.name,
-            latitude: restaurant.latitude,
-            longitude: restaurant.longitude,
-          }
-        }).then(res => {
-          if (res.error?.message?.includes('429') || res.error?.message?.includes('rate limit')) {
-            setApiStatus(prev => ({ ...prev, yelp: 'rate_limited' }));
-            return { data: null, status: 'rate_limited' };
-          }
-          setApiStatus(prev => ({ ...prev, yelp: res.data ? 'success' : 'failed' }));
-          return { data: res.data, status: res.data ? 'success' : 'failed' };
-        }).catch(() => {
-          setApiStatus(prev => ({ ...prev, yelp: 'failed' }));
-          return { data: null, status: 'failed' };
         });
 
-        // Fetch OpenTable data with fallback
-        const openTablePromise = supabase.functions.invoke('opentable-reservation', {
-          body: {
-            name: restaurant.name,
-            latitude: restaurant.latitude,
-            longitude: restaurant.longitude,
-          }
-        }).then(res => {
-          if (res.error?.message?.includes('429') || res.error?.message?.includes('rate limit')) {
-            setApiStatus(prev => ({ ...prev, openTable: 'rate_limited' }));
-            return { data: null, status: 'rate_limited' };
-          }
-          setApiStatus(prev => ({ ...prev, openTable: res.data ? 'success' : 'failed' }));
-          return { data: res.data, status: res.data ? 'success' : 'failed' };
-        }).catch(() => {
-          setApiStatus(prev => ({ ...prev, openTable: 'failed' }));
-          return { data: null, status: 'failed' };
-        });
-
-        // Fetch menu data with fallback (MealMe primary, SerpAPI secondary)
-        const mealmePromise = supabase.functions.invoke('mealme-menu', {
-          body: {
-            restaurantName: restaurant.name,
-            address: restaurant.address,
-            latitude: restaurant.latitude,
-            longitude: restaurant.longitude,
-          }
-        }).catch(() => ({ data: null }));
-
-        const serpapiPromise = supabase.functions.invoke('serpapi-menu', {
-          body: {
-            restaurantName: restaurant.name,
-            address: restaurant.address,
-            latitude: restaurant.latitude,
-            longitude: restaurant.longitude,
-          }
-        }).catch(() => ({ data: null }));
-
-        const [googlePlacesResponse, yelpResult, openTableResult, mealmeResponse, serpapiResponse] = await Promise.all([
-          googlePlacesPromise,
-          yelpPromise, 
-          openTablePromise, 
-          mealmePromise, 
-          serpapiPromise
-        ]);
-
-        // Use Google Places verified data if available
-        const googleData = googlePlacesResponse.data?.verified ? googlePlacesResponse.data : null;
-
-        // Prioritize MealMe for menu data, fallback to SerpAPI
-        const menuData = mealmeResponse.data?.available 
-          ? mealmeResponse.data 
-          : serpapiResponse.data;
-
-        if (menuData?.available) {
-          setApiStatus(prev => ({ ...prev, menu: 'success' }));
-        } else {
-          setApiStatus(prev => ({ ...prev, menu: 'failed' }));
+        if (middlewareError) {
+          throw middlewareError;
         }
 
+        // Extract data from unified response
+        const { merged, sources } = middlewareData;
+
+        // Update API status based on source results
+        setApiStatus({
+          yelp: sources.yelp?.success ? 'success' : 
+                sources.yelp?.error?.includes('Rate limited') ? 'rate_limited' : 'failed',
+          openTable: sources.opentable?.success ? 'success' :
+                     sources.opentable?.error?.includes('Rate limited') ? 'rate_limited' : 'failed',
+          menu: sources.menu?.success ? 'success' :
+                sources.menu?.error?.includes('Rate limited') ? 'rate_limited' : 'failed',
+        });
+
+        // Structure data for component consumption
         const finalData = {
-          googlePlacesData: googleData,
-          yelpData: yelpResult.data,
-          openTableData: openTableResult.data,
-          serpapiData: menuData,
+          googlePlacesData: sources.google?.success ? {
+            verified: true,
+            latitude: merged.latitude,
+            longitude: merged.longitude,
+            address: merged.address,
+            phone: merged.phone,
+            googleRating: merged.googleRating,
+            place_id: merged.placeId,
+            website: merged.website,
+            photos: merged.photos,
+            isOpen: merged.isOpen,
+            priceLevel: merged.priceLevel,
+          } : null,
+          yelpData: sources.yelp?.success ? {
+            yelpId: merged.yelpId,
+            yelpUrl: merged.yelpUrl,
+            rating: merged.yelpRating,
+            reviewCount: merged.reviewCount,
+            reviews: merged.reviews,
+            phone: merged.phone,
+          } : null,
+          openTableData: sources.opentable?.success ? {
+            reservationUrl: merged.reservationUrl,
+            available: merged.openTableAvailable,
+          } : null,
+          serpapiData: sources.menu?.success ? {
+            available: merged.menuAvailable,
+            menuItems: merged.menuItems,
+            restaurantPhone: merged.phone,
+            restaurantWebsite: merged.website,
+            photos: merged.photos,
+          } : null,
         };
 
         setEnrichedData(finalData);
 
-        // Cache successful data
-        localStorage.setItem(cacheKey, JSON.stringify(finalData));
+        // Cache successful data with data freshness info
+        const cacheData = {
+          ...finalData,
+          _cached_at: Date.now(),
+          _sources: sources,
+          _last_updated: middlewareData.lastUpdated,
+        };
+        localStorage.setItem(cacheKey, JSON.stringify(cacheData));
         localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
+
+        console.log('Enrichment complete. Data freshness:', middlewareData.lastUpdated);
 
       } catch (err: any) {
         console.error('Error fetching enriched data:', err);
@@ -170,8 +143,10 @@ export const useRestaurantData = (restaurant: Restaurant, enabled: boolean = fal
         const cacheKey = `restaurant_${restaurant.id}`;
         const cachedData = localStorage.getItem(cacheKey);
         if (cachedData) {
-          setEnrichedData(JSON.parse(cachedData));
+          const parsed = JSON.parse(cachedData);
+          setEnrichedData(parsed);
           setApiStatus({ yelp: 'failed', openTable: 'failed', menu: 'failed' });
+          console.log('Using stale cached data as fallback');
         }
       } finally {
         setLoading(false);
