@@ -90,26 +90,43 @@ const RestaurantOrder = () => {
       
       if (hasMenu) return;
       
-      // No menu found - use enriched data or fall back gracefully
+      // No menu found - sync restaurant to database first, then extract
       try {
         setMenuExtracting(true);
-        console.log('[Menu] Checking for menu URL...');
+        console.log('[Menu] Syncing restaurant to database...');
         
-        // Use enriched mapsUrl if available, otherwise query database
-        let mapsUrl = enrichedRestaurant.mapsUrl;
-        
-        if (!mapsUrl) {
-          const { data: restaurantData } = await supabase
-            .from('restaurants')
-            .select('maps_url')
-            .eq('id', restaurant.id)
-            .single();
-          
-          mapsUrl = restaurantData?.maps_url;
+        // Sync restaurant to database (adds if missing, enriches with maps_url)
+        const { data: syncData, error: syncError } = await supabase.functions.invoke('sync-restaurant', {
+          body: {
+            restaurant: {
+              id: restaurant.id,
+              name: restaurant.name,
+              cuisine: restaurant.cuisine,
+              price: restaurant.price,
+              rating: restaurant.rating,
+              distance: restaurant.distance,
+              image: restaurant.image,
+              description: restaurant.description,
+              dietary: restaurant.dietary,
+              estimatedTime: restaurant.estimatedTime,
+              latitude: restaurant.latitude,
+              longitude: restaurant.longitude,
+              address: restaurant.address,
+              deals: restaurant.deals,
+            }
+          }
+        });
+
+        if (syncError) {
+          console.error('[Menu] Sync failed:', syncError);
+          setMenuExtracting(false);
+          return;
         }
 
+        const mapsUrl = syncData?.maps_url;
+
         if (!mapsUrl) {
-          console.log('[Menu] No URL available - skipping extraction');
+          console.log('[Menu] No URL available after sync - skipping extraction');
           setMenuExtracting(false);
           return;
         }
