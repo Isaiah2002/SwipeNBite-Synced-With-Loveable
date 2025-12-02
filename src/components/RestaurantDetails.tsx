@@ -8,8 +8,10 @@ import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { RestaurantMap } from '@/components/RestaurantMap';
+import { RestaurantHours } from '@/components/RestaurantHours';
 import { useMealPlanCheck } from '@/hooks/useMealPlanCheck';
 import { useRestaurantData } from '@/hooks/useRestaurantData';
+import { useRealtimeRestaurantStatus } from '@/hooks/useRealtimeRestaurantStatus';
 import { toast } from 'sonner';
 
 interface RestaurantDetailsProps {
@@ -19,6 +21,10 @@ interface RestaurantDetailsProps {
 export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) => {
   const { isOnMealPlan } = useMealPlanCheck(restaurant.id);
   const { enrichedRestaurant, loading, apiStatus } = useRestaurantData(restaurant, true);
+  const { status: realtimeStatus, refreshStatus, refreshing } = useRealtimeRestaurantStatus(
+    restaurant.id,
+    enrichedRestaurant.placeId
+  );
 
   const handleReservationClick = () => {
     if (enrichedRestaurant.reservationUrl) {
@@ -117,6 +123,17 @@ export const RestaurantDetails = memo(({ restaurant }: RestaurantDetailsProps) =
           )}
         </section>
       )}
+
+      {/* Hours and Status */}
+      <RestaurantHours
+        hours={realtimeStatus.hours}
+        isOpenNow={realtimeStatus.is_open_now}
+        status={realtimeStatus.status}
+        statusLastChecked={realtimeStatus.status_last_checked}
+        openingHours={realtimeStatus.opening_hours}
+        onRefresh={refreshStatus}
+        refreshing={refreshing}
+      />
 
       {/* Photos Gallery */}
       {restaurant.photos && restaurant.photos.length > 0 && (

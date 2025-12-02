@@ -65,3 +65,6 @@ verify_jwt = true
 
 [functions.meal-inspiration]
 verify_jwt = true
+
+[functions.update-restaurant-status]
+verify_jwt = false
