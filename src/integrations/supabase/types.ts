@@ -597,19 +597,24 @@ export type Database = {
         Row: {
           created_at: string
           cuisine: string
+          current_popularity: number | null
           deals: string | null
           description: string
           dietary: string[]
           distance: number
           estimated_time: number
+          estimated_wait_minutes: number | null
           google_rating: number | null
+          hours: Json | null
           id: string
           image: string
+          is_open_now: boolean | null
           last_synced_at: string | null
           latitude: number | null
           longitude: number | null
           maps_url: string | null
           name: string
+          opening_hours: string | null
           opentable_available: boolean | null
           photos: string[] | null
           place_id: string | null
@@ -617,6 +622,8 @@ export type Database = {
           rating: number
           reservation_url: string | null
           review_count: number | null
+          status: string | null
+          status_last_checked: string | null
           updated_at: string
           yelp_id: string | null
           yelp_rating: number | null
@@ -625,19 +632,24 @@ export type Database = {
         Insert: {
           created_at?: string
           cuisine: string
+          current_popularity?: number | null
           deals?: string | null
           description: string
           dietary?: string[]
           distance: number
           estimated_time: number
+          estimated_wait_minutes?: number | null
           google_rating?: number | null
+          hours?: Json | null
           id: string
           image: string
+          is_open_now?: boolean | null
           last_synced_at?: string | null
           latitude?: number | null
           longitude?: number | null
           maps_url?: string | null
           name: string
+          opening_hours?: string | null
           opentable_available?: boolean | null
           photos?: string[] | null
           place_id?: string | null
@@ -645,6 +657,8 @@ export type Database = {
           rating: number
           reservation_url?: string | null
           review_count?: number | null
+          status?: string | null
+          status_last_checked?: string | null
           updated_at?: string
           yelp_id?: string | null
           yelp_rating?: number | null
@@ -653,19 +667,24 @@ export type Database = {
         Update: {
           created_at?: string
           cuisine?: string
+          current_popularity?: number | null
           deals?: string | null
           description?: string
           dietary?: string[]
           distance?: number
           estimated_time?: number
+          estimated_wait_minutes?: number | null
           google_rating?: number | null
+          hours?: Json | null
           id?: string
           image?: string
+          is_open_now?: boolean | null
           last_synced_at?: string | null
           latitude?: number | null
           longitude?: number | null
           maps_url?: string | null
           name?: string
+          opening_hours?: string | null
           opentable_available?: boolean | null
           photos?: string[] | null
           place_id?: string | null
@@ -673,6 +692,8 @@ export type Database = {
           rating?: number
           reservation_url?: string | null
           review_count?: number | null
+          status?: string | null
+          status_last_checked?: string | null
           updated_at?: string
           yelp_id?: string | null
           yelp_rating?: number | null

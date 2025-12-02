@@ -287,7 +287,11 @@ const Index = () => {
       // Only show restaurants with addresses
       const hasAddress = Boolean(restaurant.address);
       
-      return matchesPrice && matchesRating && matchesDietary && matchesCuisine && notLiked && notRecentlyPassed && hasAddress;
+      // Exclude permanently closed restaurants
+      const isOperational = !restaurant.status || 
+        (restaurant.status !== 'closed_permanently' && restaurant.status !== 'closed_temporarily');
+      
+      return matchesPrice && matchesRating && matchesDietary && matchesCuisine && notLiked && notRecentlyPassed && hasAddress && isOperational;
     });
 
     const endTime = performance.now();

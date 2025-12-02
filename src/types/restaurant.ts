@@ -55,6 +55,17 @@ export interface Restaurant {
   menuItems?: MenuSection[];
   restaurantPhone?: string;
   restaurantWebsite?: string;
+  // Real-time status data
+  hours?: {
+    weekday_text?: string[];
+    periods?: any[];
+  };
+  is_open_now?: boolean;
+  opening_hours?: string;
+  estimated_wait_minutes?: number;
+  current_popularity?: number;
+  status?: string;
+  status_last_checked?: string;
 }
 
 export interface YelpReview {
