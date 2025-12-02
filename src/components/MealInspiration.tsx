@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
 import { useToast } from '@/hooks/use-toast';
-import { Sparkles, ChefHat, ThermometerSun, Clock } from 'lucide-react';
+import { Sparkles, ChefHat, ThermometerSun, Clock, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface MealSuggestion {
@@ -34,8 +34,25 @@ export const MealInspiration = () => {
   const [loading, setLoading] = useState(false);
   const [inspiration, setInspiration] = useState<InspirationResponse | null>(null);
 
-  const loadInspiration = async () => {
+  const loadInspiration = async (force = false) => {
     if (!user || !location) return;
+
+    // Check daily cache
+    const cacheKey = `meal-inspiration-${user.id}`;
+    const cachedData = localStorage.getItem(cacheKey);
+    const today = new Date().toDateString();
+
+    if (!force && cachedData) {
+      try {
+        const parsed = JSON.parse(cachedData);
+        if (parsed.date === today) {
+          setInspiration(parsed.data);
+          return;
+        }
+      } catch (e) {
+        // Invalid cache, continue to fetch
+      }
+    }
 
     setLoading(true);
     try {
@@ -49,6 +66,12 @@ export const MealInspiration = () => {
       if (error) throw error;
 
       setInspiration(data);
+      
+      // Cache for today
+      localStorage.setItem(cacheKey, JSON.stringify({
+        date: today,
+        data
+      }));
     } catch (error) {
       console.error('Error loading inspiration:', error);
       toast({
@@ -58,6 +81,49 @@ export const MealInspiration = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveRestaurant = async (restaurant: any) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase.from('liked_restaurants').insert({
+        user_id: user.id,
+        restaurant_id: restaurant.id,
+        restaurant_name: restaurant.name,
+        cuisine: restaurant.cuisine,
+        price: restaurant.price,
+        rating: restaurant.rating,
+        distance: restaurant.distance,
+        estimated_time: restaurant.estimated_time,
+        image: restaurant.image,
+        description: restaurant.description,
+        dietary: restaurant.dietary || [],
+        deals: restaurant.deals,
+        latitude: restaurant.latitude,
+        longitude: restaurant.longitude
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Saved!",
+        description: `${restaurant.name} added to your favorites`
+      });
+    } catch (error: any) {
+      if (error.code === '23505') {
+        toast({
+          title: "Already saved",
+          description: "This restaurant is already in your favorites"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Couldn't save restaurant",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -119,10 +185,12 @@ export const MealInspiration = () => {
                       {suggestion.restaurants.slice(0, 2).map((restaurant) => (
                         <div 
                           key={restaurant.id}
-                          className="flex items-center justify-between gap-2 p-2 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
-                          onClick={() => navigate(`/order/${restaurant.id}`)}
+                          className="flex items-center justify-between gap-2 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group"
                         >
-                          <div className="flex-1 min-w-0">
+                          <div 
+                            className="flex-1 min-w-0 cursor-pointer"
+                            onClick={() => navigate(`/order/${restaurant.id}`)}
+                          >
                             <p className="font-medium text-sm truncate">{restaurant.name}</p>
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                               <span>{restaurant.cuisine}</span>
@@ -132,9 +200,30 @@ export const MealInspiration = () => {
                               <span>⭐ {restaurant.rating}</span>
                             </div>
                           </div>
-                          <Button size="sm" variant="ghost">
-                            View
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSaveRestaurant(restaurant);
+                              }}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Heart className="w-4 h-4" />
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/order/${restaurant.id}`);
+                              }}
+                              className="h-8 px-2"
+                            >
+                              View
+                            </Button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -146,7 +235,7 @@ export const MealInspiration = () => {
         </div>
 
         <Button 
-          onClick={loadInspiration} 
+          onClick={() => loadInspiration(true)} 
           variant="outline" 
           className="w-full mt-4"
           disabled={loading}

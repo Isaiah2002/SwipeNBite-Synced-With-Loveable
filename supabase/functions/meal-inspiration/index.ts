@@ -135,6 +135,9 @@ async function generateSuggestions(params: any): Promise<MealSuggestion[]> {
   const dietaryRestrictions = profile?.dietary_restrictions || [];
   const pricePreference = profile?.price_preference || '$$';
 
+  // Get trending restaurants (last 7 days)
+  const trending = await getTrendingRestaurants(supabase);
+
   // Rule 1: Time-based suggestions
   const timeBased = getTimeBasedSuggestion(mealType, weather, favoriteCuisines[0]);
   if (timeBased) {
@@ -179,7 +182,17 @@ async function generateSuggestions(params: any): Promise<MealSuggestion[]> {
     }
   }
 
-  // Rule 3: Favorite-based suggestions
+  // Rule 3: Trending restaurants suggestion
+  if (trending.length > 0) {
+    suggestions.push({
+      mealType: 'Trending Now',
+      reason: 'What everyone is loving this week',
+      restaurants: trending.slice(0, 2),
+      confidence: 0.85
+    });
+  }
+
+  // Rule 4: Favorite-based suggestions
   if (favorites.length > 0) {
     const topCuisine = favoriteCuisines[0];
     const restaurants = await findRestaurants(supabase, {
@@ -201,7 +214,7 @@ async function generateSuggestions(params: any): Promise<MealSuggestion[]> {
     }
   }
 
-  // Rule 4: Fallback - Most popular nearby
+  // Rule 5: Fallback - Most popular nearby
   if (suggestions.length < 3) {
     const popular = await findRestaurants(supabase, {
       cuisine: null,
@@ -225,6 +238,50 @@ async function generateSuggestions(params: any): Promise<MealSuggestion[]> {
 
   // Return top 3-5 suggestions sorted by confidence
   return suggestions.sort((a, b) => b.confidence - a.confidence).slice(0, 5);
+}
+
+async function getTrendingRestaurants(supabase: any) {
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  
+  try {
+    // Get most liked restaurants in last 7 days
+    const { data: recentLikes, error } = await supabase
+      .from('liked_restaurants')
+      .select('restaurant_id, restaurant_name')
+      .gte('created_at', sevenDaysAgo.toISOString());
+    
+    if (error) throw error;
+    
+    // Count occurrences
+    const restaurantCounts: Record<string, { count: number; name: string }> = {};
+    recentLikes?.forEach((like: any) => {
+      if (!restaurantCounts[like.restaurant_id]) {
+        restaurantCounts[like.restaurant_id] = { count: 0, name: like.restaurant_name };
+      }
+      restaurantCounts[like.restaurant_id].count++;
+    });
+    
+    // Get top trending restaurant IDs
+    const trendingIds = Object.entries(restaurantCounts)
+      .sort(([, a], [, b]) => b.count - a.count)
+      .slice(0, 3)
+      .map(([id]) => id);
+    
+    if (trendingIds.length === 0) return [];
+    
+    // Fetch full restaurant details
+    const { data: trendingRestaurants } = await supabase
+      .from('restaurants')
+      .select('*')
+      .in('id', trendingIds)
+      .not('address', 'is', null);
+    
+    return trendingRestaurants || [];
+  } catch (error) {
+    console.error('Error getting trending restaurants:', error);
+    return [];
+  }
 }
 
 function extractFavoriteCuisines(favorites: any[], swipes: any[]): string[] {
