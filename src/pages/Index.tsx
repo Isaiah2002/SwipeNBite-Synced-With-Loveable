@@ -20,6 +20,7 @@ import { OfflineIndicator } from '@/components/OfflineIndicator';
 import { BudgetAlert } from '@/components/BudgetAlert';
 import { ConsentBanner } from '@/components/ConsentBanner';
 import { RestaurantCardSkeleton } from '@/components/RestaurantCardSkeleton';
+import { MealInspiration } from '@/components/MealInspiration';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Heart, RotateCcw, LogOut, User, Search, MapPin } from 'lucide-react';
@@ -678,6 +679,9 @@ const Index = () => {
       {/* Main Content */}
       <main className="flex-1 p-4 pt-2" role="main" aria-label="Restaurant discovery">
         <div className="max-w-md mx-auto space-y-4">
+          
+          {/* Meal Inspiration */}
+          <MealInspiration />
           
           {/* Cards Stack */}
           <div className="relative h-[660px] flex items-center justify-center">
