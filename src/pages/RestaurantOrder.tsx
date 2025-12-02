@@ -2,7 +2,7 @@ import { ArrowLeft, Star, MapPin, Clock, Plus, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useParams } from 'react-router-dom';
 import { restaurants } from '@/data/restaurants';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { MenuItem, Restaurant } from '@/types/restaurant';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,6 +18,7 @@ const RestaurantOrder = () => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
   const [menuExtracting, setMenuExtracting] = useState(false);
+  const extractionAttemptedRef = useRef(false);
 
   // Fetch restaurant data - try liked_restaurants first, but always merge with static menu data
   useEffect(() => {
@@ -89,6 +90,12 @@ const RestaurantOrder = () => {
                      (restaurant.menu && restaurant.menu.length > 0);
       
       if (hasMenu) return;
+
+      // Ensure we only attempt extraction once per mount
+      if (extractionAttemptedRef.current) {
+        return;
+      }
+      extractionAttemptedRef.current = true;
       
       // No menu found - sync restaurant to database first, then extract
       try {
@@ -119,7 +126,6 @@ const RestaurantOrder = () => {
 
         if (syncError) {
           console.error('[Menu] Sync failed:', syncError);
-          setMenuExtracting(false);
           return;
         }
 
@@ -127,7 +133,6 @@ const RestaurantOrder = () => {
 
         if (!mapsUrl) {
           console.log('[Menu] No URL available after sync - skipping extraction');
-          setMenuExtracting(false);
           return;
         }
 
@@ -143,23 +148,33 @@ const RestaurantOrder = () => {
 
         if (error) {
           console.error('[Menu] Extraction failed:', error);
+          toast({
+            title: "Menu unavailable",
+            description: "Menu provider is rate limiting. Please try again later.",
+            variant: "destructive",
+          });
         } else {
           console.log('[Menu] Extraction complete');
           toast({
             title: "Menu loaded",
-            description: "Restaurant menu has been extracted."
+            description: "Restaurant menu has been extracted.",
           });
           window.location.reload();
         }
       } catch (error) {
         console.error('[Menu] Error:', error);
+        toast({
+          title: "Menu unavailable",
+          description: "Unable to load menu right now. Please try again later.",
+          variant: "destructive",
+        });
       } finally {
         setMenuExtracting(false);
       }
     };
 
     checkAndExtractMenu();
-  }, [restaurant, enrichedRestaurant, menuLoading]);
+  }, [restaurant, enrichedRestaurant, menuLoading, toast]);
 
   if (loading) {
     return (
